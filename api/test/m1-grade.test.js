@@ -291,4 +291,35 @@ describe('M1 — grade de atividades', () => {
     assert.equal((await pedir('GET', '/atividades/atv_00000000')).status, 404);
     assert.equal((await pedir('GET', `/atividades/${res.corpo.id}`)).status, 200);
   });
+
+  // Fatia 2 — regras de criação.
+  const encontroEm = (dia, das, ate) => ({
+    inicio: `2026-10-${dia}T${das}:00-03:00`,
+    fim: `2026-10-${dia}T${ate}:00-03:00`,
+  });
+  const esperarErro = (res, status, erro) => {
+    assert.equal(res.status, status, JSON.stringify(res.corpo));
+    assert.equal(res.corpo.erro, erro);
+    assert.equal(typeof res.corpo.mensagem, 'string');
+  };
+
+  it('R16: palestra exige exatamente 1 encontro e minicurso de 2 a 5, senão 422 QUANTIDADE_DE_ENCONTROS', async () => {
+    const minicurso = (encontros) => ({ titulo: 'Flutter do zero', tipo: 'minicurso', salaId: 'lab-3', vagas: 20, encontros });
+    const cincoDias = ['19', '20', '21', '22', '23'].map((dia) => encontroEm(dia, '19:00', '21:00'));
+
+    esperarErro(await pedir('POST', '/atividades', {
+      corpo: { ...palestraValida(), encontros: [encontroEm('19', '19:00', '21:00'), encontroEm('20', '19:00', '21:00')] },
+    }), 422, 'QUANTIDADE_DE_ENCONTROS');
+    esperarErro(await pedir('POST', '/atividades', { corpo: { ...palestraValida(), encontros: [] } }),
+      422, 'QUANTIDADE_DE_ENCONTROS');
+    esperarErro(await pedir('POST', '/atividades', { corpo: minicurso([encontroEm('19', '19:00', '21:00')]) }),
+      422, 'QUANTIDADE_DE_ENCONTROS');
+    esperarErro(await pedir('POST', '/atividades', {
+      corpo: minicurso([...cincoDias, encontroEm('19', '08:00', '10:00')]),
+    }), 422, 'QUANTIDADE_DE_ENCONTROS');
+
+    const comCinco = await pedir('POST', '/atividades', { corpo: minicurso(cincoDias) });
+    assert.equal(comCinco.status, 201);
+    assert.equal(comCinco.corpo.encontros.length, 5);
+  });
 });

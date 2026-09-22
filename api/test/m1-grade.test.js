@@ -244,4 +244,29 @@ describe('M1 — grade de atividades', () => {
   it('R14: POST /atividades com salaId que não existe responde 422 DADOS_INVALIDOS, não 404', async () => {
     esperarDadosInvalidos(await pedir('POST', '/atividades', { corpo: { ...palestraValida(), salaId: 'sala-999' } }));
   });
+
+  it('R15: títulos repetidos são aceitos e o título não tem tamanho máximo', async () => {
+    const primeira = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(primeira.status, 201);
+    const repetida = await pedir('POST', '/atividades', {
+      corpo: {
+        ...palestraValida(),
+        encontros: [{ inicio: '2026-10-20T19:00:00-03:00', fim: '2026-10-20T21:00:00-03:00' }],
+      },
+    });
+    assert.equal(repetida.status, 201);
+    assert.equal(repetida.corpo.titulo, 'IA hoje');
+    assert.notEqual(repetida.corpo.id, primeira.corpo.id);
+
+    const tituloLongo = 'a'.repeat(1000);
+    const longa = await pedir('POST', '/atividades', {
+      corpo: {
+        ...palestraValida(),
+        titulo: tituloLongo,
+        encontros: [{ inicio: '2026-10-21T19:00:00-03:00', fim: '2026-10-21T21:00:00-03:00' }],
+      },
+    });
+    assert.equal(longa.status, 201);
+    assert.equal(longa.corpo.titulo, tituloLongo);
+  });
 });

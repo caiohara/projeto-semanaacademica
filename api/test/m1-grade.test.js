@@ -364,4 +364,19 @@ describe('M1 — grade de atividades', () => {
     const ultimoDia = await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('23', '19:00', '21:00')) });
     assert.equal(ultimoDia.status, 201);
   });
+
+  it('R20: encontros da mesma atividade que se sobrepõem respondem 422 ENCONTRO_INVALIDO; encostar é aceito', async () => {
+    const minicurso = (encontros) => ({ titulo: 'Flutter do zero', tipo: 'minicurso', salaId: 'lab-3', vagas: 20, encontros });
+
+    esperarErro(await pedir('POST', '/atividades', {
+      corpo: minicurso([encontroEm('19', '19:00', '21:00'), encontroEm('19', '20:00', '22:00')]),
+    }), 422, 'ENCONTRO_INVALIDO');
+
+    // Encostar não é sobreposição nem conflito de sala da atividade consigo mesma.
+    const encostados = await pedir('POST', '/atividades', {
+      corpo: minicurso([encontroEm('19', '19:00', '21:00'), encontroEm('19', '21:00', '23:00')]),
+    });
+    assert.equal(encostados.status, 201);
+    assert.equal(encostados.corpo.encontros.length, 2);
+  });
 });

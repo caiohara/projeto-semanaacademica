@@ -36,4 +36,11 @@ export function validarCriacao({ tipo, encontros }) {
       throw encontroInvalido(`os encontros ficam entre ${EVENTO.inicio} e ${EVENTO.fim}`);
     }
   }
+  // R20: intervalo aberto — fim de um igual ao inicio do outro não sobrepõe.
+  const emOrdem = [...encontros].sort((a, b) => a.inicioMs - b.inicioMs);
+  for (let i = 1; i < emOrdem.length; i++) {
+    if (emOrdem[i].inicioMs < emOrdem[i - 1].fimMs) {
+      throw encontroInvalido('dois encontros da mesma atividade se sobrepõem');
+    }
+  }
 }

@@ -10,3 +10,4 @@
 - Nunca editar um teste existente para ele passar.
 - Comandos do projeto.json precisam rodar no Linux: nada de sintaxe de shell do Windows.
 - Um módulo por pasta: api/src/modulos/m1-grade, m2-inscricoes, m3-presenca.
+- O middleware de autenticação (api/src/autenticacao.js) deixa /_teste/* de fora (contrato §1); toda rota pública nova, como GET /certificados/:codigo do M4, precisa ser excluída explicitamente nele.

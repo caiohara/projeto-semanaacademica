@@ -6,6 +6,12 @@ import { ErroDaApi } from '../../erros.js';
 
 const novoId = (prefixo) => `${prefixo}_${randomBytes(4).toString('hex')}`;
 
+// R10: instantes saem no fuso de Brasília, -03:00 (sem horário de verão em 2026).
+const TRES_HORAS_MS = 3 * 60 * 60 * 1000;
+function emBrasilia(ms) {
+  return `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 19)}-03:00`;
+}
+
 export function rotasDaGrade({ db }) {
   const rotas = Router();
 
@@ -55,7 +61,11 @@ function lerAtividade(db, id) {
     tipo: a.tipo,
     salaId: a.sala_id,
     vagas: a.vagas,
-    encontros: encontros.map((e) => ({ id: e.id, inicio: e.inicio, fim: e.fim })),
+    encontros: encontros.map((e) => ({
+      id: e.id,
+      inicio: emBrasilia(e.inicio_ms),
+      fim: emBrasilia(e.fim_ms),
+    })),
     // R6: soma exata em minutos; pode ter fração quando os instantes têm segundos.
     cargaHorariaMinutos: encontros.reduce((soma, e) => soma + (e.fim_ms - e.inicio_ms), 0) / 60000,
     // Fatia 1: sem relógio (R7) nem inscrições do M2 (R8), a atividade nasce prevista e vazia.

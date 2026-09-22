@@ -120,4 +120,23 @@ describe('M1 — grade de atividades', () => {
     const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`);
     assert.equal(lida.corpo.cargaHorariaMinutos, 89.5);
   });
+
+  it('R10: instantes na resposta usam o fuso -03:00', async () => {
+    const res = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'IA hoje',
+        tipo: 'palestra',
+        salaId: 'sala-101',
+        vagas: 40,
+        encontros: [{ inicio: '2026-10-19T22:00:00Z', fim: '2026-10-20T00:00:00Z' }],
+      },
+    });
+    assert.equal(res.status, 201);
+    assert.equal(res.corpo.encontros[0].inicio, '2026-10-19T19:00:00-03:00');
+    assert.equal(res.corpo.encontros[0].fim, '2026-10-19T21:00:00-03:00');
+
+    const lida = await pedir('GET', `/atividades/${res.corpo.id}`);
+    assert.equal(lida.corpo.encontros[0].inicio, '2026-10-19T19:00:00-03:00');
+    assert.equal(lida.corpo.encontros[0].fim, '2026-10-19T21:00:00-03:00');
+  });
 });

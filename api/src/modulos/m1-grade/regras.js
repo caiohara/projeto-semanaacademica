@@ -17,7 +17,7 @@ const diaEmBrasilia = (ms) => new Date(ms - TRES_HORAS_MS).toISOString().slice(0
 
 const encontroInvalido = (mensagem) => new ErroDaApi(422, 'ENCONTRO_INVALIDO', mensagem);
 
-export function validarCriacao({ tipo, encontros }) {
+export function validarCriacao({ tipo, vagas, encontros }, sala) {
   const [minimo, maximo] = QUANTIDADE[tipo];
   if (encontros.length < minimo || encontros.length > maximo) {
     throw new ErroDaApi(422, 'QUANTIDADE_DE_ENCONTROS', `${tipo} precisa de ${minimo} a ${maximo} encontro(s)`);
@@ -42,5 +42,9 @@ export function validarCriacao({ tipo, encontros }) {
     if (emOrdem[i].inicioMs < emOrdem[i - 1].fimMs) {
       throw encontroInvalido('dois encontros da mesma atividade se sobrepõem');
     }
+  }
+  // R21: vagas igual à capacidade é aceito.
+  if (vagas > sala.capacidade) {
+    throw new ErroDaApi(422, 'VAGAS_ACIMA_DA_CAPACIDADE', `a sala comporta ${sala.capacidade} pessoas`);
   }
 }

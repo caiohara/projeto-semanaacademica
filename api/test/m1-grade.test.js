@@ -379,4 +379,13 @@ describe('M1 — grade de atividades', () => {
     assert.equal(encostados.status, 201);
     assert.equal(encostados.corpo.encontros.length, 2);
   });
+
+  it('R21: POST com vagas acima da capacidade da sala responde 422 VAGAS_ACIMA_DA_CAPACIDADE; igual é aceito', async () => {
+    const noLab = (vagas, dia) => ({ ...palestraValida(), salaId: 'lab-3', vagas, encontros: [encontroEm(dia, '19:00', '21:00')] });
+
+    const igual = await pedir('POST', '/atividades', { corpo: noLab(20, '19') });
+    assert.equal(igual.status, 201);
+    assert.equal(igual.corpo.vagas, 20);
+    esperarErro(await pedir('POST', '/atividades', { corpo: noLab(21, '20') }), 422, 'VAGAS_ACIMA_DA_CAPACIDADE');
+  });
 });

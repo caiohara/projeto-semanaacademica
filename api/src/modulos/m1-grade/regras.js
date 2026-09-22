@@ -2,6 +2,8 @@ import { EVENTO } from '../../dados-iniciais.js';
 import { ErroDaApi } from '../../erros.js';
 
 // Regras de criação do POST /atividades (R16–R23), depois da forma do corpo (R12–R14).
+// R23: a ordem das checagens abaixo é a precedência — QUANTIDADE_DE_ENCONTROS →
+// ENCONTRO_INVALIDO → VAGAS_ACIMA_DA_CAPACIDADE → CONFLITO_DE_SALA.
 
 // R16: palestra tem exatamente 1 encontro; minicurso, de 2 a 5.
 const QUANTIDADE = { palestra: [1, 1], minicurso: [2, 5] };

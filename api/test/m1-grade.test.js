@@ -401,4 +401,18 @@ describe('M1 — grade de atividades', () => {
     esperarErro(await pedir('POST', '/atividades', { corpo: naSala('sala-101', '18:00', '19:00') }), 409, 'CONFLITO_DE_SALA');
     assert.equal((await pedir('POST', '/atividades', { corpo: naSala('sala-102', '19:00', '21:00') })).status, 201);
   });
+
+  it('R23: precedência no POST — QUANTIDADE_DE_ENCONTROS, ENCONTRO_INVALIDO, VAGAS_ACIMA_DA_CAPACIDADE, CONFLITO_DE_SALA', async () => {
+    assert.equal((await pedir('POST', '/atividades', { corpo: palestraValida() })).status, 201);
+
+    esperarErro(await pedir('POST', '/atividades', {
+      corpo: { ...palestraValida(), vagas: 41, encontros: [encontroEm('19', '19:00', '19:30'), encontroEm('18', '19:00', '21:00')] },
+    }), 422, 'QUANTIDADE_DE_ENCONTROS');
+    esperarErro(await pedir('POST', '/atividades', {
+      corpo: { ...palestraValida(), vagas: 41, encontros: [encontroEm('19', '19:00', '19:30')] },
+    }), 422, 'ENCONTRO_INVALIDO');
+    esperarErro(await pedir('POST', '/atividades', {
+      corpo: { ...palestraValida(), vagas: 41, encontros: [encontroEm('19', '19:00', '21:00')] },
+    }), 422, 'VAGAS_ACIMA_DA_CAPACIDADE');
+  });
 });

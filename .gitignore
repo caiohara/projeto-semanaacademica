@@ -1,0 +1,20 @@
+# dependências e builds das stacks mais comuns
+node_modules/
+.dart_tool/
+build/
+dist/
+target/
+__pycache__/
+.venv/
+*.pyc
+
+# banco de dados local
+*.sqlite
+*.sqlite3
+*.db
+
+# segredos
+.env
+
+# dependências que o próprio OpenCode instala
+.opencode/node_modules/

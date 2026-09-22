@@ -1,0 +1,9 @@
+{
+  "stack": "PREENCHER — linguagem e framework da API; tipo e framework da interface",
+  "api": {
+    "pasta": "api",
+    "instalar": "PREENCHER — por exemplo: npm install",
+    "iniciar": "PREENCHER — por exemplo: npm start"
+  },
+  "testes": []
+}

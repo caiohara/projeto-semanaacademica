@@ -352,4 +352,16 @@ describe('M1 — grade de atividades', () => {
       corpo: { ...palestraValida(), encontros: [{ inicio: '2026-10-20T02:00:00Z', fim: '2026-10-20T04:00:00Z' }] },
     }), 422, 'ENCONTRO_INVALIDO');
   });
+
+  it('R19: encontro fora de 19/10/2026 a 23/10/2026 responde 422 ENCONTRO_INVALIDO', async () => {
+    const palestraCom = (encontro) => ({ ...palestraValida(), encontros: [encontro] });
+
+    esperarErro(await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('18', '19:00', '21:00')) }),
+      422, 'ENCONTRO_INVALIDO');
+    esperarErro(await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('24', '19:00', '21:00')) }),
+      422, 'ENCONTRO_INVALIDO');
+
+    const ultimoDia = await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('23', '19:00', '21:00')) });
+    assert.equal(ultimoDia.status, 201);
+  });
 });

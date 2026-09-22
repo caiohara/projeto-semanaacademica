@@ -1,3 +1,4 @@
+import { EVENTO } from '../../dados-iniciais.js';
 import { ErroDaApi } from '../../erros.js';
 
 // Regras de criação do POST /atividades (R16–R23), depois da forma do corpo (R12–R14).
@@ -28,6 +29,11 @@ export function validarCriacao({ tipo, encontros }) {
     }
     if (diaEmBrasilia(inicioMs) !== diaEmBrasilia(fimMs)) {
       throw encontroInvalido('cada encontro começa e termina no mesmo dia (horário de Brasília)');
+    }
+    // R19: só dentro da semana do evento; as datas AAAA-MM-DD comparam como texto.
+    const dia = diaEmBrasilia(inicioMs);
+    if (dia < EVENTO.inicio || dia > EVENTO.fim) {
+      throw encontroInvalido(`os encontros ficam entre ${EVENTO.inicio} e ${EVENTO.fim}`);
     }
   }
 }

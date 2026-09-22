@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { Router } from 'express';
+import { ErroDaApi } from '../../erros.js';
 
 // M1 — Grade de atividades (specs/M1-grade.md).
 
@@ -34,11 +35,16 @@ export function rotasDaGrade({ db }) {
     res.status(201).json(lerAtividade(db, id));
   });
 
+  rotas.get('/atividades/:id', (req, res) => {
+    res.json(lerAtividade(db, req.params.id));
+  });
+
   return rotas;
 }
 
 function lerAtividade(db, id) {
   const a = db.prepare('SELECT id, titulo, tipo, sala_id, vagas FROM atividades WHERE id = ?').get(id);
+  if (!a) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${id} não existe`);
   // R5: encontros sempre em ordem de inicio.
   const encontros = db.prepare(
     'SELECT id, inicio, fim FROM encontros WHERE atividade_id = ? ORDER BY inicio_ms, id',
@@ -50,5 +56,10 @@ function lerAtividade(db, id) {
     salaId: a.sala_id,
     vagas: a.vagas,
     encontros: encontros.map((e) => ({ id: e.id, inicio: e.inicio, fim: e.fim })),
+    // Fatia 1: sem relógio (R7) nem inscrições do M2 (R8), a atividade nasce prevista e vazia.
+    situacao: 'prevista',
+    ocupadas: 0,
+    vagasRestantes: a.vagas,
+    emEspera: 0,
   };
 }

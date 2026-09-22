@@ -79,6 +79,19 @@
 
 ---
 
+## Rodada de revisão da spec
+
+Perguntas abertas ao escrever `specs/M3-presenca.md`, respondidas pelo grupo em 2026-09-22.
+
+### Técnica / contrato
+
+| # | Pergunta | Resposta | Fonte |
+|---|---|---|---|
+| P-26 | Campo desconhecido no corpo da presença manual: `DADOS_INVALIDOS`, como no QR (P-13), ou é ignorado? | `DADOS_INVALIDOS`, mesmo comportamento do QR (R20 da spec). | Decisão do grupo; mesma regra do M1 P-19. |
+| P-27 | A `justificativa` da presença manual é guardada como veio ou já com o trim da P-09? | Guardada exatamente como veio, sem trim. O trim serve só para validar o mínimo de 10 caracteres (R22 da spec) e não altera o valor gravado. | Decisão do grupo. |
+
+---
+
 ## Encerramento
 
 Entrevista encerrada em 2026-09-22, depois da rodada 2. As pendentes foram respondidas no mesmo dia com base no documento de requisitos, e os conflitos entre respostas foram resolvidos (P-07 × P-11 e P-02 × P-25). Não há decisão em aberto. Próximo passo: a spec (`to-spec`).
@@ -101,6 +114,8 @@ Entrevista encerrada em 2026-09-22, depois da rodada 2. As pendentes foram respo
 | P-23 | Índice único (`encontroId`, `participanteId`); 201 insere, 200 devolve a existente | Decisão do grupo; detalhe do 200 depende da P-07 |
 | P-24 | Testes do M3 montam o cenário pelas rotas públicas; ordem M1 → M2 → M3 | Decisão do grupo |
 | P-25 | Janelas do código contadas a partir do epoch Unix, alinhadas ao relógio (revisada; prevalece a P-02) | RN-303, RN-304 |
+| P-26 | Campo desconhecido no corpo da manual → `DADOS_INVALIDOS` (revisão da spec) | Decisão do grupo (regra do M1 P-19) |
+| P-27 | `justificativa` guardada como veio, sem trim; trim só na validação dos 10 caracteres (revisão da spec) | Decisão do grupo |
 
 ## Pendentes (consultar requisitos)
 

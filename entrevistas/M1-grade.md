@@ -91,6 +91,17 @@
 
 ---
 
+## Rodada 4 (fechamento dos pontos abertos pela spec)
+
+| # | Pergunta | Resposta | Fonte |
+|---|---|---|---|
+| P-32 | Campo desconhecido ou `id` no corpo do `POST /atividades`: o que acontece? | Mesmo comportamento do PATCH (P-19): campo desconhecido → `DADOS_INVALIDOS`. `id` no corpo → ignorado em silêncio, porque o id é gerado pelo servidor e não faz parte da entrada. Qualquer outro campo fora de `{titulo, tipo, salaId, vagas, encontros}` → `DADOS_INVALIDOS`, inclusive os calculados (`situacao`, `ocupadas`, `emEspera`, `vagasRestantes`, `cargaHorariaMinutos`). | Decisão do grupo (rodada 4), mesma regra do PATCH (P-19). |
+| P-33 | Encontros da mesma atividade que se encostam (`fim` de um = `inicio` do outro) contam como sobreposição para `ENCONTRO_INVALIDO`? | Não. A sobreposição é de intervalo aberto: dois encontros que só se tocam num instante são aceitos. O intervalo de 15 min (P-04) é só para a mesma sala, não para encontros da mesma atividade. | Decisão do grupo (rodada 4). |
+| P-34 | "Começa e termina no mesmo dia" (P-02) usa qual calendário? | Calendário de Brasília (`-03:00`). | Decisão do grupo (rodada 4), coerente com P-20. |
+| P-35 | `cargaHorariaMinutos` pode ter fração (encontros com segundos, P-30)? | Sim. O contrato mostra inteiros nos exemplos mas não proíbe fração, e a P-11 diz soma exata. | P-11, P-30; decisão do grupo (rodada 4). |
+
+---
+
 ## Encerramento
 
 Entrevista encerrada em 2026-09-22, depois da rodada 3. O que ainda falta decidir depende do documento de requisitos. Quando as pendentes forem respondidas, a coluna Fonte recebe o RN correspondente. Depois disso vem a spec (`to-spec`).
@@ -113,6 +124,10 @@ Consulta ao documento de requisitos feita em 2026-09-22: todas as pendentes fora
 | P-28 | `GET /salas` na ordem da tabela de dados iniciais | Contrato §4 |
 | P-29 | Qualquer pessoa da organização altera e cancela qualquer atividade | Decisão do grupo; sem código no contrato |
 | P-31 | Corpo do `POST /atividades/:id/cancelamento` é ignorado | Decisão do grupo |
+| P-32 | POST: `id` no corpo é ignorado; qualquer outro campo fora da entrada (inclusive calculados) → `DADOS_INVALIDOS` | Decisão do grupo (regra da P-19) |
+| P-33 | Encontros da mesma atividade que só se encostam não se sobrepõem | Decisão do grupo |
+| P-34 | "Mesmo dia" pelo calendário de Brasília | Decisão do grupo; coerente com P-20 |
+| P-35 | `cargaHorariaMinutos` pode ter fração | P-11, P-30; decisão do grupo |
 
 ## Respondidas (consulta aos requisitos)
 

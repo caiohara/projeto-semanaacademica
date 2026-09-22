@@ -322,4 +322,24 @@ describe('M1 — grade de atividades', () => {
     assert.equal(comCinco.status, 201);
     assert.equal(comCinco.corpo.encontros.length, 5);
   });
+
+  it('R17: encontro com menos de 60 ou mais de 240 minutos responde 422 ENCONTRO_INVALIDO; 60 e 240 são aceitos', async () => {
+    const palestraCom = (encontro) => ({ ...palestraValida(), encontros: [encontro] });
+
+    esperarErro(await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('19', '19:00', '19:59')) }),
+      422, 'ENCONTRO_INVALIDO');
+    esperarErro(await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('19', '14:00', '18:01')) }),
+      422, 'ENCONTRO_INVALIDO');
+    esperarErro(await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('19', '19:00', '19:00')) }),
+      422, 'ENCONTRO_INVALIDO');
+    esperarErro(await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('19', '21:00', '19:00')) }),
+      422, 'ENCONTRO_INVALIDO');
+
+    const sessenta = await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('19', '19:00', '20:00')) });
+    assert.equal(sessenta.status, 201);
+    assert.equal(sessenta.corpo.cargaHorariaMinutos, 60);
+    const duzentosEQuarenta = await pedir('POST', '/atividades', { corpo: palestraCom(encontroEm('20', '14:00', '18:00')) });
+    assert.equal(duzentosEQuarenta.status, 201);
+    assert.equal(duzentosEQuarenta.corpo.cargaHorariaMinutos, 240);
+  });
 });

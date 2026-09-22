@@ -4,10 +4,22 @@ import { ErroDaApi } from '../../erros.js';
 
 // R16: palestra tem exatamente 1 encontro; minicurso, de 2 a 5.
 const QUANTIDADE = { palestra: [1, 1], minicurso: [2, 5] };
+const MINUTO_MS = 60 * 1000;
+// R17: duração de 60 a 240 minutos, inclusive; fim ≤ inicio fica abaixo do mínimo.
+const DURACAO_MIN_MS = 60 * MINUTO_MS;
+const DURACAO_MAX_MS = 240 * MINUTO_MS;
+
+const encontroInvalido = (mensagem) => new ErroDaApi(422, 'ENCONTRO_INVALIDO', mensagem);
 
 export function validarCriacao({ tipo, encontros }) {
   const [minimo, maximo] = QUANTIDADE[tipo];
   if (encontros.length < minimo || encontros.length > maximo) {
     throw new ErroDaApi(422, 'QUANTIDADE_DE_ENCONTROS', `${tipo} precisa de ${minimo} a ${maximo} encontro(s)`);
+  }
+  for (const { inicioMs, fimMs } of encontros) {
+    const duracao = fimMs - inicioMs;
+    if (duracao < DURACAO_MIN_MS || duracao > DURACAO_MAX_MS) {
+      throw encontroInvalido('cada encontro dura de 60 a 240 minutos');
+    }
   }
 }

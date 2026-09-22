@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { Router } from 'express';
+import { somenteOrganizacao } from '../../autenticacao.js';
 import { dadosInvalidos, ErroDaApi } from '../../erros.js';
 import { lerNovaAtividade } from './validacao.js';
 
@@ -23,7 +24,7 @@ export function rotasDaGrade({ db }) {
     res.json(db.prepare('SELECT id, nome, capacidade FROM salas ORDER BY rowid').all());
   });
 
-  rotas.post('/atividades', (req, res) => {
+  rotas.post('/atividades', somenteOrganizacao, (req, res) => {
     const { titulo, tipo, salaId, vagas, encontros } = lerNovaAtividade(req.body);
     // R14: sala inexistente é dado inválido do corpo, não 404.
     if (!db.prepare('SELECT 1 FROM salas WHERE id = ?').get(salaId)) {

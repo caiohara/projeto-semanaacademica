@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { Router } from 'express';
-import { ErroDaApi } from '../../erros.js';
+import { dadosInvalidos, ErroDaApi } from '../../erros.js';
 import { lerNovaAtividade } from './validacao.js';
 
 // M1 — Grade de atividades (specs/M1-grade.md).
@@ -25,6 +25,10 @@ export function rotasDaGrade({ db }) {
 
   rotas.post('/atividades', (req, res) => {
     const { titulo, tipo, salaId, vagas, encontros } = lerNovaAtividade(req.body);
+    // R14: sala inexistente é dado inválido do corpo, não 404.
+    if (!db.prepare('SELECT 1 FROM salas WHERE id = ?').get(salaId)) {
+      throw dadosInvalidos(`a sala ${salaId} não existe`);
+    }
     const id = novoId('atv');
     db.exec('BEGIN');
     try {

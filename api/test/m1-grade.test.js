@@ -240,4 +240,8 @@ describe('M1 — grade de atividades', () => {
     };
     esperarDadosInvalidos(await pedir('POST', '/atividades', { corpo }));
   });
+
+  it('R14: POST /atividades com salaId que não existe responde 422 DADOS_INVALIDOS, não 404', async () => {
+    esperarDadosInvalidos(await pedir('POST', '/atividades', { corpo: { ...palestraValida(), salaId: 'sala-999' } }));
+  });
 });

@@ -1,6 +1,7 @@
 import { dadosInvalidos, lerInstante } from '../../erros.js';
 
 const TIPOS = ['palestra', 'minicurso'];
+const CAMPOS_DO_ENCONTRO = ['inicio', 'fim'];
 
 const ehObjeto = (valor) => typeof valor === 'object' && valor !== null && !Array.isArray(valor);
 
@@ -25,6 +26,9 @@ export function lerNovaAtividade(corpo) {
     vagas,
     encontros: encontros.map((encontro, i) => {
       if (!ehObjeto(encontro)) throw dadosInvalidos(`encontros[${i}] precisa ser um objeto`);
+      // R13: o encontro só tem inicio e fim; o id é gerado pelo servidor.
+      const extra = Object.keys(encontro).find((campo) => !CAMPOS_DO_ENCONTRO.includes(campo));
+      if (extra) throw dadosInvalidos(`encontros[${i}].${extra} não é aceito`);
       return {
         inicio: encontro.inicio,
         fim: encontro.fim,

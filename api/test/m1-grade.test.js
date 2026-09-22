@@ -232,4 +232,12 @@ describe('M1 — grade de atividades', () => {
     });
     esperarDadosInvalidos({ status: res.status, corpo: await res.json() });
   });
+
+  it('R13: POST /atividades com campo extra dentro de um encontro responde 422 DADOS_INVALIDOS', async () => {
+    const corpo = {
+      ...palestraValida(),
+      encontros: [{ id: 'enc_00000000', inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T21:00:00-03:00' }],
+    };
+    esperarDadosInvalidos(await pedir('POST', '/atividades', { corpo }));
+  });
 });

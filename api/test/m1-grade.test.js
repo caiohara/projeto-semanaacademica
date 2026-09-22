@@ -34,4 +34,28 @@ describe('M1 — grade de atividades', () => {
       { id: 'lab-3', nome: 'Laboratório 3', capacidade: 20 },
     ]);
   });
+
+  it('R5: encontros enviados fora de ordem são aceitos e saem ordenados por inicio', async () => {
+    const res = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'Flutter do zero',
+        tipo: 'minicurso',
+        salaId: 'lab-3',
+        vagas: 20,
+        encontros: [
+          { inicio: '2026-10-20T19:00:00-03:00', fim: '2026-10-20T22:00:00-03:00' },
+          { inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' },
+        ],
+      },
+    });
+    assert.equal(res.status, 201);
+    assert.match(res.corpo.id, /^atv_[0-9a-f]{8}$/);
+    assert.equal(res.corpo.encontros.length, 2);
+    assert.equal(Date.parse(res.corpo.encontros[0].inicio), Date.parse('2026-10-19T19:00:00-03:00'));
+    assert.equal(Date.parse(res.corpo.encontros[0].fim), Date.parse('2026-10-19T22:00:00-03:00'));
+    assert.equal(Date.parse(res.corpo.encontros[1].inicio), Date.parse('2026-10-20T19:00:00-03:00'));
+    assert.equal(Date.parse(res.corpo.encontros[1].fim), Date.parse('2026-10-20T22:00:00-03:00'));
+    for (const encontro of res.corpo.encontros) assert.match(encontro.id, /^enc_[0-9a-f]{8}$/);
+    assert.notEqual(res.corpo.encontros[0].id, res.corpo.encontros[1].id);
+  });
 });

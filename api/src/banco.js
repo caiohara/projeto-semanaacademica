@@ -7,7 +7,7 @@ import { SALAS, USUARIOS } from './dados-iniciais.js';
 const ARQUIVO_PADRAO = fileURLToPath(new URL('../dados/semana-academica.db', import.meta.url));
 
 // Ordem de criação; o reset apaga na ordem inversa por causa das chaves estrangeiras.
-const TABELAS = ['usuarios', 'salas'];
+const TABELAS = ['usuarios', 'salas', 'atividades', 'encontros'];
 
 export function abrirBanco(arquivo = process.env.ARQUIVO_BANCO || ARQUIVO_PADRAO) {
   mkdirSync(dirname(arquivo), { recursive: true });
@@ -23,6 +23,22 @@ export function abrirBanco(arquivo = process.env.ARQUIVO_BANCO || ARQUIVO_PADRAO
       id         TEXT PRIMARY KEY,
       nome       TEXT NOT NULL,
       capacidade INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS atividades (
+      id     TEXT PRIMARY KEY,
+      titulo TEXT NOT NULL,
+      tipo   TEXT NOT NULL CHECK (tipo IN ('palestra', 'minicurso')),
+      sala_id TEXT NOT NULL REFERENCES salas (id),
+      vagas  INTEGER NOT NULL
+    );
+    -- inicio e fim guardam o texto como veio (M1 R11); os _ms servem para ordenar e calcular.
+    CREATE TABLE IF NOT EXISTS encontros (
+      id           TEXT PRIMARY KEY,
+      atividade_id TEXT NOT NULL REFERENCES atividades (id),
+      inicio       TEXT NOT NULL,
+      fim          TEXT NOT NULL,
+      inicio_ms    INTEGER NOT NULL,
+      fim_ms       INTEGER NOT NULL
     );
   `);
   const vazio = db.prepare('SELECT COUNT(*) AS n FROM usuarios').get().n === 0;

@@ -1,11 +1,15 @@
 # Equipe
 
-Cada integrante é dono de um módulo inteiro: entrevista, spec, testes, API, telas e auditoria. Grupo de 3 faz M1 a M3; grupo de 4, M1 a M4; grupo de 5, os cinco.
+Dupla, com escopo de grupo de 3: M1, M2 e M3.
+Ferramenta: Claude Code no lugar do OpenCode.
 
-| Módulo | Dono | Usuário do GitHub |
+| Módulo | Dono | GitHub |
 |---|---|---|
-| M1 — Grade de atividades | | |
-| M2 — Inscrições e lista de espera | | |
-| M3 — Presença por QR | | |
-| M4 — Certificados (grupos de 4 e 5) | | |
-| M5 — Painel da organização (grupos de 5) | | |
+| M1 Grade de atividades | Caio Hara | @caiohara |
+| M2 Inscrições | João Pedro Burgos | @Burgozz |
+| M3 Presença por QR | Caio Hara | @caiohara |
+
+## Evidências
+As sessões do Claude Code são exportadas por `evidencias/exportar-evidencias-claude.js`,
+que reaproveita a análise do script original sem alterá-lo. Os tokens de entrada contam só
+o que não veio do cache do Claude Code, por isso ficam baixos.

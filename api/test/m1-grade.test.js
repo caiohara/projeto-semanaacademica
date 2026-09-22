@@ -269,4 +269,26 @@ describe('M1 — grade de atividades', () => {
     assert.equal(longa.status, 201);
     assert.equal(longa.corpo.titulo, tituloLongo);
   });
+
+  for (const [campo, valor] of [
+    ['descricao', 'x'],
+    ['situacao', 'prevista'],
+    ['ocupadas', 0],
+    ['emEspera', 0],
+    ['vagasRestantes', 40],
+    ['cargaHorariaMinutos', 120],
+  ]) {
+    it(`R34: POST /atividades com o campo ${campo} responde 422 DADOS_INVALIDOS`, async () => {
+      esperarDadosInvalidos(await pedir('POST', '/atividades', { corpo: { ...palestraValida(), [campo]: valor } }));
+    });
+  }
+
+  it('R34: POST /atividades ignora o id do corpo e usa o id gerado pelo servidor', async () => {
+    const res = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), id: 'atv_00000000' } });
+    assert.equal(res.status, 201);
+    assert.notEqual(res.corpo.id, 'atv_00000000');
+    assert.match(res.corpo.id, /^atv_[0-9a-f]{8}$/);
+    assert.equal((await pedir('GET', '/atividades/atv_00000000')).status, 404);
+    assert.equal((await pedir('GET', `/atividades/${res.corpo.id}`)).status, 200);
+  });
 });

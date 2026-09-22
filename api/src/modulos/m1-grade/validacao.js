@@ -2,6 +2,7 @@ import { dadosInvalidos, lerInstante } from '../../erros.js';
 
 const TIPOS = ['palestra', 'minicurso'];
 const CAMPOS_DO_ENCONTRO = ['inicio', 'fim'];
+const CAMPOS_DA_ATIVIDADE = ['titulo', 'tipo', 'salaId', 'vagas', 'encontros'];
 
 const ehObjeto = (valor) => typeof valor === 'object' && valor !== null && !Array.isArray(valor);
 
@@ -9,6 +10,10 @@ const ehObjeto = (valor) => typeof valor === 'object' && valor !== null && !Arra
 // e vem antes das regras do recurso (contrato §1).
 export function lerNovaAtividade(corpo) {
   if (!ehObjeto(corpo)) throw dadosInvalidos('o corpo precisa ser um objeto');
+  // R34: id é ignorado em silêncio; qualquer outro campo fora da entrada do contrato,
+  // inclusive os calculados, é recusado.
+  const extra = Object.keys(corpo).find((campo) => campo !== 'id' && !CAMPOS_DA_ATIVIDADE.includes(campo));
+  if (extra) throw dadosInvalidos(`${extra} não é aceito`);
   const { titulo, tipo, salaId, vagas, encontros } = corpo;
 
   if (typeof titulo !== 'string' || titulo.trim() === '') {

@@ -388,4 +388,17 @@ describe('M1 — grade de atividades', () => {
     assert.equal(igual.corpo.vagas, 20);
     esperarErro(await pedir('POST', '/atividades', { corpo: noLab(21, '20') }), 422, 'VAGAS_ACIMA_DA_CAPACIDADE');
   });
+
+  it('R22: encontro a menos de 15 minutos de outro na mesma sala responde 409 CONFLITO_DE_SALA', async () => {
+    const existente = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(existente.status, 201);
+    const naSala = (salaId, das, ate) => ({ ...palestraValida(), titulo: 'Outra', salaId, encontros: [encontroEm('19', das, ate)] });
+
+    esperarErro(await pedir('POST', '/atividades', { corpo: naSala('sala-101', '21:00', '22:00') }), 409, 'CONFLITO_DE_SALA');
+    esperarErro(await pedir('POST', '/atividades', { corpo: naSala('sala-101', '21:14', '22:14') }), 409, 'CONFLITO_DE_SALA');
+    assert.equal((await pedir('POST', '/atividades', { corpo: naSala('sala-101', '21:15', '22:15') })).status, 201);
+    assert.equal((await pedir('POST', '/atividades', { corpo: naSala('sala-101', '17:45', '18:45') })).status, 201);
+    esperarErro(await pedir('POST', '/atividades', { corpo: naSala('sala-101', '18:00', '19:00') }), 409, 'CONFLITO_DE_SALA');
+    assert.equal((await pedir('POST', '/atividades', { corpo: naSala('sala-102', '19:00', '21:00') })).status, 201);
+  });
 });

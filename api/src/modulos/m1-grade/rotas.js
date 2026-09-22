@@ -31,7 +31,10 @@ export function rotasDaGrade({ db }) {
     // R14: sala inexistente é dado inválido do corpo, não 404.
     const sala = db.prepare('SELECT capacidade FROM salas WHERE id = ?').get(salaId);
     if (!sala) throw dadosInvalidos(`a sala ${salaId} não existe`);
-    validarCriacao(nova, sala);
+    const ocupacaoDaSala = db.prepare(
+      'SELECT e.inicio_ms AS inicioMs, e.fim_ms AS fimMs FROM encontros e JOIN atividades a ON a.id = e.atividade_id WHERE a.sala_id = ?',
+    ).all(salaId);
+    validarCriacao(nova, sala, ocupacaoDaSala);
     const id = novoId('atv');
     db.exec('BEGIN');
     try {

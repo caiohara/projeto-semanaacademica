@@ -139,4 +139,35 @@ describe('M1 — grade de atividades', () => {
     assert.equal(lida.corpo.encontros[0].inicio, '2026-10-19T19:00:00-03:00');
     assert.equal(lida.corpo.encontros[0].fim, '2026-10-19T21:00:00-03:00');
   });
+
+  it('R11: instantes com segundos ou milissegundos são aceitos e devolvidos com a mesma precisão', async () => {
+    const comSegundos = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'IA hoje',
+        tipo: 'palestra',
+        salaId: 'sala-101',
+        vagas: 40,
+        encontros: [{ inicio: '2026-10-19T19:00:30-03:00', fim: '2026-10-19T20:30:00-03:00' }],
+      },
+    });
+    assert.equal(comSegundos.status, 201);
+    assert.equal(comSegundos.corpo.encontros[0].inicio, '2026-10-19T19:00:30-03:00');
+
+    const comMilissegundos = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'IA amanhã',
+        tipo: 'palestra',
+        salaId: 'sala-102',
+        vagas: 40,
+        encontros: [{ inicio: '2026-10-19T22:00:15.250Z', fim: '2026-10-20T00:00:00.5Z' }],
+      },
+    });
+    assert.equal(comMilissegundos.status, 201);
+    assert.equal(comMilissegundos.corpo.encontros[0].inicio, '2026-10-19T19:00:15.250-03:00');
+    assert.equal(comMilissegundos.corpo.encontros[0].fim, '2026-10-19T21:00:00.5-03:00');
+
+    const lida = await pedir('GET', `/atividades/${comMilissegundos.corpo.id}`);
+    assert.equal(lida.corpo.encontros[0].inicio, '2026-10-19T19:00:15.250-03:00');
+    assert.equal(lida.corpo.encontros[0].fim, '2026-10-19T21:00:00.5-03:00');
+  });
 });

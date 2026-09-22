@@ -7,9 +7,11 @@ import { ErroDaApi } from '../../erros.js';
 const novoId = (prefixo) => `${prefixo}_${randomBytes(4).toString('hex')}`;
 
 // R10: instantes saem no fuso de Brasília, -03:00 (sem horário de verão em 2026).
+// R11: a fração de segundo volta como veio; trocar de fuso não mexe nela.
 const TRES_HORAS_MS = 3 * 60 * 60 * 1000;
-function emBrasilia(ms) {
-  return `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 19)}-03:00`;
+function emBrasilia(ms, original) {
+  const fracao = original.match(/:\d{2}(\.\d+)/)?.[1] ?? '';
+  return `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 19)}${fracao}-03:00`;
 }
 
 export function rotasDaGrade({ db }) {
@@ -63,8 +65,8 @@ function lerAtividade(db, id) {
     vagas: a.vagas,
     encontros: encontros.map((e) => ({
       id: e.id,
-      inicio: emBrasilia(e.inicio_ms),
-      fim: emBrasilia(e.fim_ms),
+      inicio: emBrasilia(e.inicio_ms, e.inicio),
+      fim: emBrasilia(e.fim_ms, e.fim),
     })),
     // R6: soma exata em minutos; pode ter fração quando os instantes têm segundos.
     cargaHorariaMinutos: encontros.reduce((soma, e) => soma + (e.fim_ms - e.inicio_ms), 0) / 60000,

@@ -342,4 +342,14 @@ describe('M1 — grade de atividades', () => {
     assert.equal(duzentosEQuarenta.status, 201);
     assert.equal(duzentosEQuarenta.corpo.cargaHorariaMinutos, 240);
   });
+
+  it('R18: encontro que não começa e termina no mesmo dia de Brasília responde 422 ENCONTRO_INVALIDO', async () => {
+    esperarErro(await pedir('POST', '/atividades', {
+      corpo: { ...palestraValida(), encontros: [{ inicio: '2026-10-19T22:00:00-03:00', fim: '2026-10-20T01:00:00-03:00' }] },
+    }), 422, 'ENCONTRO_INVALIDO');
+    // Mesmo dia em UTC (20/10), mas 19/10 23:00 a 20/10 01:00 em Brasília.
+    esperarErro(await pedir('POST', '/atividades', {
+      corpo: { ...palestraValida(), encontros: [{ inicio: '2026-10-20T02:00:00Z', fim: '2026-10-20T04:00:00Z' }] },
+    }), 422, 'ENCONTRO_INVALIDO');
+  });
 });

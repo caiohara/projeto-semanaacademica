@@ -9,6 +9,11 @@ const MINUTO_MS = 60 * 1000;
 const DURACAO_MIN_MS = 60 * MINUTO_MS;
 const DURACAO_MAX_MS = 240 * MINUTO_MS;
 
+// R18: o dia conta pelo calendário de Brasília (-03:00, sem horário de verão em 2026),
+// qualquer que seja o fuso em que o instante chegou.
+const TRES_HORAS_MS = 3 * 60 * MINUTO_MS;
+const diaEmBrasilia = (ms) => new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 10);
+
 const encontroInvalido = (mensagem) => new ErroDaApi(422, 'ENCONTRO_INVALIDO', mensagem);
 
 export function validarCriacao({ tipo, encontros }) {
@@ -20,6 +25,9 @@ export function validarCriacao({ tipo, encontros }) {
     const duracao = fimMs - inicioMs;
     if (duracao < DURACAO_MIN_MS || duracao > DURACAO_MAX_MS) {
       throw encontroInvalido('cada encontro dura de 60 a 240 minutos');
+    }
+    if (diaEmBrasilia(inicioMs) !== diaEmBrasilia(fimMs)) {
+      throw encontroInvalido('cada encontro começa e termina no mesmo dia (horário de Brasília)');
     }
   }
 }

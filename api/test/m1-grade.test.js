@@ -88,4 +88,36 @@ describe('M1 — grade de atividades', () => {
     assert.equal(res.corpo.emEspera, 0);
     assert.equal(res.corpo.vagasRestantes, 20);
   });
+
+  it('R6: cargaHorariaMinutos é a soma exata das durações dos encontros, sem arredondar', async () => {
+    const minicurso = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'Flutter do zero',
+        tipo: 'minicurso',
+        salaId: 'lab-3',
+        vagas: 20,
+        encontros: [
+          { inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' },
+          { inicio: '2026-10-20T19:00:00-03:00', fim: '2026-10-20T21:30:00-03:00' },
+        ],
+      },
+    });
+    assert.equal(minicurso.status, 201);
+    assert.equal(minicurso.corpo.cargaHorariaMinutos, 330);
+
+    const palestra = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'IA hoje',
+        tipo: 'palestra',
+        salaId: 'sala-101',
+        vagas: 40,
+        encontros: [{ inicio: '2026-10-19T19:00:30-03:00', fim: '2026-10-19T20:30:00-03:00' }],
+      },
+    });
+    assert.equal(palestra.status, 201);
+    assert.equal(palestra.corpo.cargaHorariaMinutos, 89.5);
+
+    const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`);
+    assert.equal(lida.corpo.cargaHorariaMinutos, 89.5);
+  });
 });

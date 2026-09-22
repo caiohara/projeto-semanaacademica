@@ -47,7 +47,7 @@ function lerAtividade(db, id) {
   if (!a) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${id} não existe`);
   // R5: encontros sempre em ordem de inicio.
   const encontros = db.prepare(
-    'SELECT id, inicio, fim FROM encontros WHERE atividade_id = ? ORDER BY inicio_ms, id',
+    'SELECT id, inicio, fim, inicio_ms, fim_ms FROM encontros WHERE atividade_id = ? ORDER BY inicio_ms, id',
   ).all(id);
   return {
     id: a.id,
@@ -56,6 +56,8 @@ function lerAtividade(db, id) {
     salaId: a.sala_id,
     vagas: a.vagas,
     encontros: encontros.map((e) => ({ id: e.id, inicio: e.inicio, fim: e.fim })),
+    // R6: soma exata em minutos; pode ter fração quando os instantes têm segundos.
+    cargaHorariaMinutos: encontros.reduce((soma, e) => soma + (e.fim_ms - e.inicio_ms), 0) / 60000,
     // Fatia 1: sem relógio (R7) nem inscrições do M2 (R8), a atividade nasce prevista e vazia.
     situacao: 'prevista',
     ocupadas: 0,

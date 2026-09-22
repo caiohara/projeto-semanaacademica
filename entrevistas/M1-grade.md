@@ -24,20 +24,20 @@
 
 | # | Pergunta | Resposta | Fonte |
 |---|---|---|---|
-| P-01 | Quantidade de encontros por tipo (`QUANTIDADE_DE_ENCONTROS`): quantos encontros uma palestra aceita? E um minicurso — qual o mínimo e o máximo? | Pendente — consultar requisitos | |
-| P-02 | O que torna um encontro inválido (`ENCONTRO_INVALIDO`)? Quais destas condições valem: (a) `fim` depois de `inicio`; (b) dentro do período do evento, 19–23/10 em Brasília; (c) começa e termina no mesmo dia; (d) duração mínima e/ou máxima — quais valores; (e) encontros da mesma atividade não podem se sobrepor; (f) `inicio` no futuro em relação ao relógio; (g) faixa de horário permitida no dia — qual; (h) alguma outra? | Pendente — consultar requisitos | |
-| P-03 | Vagas × capacidade (`VAGAS_ACIMA_DA_CAPACIDADE`): `vagas` pode ser igual à capacidade da sala, ou precisa ser menor? | Pendente — consultar requisitos | |
-| P-04 | Conflito de sala (`CONFLITO_DE_SALA`): o que conta como conflito? Encostar (`fim` de um encontro = `inicio` de outro na mesma sala) conflita? Existe intervalo mínimo entre atividades na mesma sala — qual? Atividade cancelada continua ocupando a sala? | Pendente — consultar requisitos | |
-| P-05 | Precedência no POST: quando mais de uma regra recusa a mesma criação (`QUANTIDADE_DE_ENCONTROS`, `ENCONTRO_INVALIDO`, `VAGAS_ACIMA_DA_CAPACIDADE`, `CONFLITO_DE_SALA`), em que ordem são verificadas? | Pendente — consultar requisitos | |
-| P-06 | Campos editáveis no PATCH (`CAMPO_NAO_EDITAVEL`): quais dos campos `titulo`, `tipo`, `salaId`, `vagas`, `encontros` podem ser alterados? A editabilidade muda com o tempo ou o estado (ex.: depois da primeira inscrição, depois do início)? | Pendente — consultar requisitos | |
-| P-07 | Redução de vagas (`VAGAS_ABAIXO_DOS_INSCRITOS`): o novo `vagas` é comparado com qual número (ocupadas? ocupadas + em espera?) e pode ser igual a ele, ou precisa ser maior? | Pendente — consultar requisitos | |
-| P-08 | Alterar e cancelar depois do início: PATCH é permitido em atividade em andamento ou encerrada? A partir de que instante a atividade conta como "já iniciada" para `ATIVIDADE_JA_INICIADA`? Cancelar exige alguma antecedência mínima — qual? | Pendente — consultar requisitos | |
-| P-09 | Situação calculada (`prevista` / `em_andamento` / `encerrada` / `cancelada`): quando cada uma começa e termina? Entre dois encontros em dias diferentes a atividade está `em_andamento` ou `prevista`? No instante exato de `inicio` e de `fim`, qual é a situação? `cancelada` prevalece sobre as demais? | Pendente — consultar requisitos | |
-| P-10 | Contagens da Atividade: (a) `ocupadas` — quais status de inscrição do M2 contam (`confirmada`? `convocada`?); (b) `emEspera` — quais status contam (só `em_espera`? `convocada` também?); (c) `vagasRestantes` — é `vagas − ocupadas`? Pode ficar negativo ou tem piso 0? (d) em atividade cancelada, o que as três contagens mostram? | Pendente — consultar requisitos | |
-| P-11 | Carga horária (`cargaHorariaMinutos`): é a soma das durações dos encontros? Há arredondamento, desconto (intervalo) ou teto? | Pendente — consultar requisitos | |
-| P-12 | Efeitos do cancelamento: cancelar a atividade faz algo com as inscrições e com a lista de espera? Isso é responsabilidade do M1 ou do M2? | Pendente — consultar requisitos | |
-| P-13 | Visibilidade: atividades canceladas aparecem em `GET /atividades` e em `GET /atividades/:id`? Para todos os perfis? | Pendente — consultar requisitos | |
-| P-14 | Fora do escopo: o M1 faz algum destes? Excluir atividade, reativar atividade cancelada, criar sala, cadastrar palestrante/descrição, limitar quantas atividades um organizador cria. | Pendente — consultar requisitos | |
+| P-01 | Quantidade de encontros por tipo (`QUANTIDADE_DE_ENCONTROS`): quantos encontros uma palestra aceita? E um minicurso — qual o mínimo e o máximo? | Palestra: exatamente 1 encontro. Minicurso: mínimo 2 e máximo 5 encontros. | RN-102, RN-103. |
+| P-02 | O que torna um encontro inválido (`ENCONTRO_INVALIDO`)? Quais destas condições valem: (a) `fim` depois de `inicio`; (b) dentro do período do evento, 19–23/10 em Brasília; (c) começa e termina no mesmo dia; (d) duração mínima e/ou máxima — quais valores; (e) encontros da mesma atividade não podem se sobrepor; (f) `inicio` no futuro em relação ao relógio; (g) faixa de horário permitida no dia — qual; (h) alguma outra? | Encontro inválido quando: duração inferior a 1 hora ou superior a 4 horas; não inicia e termina no mesmo dia; fora do período 19–23/10/2026; sobrepõe outro encontro da mesma atividade. As condições (f) início no futuro e (g) faixa de horário não constam no documento. | RN-104, RN-105, RN-106. |
+| P-03 | Vagas × capacidade (`VAGAS_ACIMA_DA_CAPACIDADE`): `vagas` pode ser igual à capacidade da sala, ou precisa ser menor? | `vagas` pode ser igual à capacidade da sala. `VAGAS_ACIMA_DA_CAPACIDADE` só quando o valor ultrapassa a capacidade. | RN-107. |
+| P-04 | Conflito de sala (`CONFLITO_DE_SALA`): o que conta como conflito? Encostar (`fim` de um encontro = `inicio` de outro na mesma sala) conflita? Existe intervalo mínimo entre atividades na mesma sala — qual? Atividade cancelada continua ocupando a sala? | Intervalo mínimo de 15 minutos entre o fim de um encontro e o início do seguinte na mesma sala; atividades que apenas se encostam geram `CONFLITO_DE_SALA`. Atividade cancelada não ocupa a sala. | RN-108. |
+| P-05 | Precedência no POST: quando mais de uma regra recusa a mesma criação (`QUANTIDADE_DE_ENCONTROS`, `ENCONTRO_INVALIDO`, `VAGAS_ACIMA_DA_CAPACIDADE`, `CONFLITO_DE_SALA`), em que ordem são verificadas? | Ordem: `QUANTIDADE_DE_ENCONTROS` → `ENCONTRO_INVALIDO` → `VAGAS_ACIMA_DA_CAPACIDADE` → `CONFLITO_DE_SALA`. | Decisão do grupo (documento consultado, seção não especifica). |
+| P-06 | Campos editáveis no PATCH (`CAMPO_NAO_EDITAVEL`): quais dos campos `titulo`, `tipo`, `salaId`, `vagas`, `encontros` podem ser alterados? A editabilidade muda com o tempo ou o estado (ex.: depois da primeira inscrição, depois do início)? | Após a criação, só `titulo` e `vagas` são editáveis. `salaId`, `tipo` e `encontros` não podem ser alterados em nenhuma circunstância. | RN-110. |
+| P-07 | Redução de vagas (`VAGAS_ABAIXO_DOS_INSCRITOS`): o novo `vagas` é comparado com qual número (ocupadas? ocupadas + em espera?) e pode ser igual a ele, ou precisa ser maior? | O novo `vagas` é comparado com `ocupadas` e pode ser igual. Lista de espera não entra na conta. | RN-111. |
+| P-08 | Alterar e cancelar depois do início: PATCH é permitido em atividade em andamento ou encerrada? A partir de que instante a atividade conta como "já iniciada" para `ATIVIDADE_JA_INICIADA`? Cancelar exige alguma antecedência mínima — qual? | Cancelamento só antes do início da atividade, sem antecedência mínima. A atividade conta como iniciada no instante exato do início do 1º encontro. O documento não menciona bloqueio de PATCH em atividade em andamento ou encerrada. | RN-110, RN-112, Regras Gerais Seção 5. |
+| P-09 | Situação calculada (`prevista` / `em_andamento` / `encerrada` / `cancelada`): quando cada uma começa e termina? Entre dois encontros em dias diferentes a atividade está `em_andamento` ou `prevista`? No instante exato de `inicio` e de `fim`, qual é a situação? `cancelada` prevalece sobre as demais? | `prevista` → `em_andamento` no instante exato do início do 1º encontro; `em_andamento` → `encerrada` no instante exato do fim do último encontro. `cancelada` prevalece sobre todas. | RN-114. |
+| P-10 | Contagens da Atividade: (a) `ocupadas` — quais status de inscrição do M2 contam (`confirmada`? `convocada`?); (b) `emEspera` — quais status contam (só `em_espera`? `convocada` também?); (c) `vagasRestantes` — é `vagas − ocupadas`? Pode ficar negativo ou tem piso 0? (d) em atividade cancelada, o que as três contagens mostram? | (a) `confirmada` e `convocada` contam em `ocupadas`. (b) `emEspera` conta só `em_espera`; `convocada` não entra. (c) `vagasRestantes = vagas − ocupadas`; não fica negativo porque o PATCH impede reduzir `vagas` abaixo de `ocupadas`. (d) Numa atividade cancelada, todas as inscrições foram canceladas (RN-217), então `ocupadas: 0`, `emEspera: 0`, `vagasRestantes: vagas`. | RN-111, RN-205, Seção 5.2. `vagasRestantes`: decisão do grupo, apoiada em RN-111. Atividade cancelada: RN-217 e P-27 (contagens calculadas na leitura). |
+| P-11 | Carga horária (`cargaHorariaMinutos`): é a soma das durações dos encontros? Há arredondamento, desconto (intervalo) ou teto? | Soma exata das durações dos encontros em minutos, sem arredondamento. | RN-109. |
+| P-12 | Efeitos do cancelamento: cancelar a atividade faz algo com as inscrições e com a lista de espera? Isso é responsabilidade do M1 ou do M2? | Cancelar a atividade cancela todas as inscrições ativas. Tratado no M2. | RN-217. |
+| P-13 | Visibilidade: atividades canceladas aparecem em `GET /atividades` e em `GET /atividades/:id`? Para todos os perfis? | Canceladas aparecem em `GET /atividades` e em `GET /atividades/:id`, para todos os perfis. | RN-115. |
+| P-14 | Fora do escopo: o M1 faz algum destes? Excluir atividade, reativar atividade cancelada, criar sala, cadastrar palestrante/descrição, limitar quantas atividades um organizador cria. | Excluir atividade e reativar atividade cancelada: impossível / fora do escopo. Criar sala, cadastrar palestrante e limitar atividades por organizador: fora do escopo. | RN-113, Seção 7. |
 
 ### Técnica / contrato
 
@@ -46,7 +46,7 @@
 | P-15 | Validação de corpo no POST/PATCH: o que é `422 DADOS_INVALIDOS`? | `titulo` precisa ser string não vazia após trim; `tipo` fora de `palestra`/`minicurso`; `vagas` precisa ser inteiro ≥ 1 (0, negativo ou decimal → `DADOS_INVALIDOS`); `encontros` precisa ser array de objetos com `inicio` e `fim` ISO 8601 com fuso; campo obrigatório ausente ou de tipo errado. Array `encontros` vazio → `QUANTIDADE_DE_ENCONTROS`, não `DADOS_INVALIDOS`. | Ausente / tipo errado → 422: contrato §1. Valores de `tipo`: contrato §5 (Atividade). Datas ISO com fuso: contrato §1. Título não vazio, `vagas` ≥ 1 e array vazio: decisão do grupo (rodada 1), o contrato não fixa. |
 | P-16 | `salaId` inexistente no corpo: 404 `NAO_ENCONTRADO` ou 422 `DADOS_INVALIDOS`? | 422 `DADOS_INVALIDOS`. | Decisão do grupo (rodada 1). O contrato não trata id inexistente dentro do corpo: §1 põe a existência (404) antes da validação do corpo e §6 descreve 404 como "recurso inexistente", o que se refere ao recurso da rota. |
 | P-17 | Ordem de `GET /atividades`. | Pelo `inicio` do primeiro encontro; empate pelo `id`. | Decisão do grupo (rodada 1). O contrato só fixa a ordem dos encontros dentro da atividade (§5). |
-| P-18 | Filtros de `GET /atividades`: `?dia=` casa a atividade que tem algum encontro naquele dia no fuso de Brasília? `dia` ou `tipo` com valor inválido → 422 `DADOS_INVALIDOS` ou lista vazia? Os dois filtros combinam (E)? | Pendente — consultar requisitos | |
+| P-18 | Filtros de `GET /atividades`: `?dia=` casa a atividade que tem algum encontro naquele dia no fuso de Brasília? `dia` ou `tipo` com valor inválido → 422 `DADOS_INVALIDOS` ou lista vazia? Os dois filtros combinam (E)? | `?dia=` casa atividades com encontro naquele dia pelo calendário de Brasília. `?tipo=` filtra por `palestra` ou `minicurso`. Os dois filtros combinam (E). Valor inválido em qualquer filtro → 422 `DADOS_INVALIDOS`. | RN-116. Código de erro e combinação dos filtros: decisão do grupo. |
 | P-19 | PATCH com corpo `{}` ou com campos fora da entrada (`id`, `situacao`, `ocupadas`, campo desconhecido). | `{}` → 200 sem mudança. `id` e campos calculados → `CAMPO_NAO_EDITAVEL`. Campo desconhecido → `DADOS_INVALIDOS`. | Decisão do grupo (rodada 1). |
 | P-20 | Fuso dos instantes na resposta. | `-03:00`. | Contrato §1 aceita qualquer fuso ("o juiz compara o instante, não o texto"), então não fixa; os exemplos do contrato usam `-03:00` (§1, §3 reset, §5 entrada do POST). Decisão do grupo: `-03:00`. Observação: `/_teste/relogio` já responde em UTC (`toISOString`), o que o §1 permite. |
 
@@ -58,9 +58,9 @@
 
 | # | Pergunta | Resposta | Fonte |
 |---|---|---|---|
-| P-21 | Precedência no PATCH: quando mais de uma regra recusa a mesma alteração (`ATIVIDADE_CANCELADA`, `CAMPO_NAO_EDITAVEL`, `VAGAS_ACIMA_DA_CAPACIDADE`, `VAGAS_ABAIXO_DOS_INSCRITOS`), em que ordem são verificadas? | Pendente — consultar requisitos | |
-| P-22 | Precedência no cancelamento: atividade já cancelada **e** já iniciada — `ATIVIDADE_CANCELADA` ou `ATIVIDADE_JA_INICIADA`? | Pendente — consultar requisitos | |
-| P-23 | Título: há tamanho máximo? Duas atividades podem ter o mesmo título? | Pendente — consultar requisitos | |
+| P-21 | Precedência no PATCH: quando mais de uma regra recusa a mesma alteração (`ATIVIDADE_CANCELADA`, `CAMPO_NAO_EDITAVEL`, `VAGAS_ACIMA_DA_CAPACIDADE`, `VAGAS_ABAIXO_DOS_INSCRITOS`), em que ordem são verificadas? | Ordem: `ATIVIDADE_CANCELADA` → `CAMPO_NAO_EDITAVEL` → `VAGAS_ACIMA_DA_CAPACIDADE` → `VAGAS_ABAIXO_DOS_INSCRITOS`. | Decisão do grupo (documento consultado, seção não especifica). |
+| P-22 | Precedência no cancelamento: atividade já cancelada **e** já iniciada — `ATIVIDADE_CANCELADA` ou `ATIVIDADE_JA_INICIADA`? | `ATIVIDADE_CANCELADA`: `cancelada` prevalece sobre as situações temporais, e atividade cancelada não pode ser cancelada de novo. | RN-113, RN-114. |
+| P-23 | Título: há tamanho máximo? Duas atividades podem ter o mesmo título? | Sem tamanho máximo para o título; títulos repetidos são permitidos. | Decisão do grupo (documento consultado, seção não especifica). |
 
 ### Técnica / contrato
 
@@ -86,7 +86,7 @@
 
 | # | Pergunta | Resposta | Fonte |
 |---|---|---|---|
-| P-30 | Instantes dos encontros com segundos ou milissegundos (ex.: `19:00:30-03:00`): aceita como vieram ou `DADOS_INVALIDOS`? | Pendente — consultar requisitos | |
+| P-30 | Instantes dos encontros com segundos ou milissegundos (ex.: `19:00:30-03:00`): aceita como vieram ou `DADOS_INVALIDOS`? | Aceita instantes com segundos e milissegundos e guarda como veio. | Decisão do grupo (consulta aos requisitos). |
 | P-31 | Corpo enviado em `POST /atividades/:id/cancelamento` (o contrato não define entrada): ignora ou `DADOS_INVALIDOS`? | Ignora o corpo. | Decisão do grupo (rodada 3). |
 
 ---
@@ -94,6 +94,8 @@
 ## Encerramento
 
 Entrevista encerrada em 2026-09-22, depois da rodada 3. O que ainda falta decidir depende do documento de requisitos. Quando as pendentes forem respondidas, a coluna Fonte recebe o RN correspondente. Depois disso vem a spec (`to-spec`).
+
+Consulta ao documento de requisitos feita em 2026-09-22: todas as pendentes foram respondidas. Não há pergunta em aberto; o próximo passo é a spec (`to-spec`).
 
 ### Decisões tomadas
 
@@ -112,40 +114,37 @@ Entrevista encerrada em 2026-09-22, depois da rodada 3. O que ainda falta decidi
 | P-29 | Qualquer pessoa da organização altera e cancela qualquer atividade | Decisão do grupo; sem código no contrato |
 | P-31 | Corpo do `POST /atividades/:id/cancelamento` é ignorado | Decisão do grupo |
 
-## Pendentes (consultar requisitos)
+## Respondidas (consulta aos requisitos)
 
-### Regra de negócio
-
-| # | Assunto | Código(s) afetado(s) |
+| # | Decisão | Fonte |
 |---|---|---|
-| P-01 | Quantidade de encontros por tipo | `QUANTIDADE_DE_ENCONTROS` |
-| P-02 | Condições de encontro inválido (período, dia, duração, sobreposição, futuro, faixa de horário) | `ENCONTRO_INVALIDO` |
-| P-03 | `vagas` igual à capacidade é permitido? | `VAGAS_ACIMA_DA_CAPACIDADE` |
-| P-04 | Definição de conflito de sala (encostar, intervalo mínimo, canceladas) | `CONFLITO_DE_SALA` |
-| P-05 | Precedência entre regras no POST | todos os de criar |
-| P-06 | Campos editáveis e se isso muda com tempo/estado | `CAMPO_NAO_EDITAVEL` |
-| P-07 | Com que número o novo `vagas` é comparado, e se pode ser igual | `VAGAS_ABAIXO_DOS_INSCRITOS` |
-| P-08 | Alterar/cancelar depois do início; instante de "já iniciada"; antecedência | `ATIVIDADE_JA_INICIADA` |
-| P-09 | Transições de `situacao` e instantes-limite | `situacao` |
-| P-10 | Status que contam em `ocupadas`/`emEspera`; fórmula e piso de `vagasRestantes`; contagens em atividade cancelada | `ocupadas`, `vagasRestantes`, `emEspera` |
-| P-11 | Cálculo de `cargaHorariaMinutos` (arredondamento, desconto, teto) | `cargaHorariaMinutos` |
-| P-12 | Efeitos do cancelamento sobre inscrições e espera; M1 ou M2 | — |
-| P-13 | Canceladas aparecem nas listagens? Para quem? | — |
-| P-14 | Limites de escopo (excluir, reativar, criar sala, palestrante, limite por organizador) | — |
-| P-21 | Precedência entre regras no PATCH | todos os de alterar |
-| P-22 | Precedência no cancelamento: cancelada × já iniciada | `ATIVIDADE_CANCELADA`, `ATIVIDADE_JA_INICIADA` |
-| P-23 | Tamanho máximo e unicidade do título | — |
+| P-01 | Palestra: 1 encontro; minicurso: 2 a 5 | RN-102, RN-103 |
+| P-02 | Encontro inválido: duração < 1 h ou > 4 h; não começa e termina no mesmo dia; fora de 19–23/10/2026; sobreposição na mesma atividade. Sem regra de início no futuro nem faixa de horário | RN-104, RN-105, RN-106 |
+| P-03 | `vagas` igual à capacidade é permitido; só acima dela recusa | RN-107 |
+| P-04 | Intervalo mínimo de 15 min na mesma sala; encostar conflita; cancelada não ocupa a sala | RN-108 |
+| P-05 | POST: `QUANTIDADE_DE_ENCONTROS` → `ENCONTRO_INVALIDO` → `VAGAS_ACIMA_DA_CAPACIDADE` → `CONFLITO_DE_SALA` | Decisão do grupo (documento não especifica) |
+| P-06 | Editáveis só `titulo` e `vagas`, sempre; `salaId`, `tipo`, `encontros` nunca | RN-110 |
+| P-07 | Novo `vagas` ≥ `ocupadas` (igual permitido); espera não conta | RN-111 |
+| P-08 | Cancelar só antes do início, sem antecedência; iniciada no instante do início do 1º encontro; PATCH não é bloqueado pelo tempo | RN-110, RN-112, Seção 5 |
+| P-09 | `em_andamento` do início do 1º encontro ao fim do último; `encerrada` a partir do fim; `cancelada` prevalece | RN-114 |
+| P-10 | `ocupadas` = `confirmada` + `convocada`; `emEspera` = `em_espera`; `vagasRestantes = vagas − ocupadas`; cancelada → `ocupadas: 0`, `emEspera: 0`, `vagasRestantes: vagas` | RN-111, RN-205, RN-217, Seção 5.2; decisão do grupo; P-27 |
+| P-11 | `cargaHorariaMinutos` = soma exata das durações, sem arredondamento | RN-109 |
+| P-12 | Cancelar a atividade cancela as inscrições ativas; tratado no M2 | RN-217 |
+| P-13 | Canceladas aparecem na lista e no detalhe, para todos os perfis | RN-115 |
+| P-14 | Fora do escopo: excluir, reativar, criar sala, palestrante, limite por organizador | RN-113, Seção 7 |
+| P-18 | `?dia=` (calendário de Brasília) e `?tipo=` combinam (E); valor inválido → 422 `DADOS_INVALIDOS` | RN-116; decisão do grupo |
+| P-21 | PATCH: `ATIVIDADE_CANCELADA` → `CAMPO_NAO_EDITAVEL` → `VAGAS_ACIMA_DA_CAPACIDADE` → `VAGAS_ABAIXO_DOS_INSCRITOS` | Decisão do grupo (documento não especifica) |
+| P-22 | Cancelada e já iniciada → `ATIVIDADE_CANCELADA` | RN-113, RN-114 |
+| P-23 | Título sem tamanho máximo; repetição permitida | Decisão do grupo (documento não especifica) |
+| P-30 | Instantes com segundos/milissegundos aceitos e guardados como vieram | Decisão do grupo |
 
-### Técnica / contrato
+### Perguntas dependentes — encerradas
 
-| # | Assunto | Código(s) afetado(s) |
+Nenhuma precisa de rodada nova: a condição que as abriria não se confirmou.
+
+| Pergunta | Situação | Por quê |
 |---|---|---|
-| P-18 | Semântica e validação dos filtros `?dia=` e `?tipo=` | `DADOS_INVALIDOS` |
-| P-30 | Instantes com segundos/milissegundos nos encontros | `DADOS_INVALIDOS` |
-
-### Perguntas que só abrem depois das pendentes
-
-- Se P-06 liberar `encontros` ou `salaId` no PATCH: o PATCH revalida `ENCONTRO_INVALIDO`/`CONFLITO_DE_SALA`? Os `id` dos encontros se mantêm?
-- Se P-01 fixar máximo de encontros: e se P-06 liberar `encontros`, o PATCH também cobra `QUANTIDADE_DE_ENCONTROS`?
-- Se P-02 incluir "início no futuro": o PATCH de `encontros` também cobra isso?
-- Se P-11 tiver arredondamento: combinar com a resposta da P-30 (segundos).
+| Se P-06 liberar `encontros` ou `salaId` no PATCH: o PATCH revalida `ENCONTRO_INVALIDO`/`CONFLITO_DE_SALA`? Os `id` dos encontros se mantêm? | Encerrada | P-06 confirmou que `encontros` e `salaId` nunca são editáveis (RN-110). |
+| Se P-01 fixar máximo de encontros: e se P-06 liberar `encontros`, o PATCH também cobra `QUANTIDADE_DE_ENCONTROS`? | Encerrada | P-01 fixou o máximo, mas P-06 não libera `encontros` no PATCH (RN-110). |
+| Se P-02 incluir "início no futuro": o PATCH de `encontros` também cobra isso? | Encerrada | P-02 foi respondida pelo documento sem a condição de início no futuro (RN-104–RN-106). |
+| Se P-11 tiver arredondamento: combinar com a resposta da P-30 (segundos). | Encerrada | P-11 foi respondida pelo documento: soma exata, sem arredondamento (RN-109). |

@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { Router } from 'express';
 import { ErroDaApi } from '../../erros.js';
+import { lerNovaAtividade } from './validacao.js';
 
 // M1 — Grade de atividades (specs/M1-grade.md).
 
@@ -23,7 +24,7 @@ export function rotasDaGrade({ db }) {
   });
 
   rotas.post('/atividades', (req, res) => {
-    const { titulo, tipo, salaId, vagas, encontros } = req.body;
+    const { titulo, tipo, salaId, vagas, encontros } = lerNovaAtividade(req.body);
     const id = novoId('atv');
     db.exec('BEGIN');
     try {
@@ -33,7 +34,7 @@ export function rotasDaGrade({ db }) {
         'INSERT INTO encontros (id, atividade_id, inicio, fim, inicio_ms, fim_ms) VALUES (?, ?, ?, ?, ?, ?)',
       );
       for (const e of encontros) {
-        encontro.run(novoId('enc'), id, e.inicio, e.fim, Date.parse(e.inicio), Date.parse(e.fim));
+        encontro.run(novoId('enc'), id, e.inicio, e.fim, e.inicioMs, e.fimMs);
       }
       db.exec('COMMIT');
     } catch (erro) {

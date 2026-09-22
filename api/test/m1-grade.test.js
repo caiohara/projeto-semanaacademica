@@ -170,4 +170,66 @@ describe('M1 — grade de atividades', () => {
     assert.equal(lida.corpo.encontros[0].inicio, '2026-10-19T19:00:15.250-03:00');
     assert.equal(lida.corpo.encontros[0].fim, '2026-10-19T21:00:00.5-03:00');
   });
+
+  const palestraValida = () => ({
+    titulo: 'IA hoje',
+    tipo: 'palestra',
+    salaId: 'sala-101',
+    vagas: 40,
+    encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T21:00:00-03:00' }],
+  });
+  const semCampo = (campo) => {
+    const corpo = palestraValida();
+    delete corpo[campo];
+    return corpo;
+  };
+
+  const esperarDadosInvalidos = (res) => {
+    assert.equal(res.status, 422);
+    assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
+    assert.equal(typeof res.corpo.mensagem, 'string');
+  };
+
+  for (const [caso, corpo] of [
+    ['titulo só com espaços', { ...palestraValida(), titulo: '   ' }],
+    ['titulo vazio', { ...palestraValida(), titulo: '' }],
+    ['titulo null', { ...palestraValida(), titulo: null }],
+    ['titulo que não é texto', { ...palestraValida(), titulo: 123 }],
+    ['sem titulo', semCampo('titulo')],
+    ['tipo oficina', { ...palestraValida(), tipo: 'oficina' }],
+    ['sem tipo', semCampo('tipo')],
+    ['vagas 0', { ...palestraValida(), vagas: 0 }],
+    ['vagas -1', { ...palestraValida(), vagas: -1 }],
+    ['vagas 2.5', { ...palestraValida(), vagas: 2.5 }],
+    ['vagas "20"', { ...palestraValida(), vagas: '20' }],
+    ['sem vagas', semCampo('vagas')],
+    ['sem salaId', semCampo('salaId')],
+    ['salaId que não é texto', { ...palestraValida(), salaId: 101 }],
+    ['sem encontros', semCampo('encontros')],
+    ['encontros que não é lista', { ...palestraValida(), encontros: { inicio: '2026-10-19T19:00:00-03:00' } }],
+    ['encontro que não é objeto', { ...palestraValida(), encontros: ['2026-10-19T19:00:00-03:00'] }],
+    ['encontro sem fuso e sem fim', { ...palestraValida(), encontros: [{ inicio: '2026-10-19T19:00:00' }] }],
+    ['encontro com fim sem fuso', {
+      ...palestraValida(),
+      encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T21:00:00' }],
+    }],
+    ['encontro com inicio que não é data', {
+      ...palestraValida(),
+      encontros: [{ inicio: 'amanhã', fim: '2026-10-19T21:00:00-03:00' }],
+    }],
+    ['vagas 0 e encontros vazio (corpo vence regra)', { ...palestraValida(), vagas: 0, encontros: [] }],
+  ]) {
+    it(`R12: POST /atividades com ${caso} responde 422 DADOS_INVALIDOS`, async () => {
+      esperarDadosInvalidos(await pedir('POST', '/atividades', { corpo }));
+    });
+  }
+
+  it('R12: POST /atividades com corpo que não é JSON responde 422 DADOS_INVALIDOS', async () => {
+    const res = await fetch(`${api.url}/atividades`, {
+      method: 'POST',
+      headers: { 'X-Usuario': 'org-ana', 'Content-Type': 'application/json' },
+      body: '{titulo:',
+    });
+    esperarDadosInvalidos({ status: res.status, corpo: await res.json() });
+  });
 });

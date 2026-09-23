@@ -20,7 +20,9 @@ const dentroDaJanela = (encontro, agoraMs) =>
 const CAMPOS_DO_QR = ['codigo', 'lidoEm'];
 
 // R10: vale o código do minuto do instante de referência ou o do minuto anterior.
-const codigoAceito = (encontroId, codigo, referenciaMs) => {
+// R11: o recebido só é convertido para maiúsculas; qualquer outro desvio não casa.
+const codigoAceito = (encontroId, recebido, referenciaMs) => {
+  const codigo = recebido.toUpperCase();
   const indice = indiceDoMinuto(referenciaMs);
   return codigo === derivarCodigo(encontroId, indice) || codigo === derivarCodigo(encontroId, indice - 1);
 };

@@ -291,6 +291,21 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'CODIGO_INVALIDO');
     });
+
+    it('R11: código só é convertido para maiúsculas; espaço, hífen, tamanho ≠ 6 ou letra fora do alfabeto → 422 CODIGO_INVALIDO', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:30-03:00');
+
+      for (const desviado of [` ${codigo} `, 'K7M-2QX', codigo.slice(0, 5), `${codigo}A`, `O${codigo.slice(1)}`]) {
+        const res = await enviar(E, 'p-carla', { codigo: desviado });
+        assert.equal(res.status, 422, `codigo ${JSON.stringify(desviado)}`);
+        assert.equal(res.corpo.erro, 'CODIGO_INVALIDO', `codigo ${JSON.stringify(desviado)}`);
+      }
+
+      const res = await enviar(E, 'p-carla', { codigo: codigo.toLowerCase() });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.origem, 'qr');
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

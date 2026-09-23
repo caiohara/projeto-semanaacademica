@@ -72,6 +72,12 @@ export function rotasDaPresenca({ db, relogio }) {
     const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
+    // R17: com o relógio, aceito até fim + 2 h, inclusive. Vem antes da janela (R28).
+    const agoraMs = relogio.agora().getTime();
+    if (agoraMs > encontro.fim_ms + 2 * 60 * MINUTO_MS) {
+      throw new ErroDaApi(422, 'SINCRONIZACAO_TARDIA', 'leitura offline enviada depois de fim + 2 h');
+    }
+
     // R16/R2: a janela de presença é conferida com lidoEm, não com o relógio.
     const lidoEmMs = Date.parse(corpo.lidoEm);
     if (!dentroDaJanela(encontro, lidoEmMs)) {
@@ -91,7 +97,7 @@ export function rotasDaPresenca({ db, relogio }) {
       participante_id: req.usuario.id,
       origem: 'qr_offline',
       lido_em: corpo.lidoEm,
-      registrada_em: emBrasilia(relogio.agora().getTime()),
+      registrada_em: emBrasilia(agoraMs),
       justificativa: null,
     };
     db.prepare(

@@ -293,6 +293,21 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
     });
+
+    it('R17: envio com lidoEm aceito com o relógio até fim + 2 h, inclusive; depois → 422 SINCRONIZACAO_TARDIA', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:00-03:00');
+
+      await relogio('2026-10-20T00:00:00-03:00');
+      let res = await enviar(E, 'p-carla', { codigo, lidoEm: '2026-10-19T19:00:45-03:00' });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.origem, 'qr_offline');
+
+      await relogio('2026-10-20T00:00:00.001-03:00');
+      res = await enviar(E, 'p-diego', { codigo, lidoEm: '2026-10-19T19:00:45-03:00' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'SINCRONIZACAO_TARDIA');
+    });
   });
 
   describe('listagem (R26)', () => {

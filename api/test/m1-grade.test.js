@@ -716,4 +716,22 @@ describe('M1 — grade de atividades', () => {
     const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
     assert.deepEqual(lida.corpo, cancelada.corpo);
   });
+
+  it('R28: PATCH não é bloqueado pelo tempo: atividade em andamento ou encerrada aceita alteração', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+
+    await ajustarRelogio('2026-10-19T20:00:00-03:00');
+    const emAndamento = await alterar(palestra.corpo.id, { titulo: 'x' });
+    assert.equal(emAndamento.status, 200, JSON.stringify(emAndamento.corpo));
+    assert.equal(emAndamento.corpo.situacao, 'em_andamento');
+    assert.equal(emAndamento.corpo.titulo, 'x');
+
+    await ajustarRelogio('2026-10-19T22:00:00-03:00');
+    const encerrada = await alterar(palestra.corpo.id, { vagas: 35 });
+    assert.equal(encerrada.status, 200, JSON.stringify(encerrada.corpo));
+    assert.equal(encerrada.corpo.situacao, 'encerrada');
+    assert.equal(encerrada.corpo.vagas, 35);
+    assert.equal(encerrada.corpo.vagasRestantes, 35);
+  });
 });

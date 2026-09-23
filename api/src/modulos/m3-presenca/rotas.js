@@ -22,6 +22,7 @@ const dentroDaJanelaManual = (encontro, agoraMs) =>
   agoraMs >= encontro.inicio_ms - 15 * MINUTO_MS && agoraMs <= encontro.fim_ms + 2 * 60 * MINUTO_MS;
 
 const CAMPOS_DO_QR = ['codigo', 'lidoEm'];
+const CAMPOS_DA_MANUAL = ['participanteId', 'justificativa'];
 
 // R10: vale o código do minuto do instante de referência ou o do minuto anterior.
 // R11: o recebido só é convertido para maiúsculas; qualquer outro desvio não casa.
@@ -173,8 +174,20 @@ export function rotasDaPresenca({ db, relogio }) {
 
   rotas.post('/encontros/:id/presencas/manual', somenteOrganizacao, (req, res) => {
     const corpo = req.body ?? {};
+    // R21
+    const desconhecido = Object.keys(corpo).find((campo) => !CAMPOS_DA_MANUAL.includes(campo));
+    if (desconhecido) throw dadosInvalidos(`campo desconhecido: ${desconhecido}`);
+    if (typeof corpo.participanteId !== 'string') throw dadosInvalidos('participanteId é obrigatório e precisa ser texto');
+    if ('justificativa' in corpo && typeof corpo.justificativa !== 'string') {
+      throw dadosInvalidos('justificativa precisa ser texto');
+    }
+
     const encontro = db.prepare('SELECT id, atividade_id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
+
+    // R21: participanteId inexistente também é DADOS_INVALIDOS.
+    const participante = db.prepare('SELECT id FROM usuarios WHERE id = ?').get(corpo.participanteId);
+    if (!participante) throw dadosInvalidos(`participanteId ${corpo.participanteId} não existe`);
 
     // R22: justificativa precisa de pelo menos 10 caracteres depois do trim.
     const justificativa = typeof corpo.justificativa === 'string' ? corpo.justificativa : '';

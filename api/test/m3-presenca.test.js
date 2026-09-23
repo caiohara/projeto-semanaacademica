@@ -656,6 +656,24 @@ describe('M3 — presença', () => {
       assert.equal(lista.status, 200);
       assert.equal(lista.corpo[0].justificativa, '  0123456789  ');
     });
+
+    it('R21: participanteId ausente, não-string, inexistente, justificativa não-string ou campo desconhecido → 422 DADOS_INVALIDOS', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T19:30:00-03:00');
+      const justificativa = 'Celular sem bateria';
+
+      for (const corpo of [
+        { justificativa },
+        { participanteId: 42, justificativa },
+        { participanteId: 'p-naoexiste', justificativa },
+        { participanteId: 'p-carla', justificativa: 5 },
+        { participanteId: 'p-carla', justificativa, extra: 1 },
+      ]) {
+        const res = await enviarManual(E, 'org-ana', corpo);
+        assert.equal(res.status, 422, JSON.stringify(corpo));
+        assert.equal(res.corpo.erro, 'DADOS_INVALIDOS', JSON.stringify(corpo));
+      }
+    });
   });
 
   describe('listagem (R26)', () => {

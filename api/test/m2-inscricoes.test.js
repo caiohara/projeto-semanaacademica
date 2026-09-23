@@ -196,5 +196,17 @@ describe('M2 — inscrições', () => {
       const inscricaoPalestra = await pedir('POST', `/atividades/${palestra.corpo.id}/inscricoes`, { usuario: 'p-carla' });
       assert.equal(inscricaoPalestra.status, 201);
     });
+
+    it('R8: com ATIVIDADE_CANCELADA, INSCRICOES_ENCERRADAS e JA_INSCRITO aplicáveis, a mais externa vence', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const primeira = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(primeira.status, 201);
+      const cancelamento = await pedir('POST', `/atividades/${m.id}/cancelamento`, { usuario: 'org-ana' });
+      assert.equal(cancelamento.status, 200);
+      await relogio('2026-10-19T18:30:00-03:00');
+
+      const res = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      esperarErro(res, 422, 'ATIVIDADE_CANCELADA');
+    });
   });
 });

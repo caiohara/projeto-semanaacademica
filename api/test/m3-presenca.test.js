@@ -377,6 +377,17 @@ describe('M3 — presença', () => {
         assert.equal(res.corpo.erro, 'NAO_INSCRITO', participante);
       }
     });
+
+    it('R14: encontro de atividade cancelada → 403 NAO_INSCRITO (o cancelamento cancela as inscrições)', async () => {
+      const { A, E } = await montarComInscritos();
+      const cancelada = await pedir('POST', `/atividades/${A.id}/cancelamento`);
+      assert.equal(cancelada.status, 200);
+
+      await relogio('2026-10-19T19:00:30-03:00');
+      const res = await enviar(E, 'p-carla', { codigo: 'ZZZZZZ' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'NAO_INSCRITO');
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

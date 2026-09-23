@@ -42,8 +42,10 @@ const comoPresenca = (p) => ({
 export function rotasDaPresenca({ db, relogio }) {
   const rotas = Router();
 
+  // R13/R14: inscrição confirmada em atividade não cancelada — o cancelamento da atividade
+  // (M1) cancela as inscrições, mas o status só é recalculado na leitura (M2 R25).
   const confirmado = (atividadeId, participanteId) => Boolean(db.prepare(
-    "SELECT 1 FROM inscricoes WHERE atividade_id = ? AND participante_id = ? AND status = 'confirmada'",
+    "SELECT 1 FROM inscricoes i JOIN atividades a ON a.id = i.atividade_id WHERE i.atividade_id = ? AND i.participante_id = ? AND i.status = 'confirmada' AND a.cancelada = 0",
   ).get(atividadeId, participanteId));
 
   const gravar = (presenca, lidoEmMs) => db.prepare(

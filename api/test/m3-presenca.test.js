@@ -170,6 +170,24 @@ describe('M3 — presença', () => {
       assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);
     });
   });
+
+  describe('corpo do QR (R20)', () => {
+    // DADOS_INVALIDOS vem antes da inscrição (R28), então o corpo é conferido sem montar inscrições.
+    const enviar = (E, corpo) => pedir('POST', `/encontros/${E}/presencas`, { usuario: 'p-carla', corpo });
+
+    it('R20: codigo ausente ou não-string → 422 DADOS_INVALIDOS', async () => {
+      const { E } = await montarCenario();
+      await relogio('2026-10-19T19:00:30-03:00');
+
+      let res = await enviar(E, {});
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
+
+      res = await enviar(E, { codigo: 123 });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
+    });
+  });
 });
 
 describe('M3 — segredo do código (R9)', () => {

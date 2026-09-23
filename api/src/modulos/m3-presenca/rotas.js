@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { somenteOrganizacao } from '../../autenticacao.js';
-import { ErroDaApi } from '../../erros.js';
+import { dadosInvalidos, ErroDaApi } from '../../erros.js';
 import { derivarCodigo, indiceDoMinuto } from './codigo.js';
 
 // M3 — Presença por QR (specs/M3-presenca.md).
@@ -41,6 +41,13 @@ export function rotasDaPresenca({ db, relogio }) {
       trocaEm: emBrasilia(inicioDoMinuto + MINUTO_MS),
       validoAte: emBrasilia(inicioDoMinuto + 2 * MINUTO_MS),
     });
+  });
+
+  rotas.post('/encontros/:id/presencas', (req, res, next) => {
+    const corpo = req.body ?? {};
+    // R20
+    if (typeof corpo.codigo !== 'string') throw dadosInvalidos('codigo é obrigatório e precisa ser texto');
+    next();
   });
 
   return rotas;

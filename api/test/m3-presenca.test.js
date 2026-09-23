@@ -674,6 +674,15 @@ describe('M3 — presença', () => {
         assert.equal(res.corpo.erro, 'DADOS_INVALIDOS', JSON.stringify(corpo));
       }
     });
+
+    it('R15: participanteId de alguém da organização → 403 NAO_INSCRITO', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T19:30:00-03:00');
+
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'org-bruno', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'NAO_INSCRITO');
+    });
   });
 
   describe('listagem (R26)', () => {

@@ -195,6 +195,11 @@ export function rotasDaPresenca({ db, relogio }) {
       throw new ErroDaApi(422, 'JUSTIFICATIVA_OBRIGATORIA', 'justificativa precisa de pelo menos 10 caracteres');
     }
 
+    // R13/R14/R15: só inscrição confirmada na atividade dona do encontro.
+    if (!confirmado(encontro.atividade_id, corpo.participanteId)) {
+      throw new ErroDaApi(403, 'NAO_INSCRITO', 'sem inscrição confirmada na atividade');
+    }
+
     const agoraMs = relogio.agora().getTime();
     // R5: janela manual de inicio − 15 min até fim + 2 h, os dois limites inclusivos.
     if (!dentroDaJanelaManual(encontro, agoraMs)) {

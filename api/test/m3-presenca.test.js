@@ -308,6 +308,15 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'SINCRONIZACAO_TARDIA');
     });
+
+    it('R17/R28: SINCRONIZACAO_TARDIA vem antes de FORA_DA_JANELA e de CODIGO_INVALIDO', async () => {
+      const { E } = await montarComInscritos();
+
+      await relogio('2026-10-20T01:00:00-03:00');
+      const res = await enviar(E, 'p-carla', { codigo: 'ZZZZZZ', lidoEm: '2026-10-19T23:00:00-03:00' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'SINCRONIZACAO_TARDIA');
+    });
   });
 
   describe('listagem (R26)', () => {

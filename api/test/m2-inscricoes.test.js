@@ -338,6 +338,34 @@ describe('M2 — inscrições', () => {
       assert.equal(porId[elisa.corpo.id].status, 'convocada');
       assert.equal(porId[fabio.corpo.id].status, 'convocada');
     });
+
+    it('R16: convocação vencida expira e convoca o próximo na mesma leitura (lazy)', async () => {
+      const m = await criarAtividadeM({ vagas: 1 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.corpo.status, 'em_espera');
+      // Relógio parado dá o mesmo criadaEm a diego e elisa; avançar 1ms garante a ordem
+      // FIFO por criadaEm (R14) sem depender do desempate por id (aleatório).
+      await relogio('2026-10-13T09:00:00.001-03:00');
+      const elisa = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-elisa' });
+      assert.equal(elisa.corpo.status, 'em_espera');
+
+      const cancelamento = await pedir('POST', `/inscricoes/${carla.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(cancelamento.status, 200);
+      const diegoConvocado = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
+      assert.equal(diegoConvocado.corpo.status, 'convocada');
+      const convocadaAte = Date.parse(diegoConvocado.corpo.convocadaAte);
+
+      await relogio(new Date(convocadaAte + 1000).toISOString());
+      const diegoDepois = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
+      assert.equal(diegoDepois.status, 200);
+      assert.equal(diegoDepois.corpo.status, 'expirada');
+      assert.equal(diegoDepois.corpo.convocadaAte, null);
+
+      const elisaDepois = await pedir('GET', `/inscricoes/${elisa.corpo.id}`, { usuario: 'p-elisa' });
+      assert.equal(elisaDepois.corpo.status, 'convocada');
+    });
   });
 
   describe('leitura (fatia 1)', () => {

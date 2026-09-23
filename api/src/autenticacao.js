@@ -24,3 +24,11 @@ export function somenteOrganizacao(req, res, next) {
   }
   next();
 }
+
+// Rotas "Quem: participante" do contrato, seção 5. Roda depois de identificar e antes do corpo.
+export function somenteParticipante(req, res, next) {
+  if (req.usuario.papel !== 'participante') {
+    return next(new ErroDaApi(403, 'SOMENTE_PARTICIPANTE', 'rota exclusiva de participante'));
+  }
+  next();
+}

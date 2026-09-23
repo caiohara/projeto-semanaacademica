@@ -583,4 +583,26 @@ describe('M1 — grade de atividades', () => {
     const nova = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), titulo: 'No mesmo horário' } });
     assert.equal(nova.status, 201, JSON.stringify(nova.corpo));
   });
+
+  it('R30: cancelar a partir do instante exato do início responde 422 ATIVIDADE_JA_INICIADA', async () => {
+    const umSegundoAntes = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    const noInicio = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), salaId: 'sala-102' } });
+    const depois = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), salaId: 'auditorio' } });
+    for (const criada of [umSegundoAntes, noInicio, depois]) assert.equal(criada.status, 201);
+
+    await ajustarRelogio('2026-10-19T18:59:59-03:00');
+    const aceito = await cancelar(umSegundoAntes.corpo.id);
+    assert.equal(aceito.status, 200);
+    assert.equal(aceito.corpo.situacao, 'cancelada');
+
+    await ajustarRelogio('2026-10-19T19:00:00-03:00');
+    esperarErro(await cancelar(noInicio.corpo.id), 422, 'ATIVIDADE_JA_INICIADA');
+
+    await ajustarRelogio('2026-10-19T22:00:00-03:00');
+    esperarErro(await cancelar(depois.corpo.id), 422, 'ATIVIDADE_JA_INICIADA');
+
+    // A recusa não cancela: a atividade segue pelo relógio.
+    const lida = await pedir('GET', `/atividades/${depois.corpo.id}`, { usuario: 'p-carla' });
+    assert.equal(lida.corpo.situacao, 'encerrada');
+  });
 });

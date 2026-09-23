@@ -218,6 +218,22 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 200);
       assert.deepEqual(res.corpo, []);
     });
+
+    it('R26/R1: qualquer pessoa da organização lista; participante → 403 SOMENTE_ORGANIZACAO; encontro inexistente → 404', async () => {
+      const { E } = await montarCenario(); // criado por org-ana
+
+      let res = await pedir('GET', `/encontros/${E}/presencas`, { usuario: 'org-bruno' });
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.corpo, []);
+
+      res = await pedir('GET', `/encontros/${E}/presencas`, { usuario: 'p-carla' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'SOMENTE_ORGANIZACAO');
+
+      res = await pedir('GET', '/encontros/enc_00000000/presencas');
+      assert.equal(res.status, 404);
+      assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');
+    });
   });
 });
 

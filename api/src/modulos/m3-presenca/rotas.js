@@ -57,7 +57,9 @@ export function rotasDaPresenca({ db, relogio }) {
   });
 
   // R26: só quem tem presença registrada no encontro.
-  rotas.get('/encontros/:id/presencas', (req, res) => {
+  rotas.get('/encontros/:id/presencas', somenteOrganizacao, (req, res) => {
+    const encontro = db.prepare('SELECT id FROM encontros WHERE id = ?').get(req.params.id);
+    if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
     const presencas = db.prepare(
       'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ?',
     ).all(req.params.id);

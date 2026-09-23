@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { somenteOrganizacao } from '../../autenticacao.js';
 import { dadosInvalidos, ErroDaApi } from '../../erros.js';
 import { validarCriacao } from './regras.js';
-import { lerNovaAtividade } from './validacao.js';
+import { lerFiltros, lerNovaAtividade } from './validacao.js';
 
 // M1 — Grade de atividades (specs/M1-grade.md).
 
@@ -52,6 +52,20 @@ export function rotasDaGrade({ db }) {
       throw erro;
     }
     res.status(201).json(lerAtividade(db, id));
+  });
+
+  // R2: ordem pelo inicio do 1º encontro; empate pelo id.
+  rotas.get('/atividades', (req, res) => {
+    const ids = db.prepare(
+      'SELECT a.id FROM atividades a JOIN encontros e ON e.atividade_id = a.id GROUP BY a.id ORDER BY MIN(e.inicio_ms), a.id',
+    ).all();
+    // R3: ?dia= (algum encontro nesse dia) e ?tipo=, combinados em E. O dia é o do
+    // calendário de Brasília: o inicio já sai em -03:00 (R10), então a data é o prefixo.
+    const { dia, tipo } = lerFiltros(req.query);
+    const atividades = ids.map(({ id }) => lerAtividade(db, id))
+      .filter((atv) => tipo === undefined || atv.tipo === tipo)
+      .filter((atv) => dia === undefined || atv.encontros.some((e) => e.inicio.slice(0, 10) === dia));
+    res.json(atividades);
   });
 
   rotas.get('/atividades/:id', (req, res) => {

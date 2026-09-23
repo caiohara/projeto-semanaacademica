@@ -6,6 +6,18 @@ const CAMPOS_DA_ATIVIDADE = ['titulo', 'tipo', 'salaId', 'vagas', 'encontros'];
 
 const ehObjeto = (valor) => typeof valor === 'object' && valor !== null && !Array.isArray(valor);
 
+// R3: filtros de GET /atividades. ?dia= é AAAA-MM-DD de um dia que existe; ?tipo= é
+// palestra ou minicurso. Qualquer outro valor (inclusive o parâmetro repetido) é DADOS_INVALIDOS.
+export function lerFiltros({ dia, tipo }) {
+  if (dia !== undefined) {
+    const valido = typeof dia === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dia)
+      && !Number.isNaN(Date.parse(dia)) && new Date(dia).toISOString().startsWith(dia);
+    if (!valido) throw dadosInvalidos('dia precisa estar no formato AAAA-MM-DD');
+  }
+  if (tipo !== undefined && !TIPOS.includes(tipo)) throw dadosInvalidos('tipo precisa ser palestra ou minicurso');
+  return { dia, tipo };
+}
+
 // R12: forma do corpo do POST /atividades. Qualquer falha aqui é DADOS_INVALIDOS
 // e vem antes das regras do recurso (contrato §1).
 export function lerNovaAtividade(corpo) {

@@ -426,4 +426,70 @@ describe('M1 — grade de atividades', () => {
       corpo: { ...palestraValida(), vagas: 41, encontros: [encontroEm('19', '19:00', '21:00')] },
     }), 422, 'VAGAS_ACIMA_DA_CAPACIDADE');
   });
+
+  it('R2: GET /atividades ordena pelo inicio do primeiro encontro', async () => {
+    const a = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), titulo: 'A', encontros: [encontroEm('20', '19:00', '21:00')] } });
+    const b = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), titulo: 'B', encontros: [encontroEm('19', '19:00', '21:00')] } });
+    assert.equal(a.status, 201);
+    assert.equal(b.status, 201);
+
+    const res = await pedir('GET', '/atividades', { usuario: 'p-carla' });
+    assert.equal(res.status, 200);
+    assert.deepEqual(res.corpo.map((atv) => atv.id), [b.corpo.id, a.corpo.id]);
+    assert.deepEqual(res.corpo[0], b.corpo);
+  });
+
+  it('R2: atividades com o mesmo inicio do primeiro encontro saem em ordem crescente de id', async () => {
+    const ids = [];
+    for (const [salaId, vagas] of [['auditorio', 200], ['sala-101', 40], ['sala-102', 40], ['lab-3', 20]]) {
+      const criada = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), salaId, vagas } });
+      assert.equal(criada.status, 201);
+      ids.push(criada.corpo.id);
+    }
+
+    const res = await pedir('GET', '/atividades', { usuario: 'p-carla' });
+    assert.equal(res.status, 200);
+    assert.deepEqual(res.corpo.map((atv) => atv.id), [...ids].sort());
+  });
+
+  it('R3: ?dia= e ?tipo= filtram a listagem e combinam em E', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    const minicurso = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'Flutter do zero',
+        tipo: 'minicurso',
+        salaId: 'lab-3',
+        vagas: 20,
+        encontros: [encontroEm('20', '19:00', '22:00'), encontroEm('21', '19:00', '22:00')],
+      },
+    });
+    assert.equal(palestra.status, 201);
+    assert.equal(minicurso.status, 201);
+    const listar = async (filtro) => {
+      const res = await pedir('GET', `/atividades?${filtro}`, { usuario: 'p-carla' });
+      assert.equal(res.status, 200, JSON.stringify(res.corpo));
+      return res.corpo.map((atv) => atv.id);
+    };
+
+    assert.deepEqual(await listar('dia=2026-10-20'), [minicurso.corpo.id]);
+    assert.deepEqual(await listar('tipo=palestra'), [palestra.corpo.id]);
+    assert.deepEqual(await listar('dia=2026-10-20&tipo=palestra'), []);
+  });
+
+  it('R3: ?dia= usa o calendário de Brasília, não o dia UTC do encontro', async () => {
+    const noturna = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), encontros: [encontroEm('19', '22:00', '23:30')] } });
+    assert.equal(noturna.status, 201);
+
+    const dia19 = await pedir('GET', '/atividades?dia=2026-10-19', { usuario: 'p-carla' });
+    assert.equal(dia19.status, 200);
+    assert.deepEqual(dia19.corpo.map((atv) => atv.id), [noturna.corpo.id]);
+    const dia20 = await pedir('GET', '/atividades?dia=2026-10-20', { usuario: 'p-carla' });
+    assert.equal(dia20.status, 200);
+    assert.deepEqual(dia20.corpo, []);
+  });
+
+  it('R3: filtro com valor inválido responde 422 DADOS_INVALIDOS', async () => {
+    esperarErro(await pedir('GET', '/atividades?dia=19-10-2026', { usuario: 'p-carla' }), 422, 'DADOS_INVALIDOS');
+    esperarErro(await pedir('GET', '/atividades?tipo=oficina', { usuario: 'p-carla' }), 422, 'DADOS_INVALIDOS');
+  });
 });

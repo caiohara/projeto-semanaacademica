@@ -428,6 +428,23 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
     });
+
+    it('R28/contrato §1: 401 USUARIO_DESCONHECIDO → 403 SOMENTE_PARTICIPANTE → 404 NAO_ENCONTRADO', async () => {
+      await montarComInscritos();
+      await relogio('2026-10-19T19:00:30-03:00');
+
+      let res = await enviar('enc_00000000', null, { codigo: 'ZZZZZZ' });
+      assert.equal(res.status, 401);
+      assert.equal(res.corpo.erro, 'USUARIO_DESCONHECIDO');
+
+      res = await enviar('enc_00000000', 'org-ana', { codigo: 'ZZZZZZ' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'SOMENTE_PARTICIPANTE');
+
+      res = await enviar('enc_00000000', 'p-carla', { codigo: 'ZZZZZZ' });
+      assert.equal(res.status, 404);
+      assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

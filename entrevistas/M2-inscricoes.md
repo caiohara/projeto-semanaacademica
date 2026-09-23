@@ -80,27 +80,43 @@
 
 ---
 
+## Rodada de revisão
+
+Resolve as três contradições registradas em "Contradições a resolver na spec" (P-04/P-05, P-08, P-16). Nenhuma pergunta já respondida foi alterada.
+
+### Regra de negócio
+
+| # | Pergunta | Resposta | Fonte |
+|---|---|---|---|
+| P-30 | Convocação lazy vs cascade (P-04 e P-05): o relógio do modo de teste fica parado e não há job em background — a convocação em cadeia é lazy (só ao tocar a atividade/inscrição) ou cascade (acontece sozinha por tempo decorrido)? | Lazy. A convocação em cadeia "acontece" quando uma requisição toca a atividade ou a inscrição e detecta que `convocadaAte` venceu — nesse momento convoca o próximo e repete até esgotar a fila ou as vagas. Resultado final equivalente ao descrito no documento; compatível com o relógio parado do modo de teste. | Decisão do grupo; RN-213 (resultado equivalente) |
+| P-31 | Encerramento das inscrições (P-08): o documento fala em 30 minutos de antecedência mínima, não no instante exato — confirma o critério `INSCRICOES_ENCERRADAS` quando o relógio >= início do 1º encontro - 30min? | Confirmado; prevalece o documento. `INSCRICOES_ENCERRADAS` quando o relógio >= início do 1º encontro - 30 minutos. | RN-202 |
+| P-32 | Precedência no cancelamento (P-16): o documento lista `ATIVIDADE_JA_INICIADA` (RN-209) antes de `INSCRICAO_INATIVA` (RN-210) — essa é a ordem a adotar? | Sim. Ordem: `ATIVIDADE_JA_INICIADA` → `INSCRICAO_INATIVA`. | RN-209, RN-210 (ordem de numeração no documento) |
+
+---
+
 ## Pendentes (consultar requisitos)
 
 Nenhuma pendente. P-17 e P-18 foram respondidas na consulta ao documento de requisitos (ver Rodada 1).
 
 ## Contradições a resolver na spec
 
-Respondidas com a regra do documento de requisitos, mas o grupo precisa decidir entre versões conflitantes antes de virar spec.
+Todas resolvidas na Rodada de revisão (P-30, P-31, P-32). Nenhuma contradição em aberto.
 
-| # | Assunto | Contradição | Fonte |
-|---|---|---|---|
-| P-04 | Prazo e natureza da expiração da convocação | Documento diz que a expiração ocorre em cascata mesmo sem acesso ao sistema; decisão da rodada 1 era lazy | RN-211, RN-212, RN-213 |
-| P-05 | Convocação em cadeia | Documento descreve cascade imediato por tempo decorrido; contradiz a decisão lazy da rodada 1 | RN-213 |
-| P-16 | Precedência no cancelamento | Documento não define a ordem entre `ATIVIDADE_JA_INICIADA` e `INSCRICAO_INATIVA` | RN-209, RN-210 |
+| # | Assunto | Contradição | Resolução | Fonte |
+|---|---|---|---|---|
+| P-04 | Prazo e natureza da expiração da convocação | Documento diz que a expiração ocorre em cascata mesmo sem acesso ao sistema; decisão da rodada 1 era lazy | Lazy, ver P-30 | RN-211, RN-212, RN-213 |
+| P-05 | Convocação em cadeia | Documento descreve cascade imediato por tempo decorrido; contradiz a decisão lazy da rodada 1 | Lazy, ver P-30 | RN-213 |
+| P-16 | Precedência no cancelamento | Documento não define a ordem entre `ATIVIDADE_JA_INICIADA` e `INSCRICAO_INATIVA` | `ATIVIDADE_JA_INICIADA` → `INSCRICAO_INATIVA`, ver P-32 | RN-209, RN-210 |
 
 ---
 
 ## Encerramento
 
-Entrevista encerrada em 2026-09-22, depois da rodada 2. As perguntas de técnica/contrato (P-19 a P-29) foram decididas pelo grupo, com base nos critérios já fixados nas entrevistas do M1 e do M3. Não há decisão técnica em aberto.
+Entrevista encerrada em 2026-09-22, depois da rodada de revisão. As perguntas de técnica/contrato (P-19 a P-29) foram decididas pelo grupo, com base nos critérios já fixados nas entrevistas do M1 e do M3. Não há decisão técnica em aberto.
 
-Em 2026-09-22, consulta ao documento de requisitos resolveu P-01, P-02, P-03, P-06, P-07, P-08, P-09, P-10, P-11, P-12, P-13, P-14, P-15, P-17 e P-18. P-04, P-05 e P-16 também foram respondidas com a regra do documento, mas ficaram marcadas para decidir na spec por contradizerem (ou deixarem em aberto) decisões já tomadas — ver "Contradições a resolver na spec". Nenhuma pergunta segue pendente. Próximo passo: decidir as contradições registradas e então a spec (`to-spec`).
+Em 2026-09-22, consulta ao documento de requisitos resolveu P-01, P-02, P-03, P-06, P-07, P-08, P-09, P-10, P-11, P-12, P-13, P-14, P-15, P-17 e P-18. P-04, P-05 e P-16 também foram respondidas com a regra do documento, mas ficaram marcadas para decidir na spec por contradizerem (ou deixarem em aberto) decisões já tomadas — ver "Contradições a resolver na spec".
+
+Em 2026-09-22, a rodada de revisão (P-30, P-31, P-32) resolveu as três contradições: convocação lazy (P-30, confirma P-04/P-05), `INSCRICOES_ENCERRADAS` a 30 minutos do início do 1º encontro (P-31, confirma P-08) e a precedência `ATIVIDADE_JA_INICIADA` → `INSCRICAO_INATIVA` no cancelamento (P-32, resolve P-16). Nenhuma pergunta segue pendente e não há mais contradição em aberto. Próximo passo: a spec (`to-spec`).
 
 ### Decisões tomadas (técnica / contrato)
 

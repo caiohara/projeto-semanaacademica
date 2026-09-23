@@ -574,4 +574,13 @@ describe('M1 — grade de atividades', () => {
     assert.equal(res.corpo.emEspera, 0);
     assert.equal(res.corpo.vagasRestantes, 40);
   });
+
+  it('R22: atividade cancelada não ocupa a sala', async () => {
+    const existente = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(existente.status, 201);
+    assert.equal((await cancelar(existente.corpo.id)).status, 200);
+
+    const nova = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), titulo: 'No mesmo horário' } });
+    assert.equal(nova.status, 201, JSON.stringify(nova.corpo));
+  });
 });

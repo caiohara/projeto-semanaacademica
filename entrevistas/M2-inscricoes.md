@@ -94,6 +94,19 @@ Resolve as três contradições registradas em "Contradições a resolver na spe
 
 ---
 
+## Rodada de revisão da spec
+
+Registradas durante a escrita da spec (`to-spec`), para dar fonte P-xx a duas decisões que a spec precisou tornar explícitas e que não tinham pergunta própria.
+
+### Técnica / contrato
+
+| # | Pergunta | Resposta | Fonte |
+|---|---|---|---|
+| P-33 | Na confirmação bem-sucedida, `convocadaAte` é zerado ou deixa de ser relevante? | `convocadaAte` passa a `null` após confirmação. | Decisão do grupo; contrato §5 (campo derivado, não aparece mais na resposta após confirmação) |
+| P-34 | Confirmar inscrição de outro participante recebe 404 `NAO_ENCONTRADO`, mesmo critério de R13 (cancelamento, P-14)? | Sim, mesmo critério. | Decisão do grupo; mesmo raciocínio de RN-218 |
+
+---
+
 ## Pendentes (consultar requisitos)
 
 Nenhuma pendente. P-17 e P-18 foram respondidas na consulta ao documento de requisitos (ver Rodada 1).
@@ -116,7 +129,9 @@ Entrevista encerrada em 2026-09-22, depois da rodada de revisão. As perguntas d
 
 Em 2026-09-22, consulta ao documento de requisitos resolveu P-01, P-02, P-03, P-06, P-07, P-08, P-09, P-10, P-11, P-12, P-13, P-14, P-15, P-17 e P-18. P-04, P-05 e P-16 também foram respondidas com a regra do documento, mas ficaram marcadas para decidir na spec por contradizerem (ou deixarem em aberto) decisões já tomadas — ver "Contradições a resolver na spec".
 
-Em 2026-09-22, a rodada de revisão (P-30, P-31, P-32) resolveu as três contradições: convocação lazy (P-30, confirma P-04/P-05), `INSCRICOES_ENCERRADAS` a 30 minutos do início do 1º encontro (P-31, confirma P-08) e a precedência `ATIVIDADE_JA_INICIADA` → `INSCRICAO_INATIVA` no cancelamento (P-32, resolve P-16). Nenhuma pergunta segue pendente e não há mais contradição em aberto. Próximo passo: a spec (`to-spec`).
+Em 2026-09-22, a rodada de revisão (P-30, P-31, P-32) resolveu as três contradições: convocação lazy (P-30, confirma P-04/P-05), `INSCRICOES_ENCERRADAS` a 30 minutos do início do 1º encontro (P-31, confirma P-08) e a precedência `ATIVIDADE_JA_INICIADA` → `INSCRICAO_INATIVA` no cancelamento (P-32, resolve P-16). Nenhuma pergunta segue pendente e não há mais contradição em aberto.
+
+Em 2026-09-22, durante a escrita da spec (`to-spec`), a rodada de revisão da spec (P-33, P-34) deu fonte a duas regras que a spec precisou tornar explícitas: `convocadaAte` volta a `null` após confirmação (P-33) e confirmar inscrição de outro participante recebe 404 `NAO_ENCONTRADO`, mesmo critério do cancelamento (P-34). Spec concluída.
 
 ### Decisões tomadas (técnica / contrato)
 

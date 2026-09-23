@@ -5,5 +5,5 @@
     "instalar": "npm install",
     "iniciar": "npm start"
   },
-  "testes": ["npm test"]
+  "testes": ["npm test", "npx vitest run"]
 }

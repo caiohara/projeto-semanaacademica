@@ -616,4 +616,13 @@ describe('M1 — grade de atividades', () => {
     await ajustarRelogio('2026-10-19T20:00:00-03:00');
     esperarErro(await cancelar(palestra.corpo.id), 422, 'ATIVIDADE_CANCELADA');
   });
+
+  it('R33: qualquer pessoa da organização cancela atividade criada por outra', async () => {
+    const daAna = await pedir('POST', '/atividades', { usuario: 'org-ana', corpo: palestraValida() });
+    assert.equal(daAna.status, 201);
+
+    const res = await cancelar(daAna.corpo.id, { usuario: 'org-bruno' });
+    assert.equal(res.status, 200, JSON.stringify(res.corpo));
+    assert.equal(res.corpo.situacao, 'cancelada');
+  });
 });

@@ -717,6 +717,43 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'LIMITE_DE_MANUAIS');
     });
+
+    it('R23/R24: repetir uma manual já gravada não gasta o limite → 200, não LIMITE_DE_MANUAIS', async () => {
+      const { E } = await montarComInscritos(); // limite = 1
+      await relogio('2026-10-19T19:30:00-03:00');
+      const justificativa = 'Celular sem bateria';
+
+      const primeira = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa });
+      assert.equal(primeira.status, 201);
+
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa });
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.corpo, primeira.corpo);
+    });
+
+    it('R24: presença por qualquer origem não é substituída — manual não muda QR, QR não muda manual', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:30-03:00');
+      const viaQr = await enviar(E, 'p-carla', { codigo });
+      assert.equal(viaQr.status, 201);
+      assert.equal(viaQr.corpo.origem, 'qr');
+
+      let res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.corpo, viaQr.corpo);
+      assert.equal(res.corpo.origem, 'qr');
+      assert.equal(res.corpo.justificativa, null);
+
+      const viaManual = await enviarManual(E, 'org-ana', { participanteId: 'p-diego', justificativa: 'Celular sem bateria' });
+      assert.equal(viaManual.status, 201);
+      assert.equal(viaManual.corpo.origem, 'manual');
+
+      const outroCodigo = await codigoAs(E, '2026-10-19T19:35:00-03:00');
+      res = await enviar(E, 'p-diego', { codigo: outroCodigo });
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.corpo, viaManual.corpo);
+      assert.equal(res.corpo.origem, 'manual');
+    });
   });
 
   describe('listagem (R26)', () => {

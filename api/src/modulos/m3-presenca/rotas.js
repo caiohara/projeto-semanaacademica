@@ -195,6 +195,12 @@ export function rotasDaPresenca({ db, relogio }) {
       throw new ErroDaApi(422, 'JUSTIFICATIVA_OBRIGATORIA', 'justificativa precisa de pelo menos 10 caracteres');
     }
 
+    // R24: presença já gravada volta 200, sem alteração; vem antes de NAO_INSCRITO (R29).
+    const existente = db.prepare(
+      'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ? AND participante_id = ?',
+    ).get(encontro.id, corpo.participanteId);
+    if (existente) return res.json(comoPresenca(existente));
+
     // R13/R14/R15: só inscrição confirmada na atividade dona do encontro.
     if (!confirmado(encontro.atividade_id, corpo.participanteId)) {
       throw new ErroDaApi(403, 'NAO_INSCRITO', 'sem inscrição confirmada na atividade');

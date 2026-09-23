@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { Router } from 'express';
 import { somenteOrganizacao, somenteParticipante } from '../../autenticacao.js';
 import { dadosInvalidos, ErroDaApi, lerInstante } from '../../erros.js';
@@ -17,6 +18,18 @@ const dentroDaJanela = (encontro, agoraMs) =>
   agoraMs >= encontro.inicio_ms - 15 * MINUTO_MS && agoraMs <= encontro.fim_ms + 30 * MINUTO_MS;
 
 const CAMPOS_DO_QR = ['codigo', 'lidoEm'];
+
+const novoId = () => `pre_${randomBytes(4).toString('hex')}`;
+
+const comoPresenca = (p) => ({
+  id: p.id,
+  encontroId: p.encontro_id,
+  participanteId: p.participante_id,
+  origem: p.origem,
+  lidoEm: p.lido_em,
+  registradaEm: p.registrada_em,
+  justificativa: p.justificativa,
+});
 
 export function rotasDaPresenca({ db, relogio }) {
   const rotas = Router();
@@ -53,7 +66,27 @@ export function rotasDaPresenca({ db, relogio }) {
     if (typeof corpo.codigo !== 'string') throw dadosInvalidos('codigo é obrigatório e precisa ser texto');
     // R20: lidoEm é opcional, mas null não equivale a ausente.
     if ('lidoEm' in corpo) lerInstante(corpo.lidoEm, 'lidoEm');
-    next();
+    // Sem lidoEm é a presença online (fatia 2).
+    if (!('lidoEm' in corpo)) return next();
+
+    const encontro = db.prepare('SELECT id FROM encontros WHERE id = ?').get(req.params.id);
+    if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
+
+    // R16/R25: com lidoEm é sempre qr_offline; lidoEm é o enviado, registradaEm é o relógio.
+    const presenca = {
+      id: novoId(),
+      encontro_id: encontro.id,
+      participante_id: req.usuario.id,
+      origem: 'qr_offline',
+      lido_em: corpo.lidoEm,
+      registrada_em: emBrasilia(relogio.agora().getTime()),
+      justificativa: null,
+    };
+    db.prepare(
+      'INSERT INTO presencas (id, encontro_id, participante_id, origem, lido_em, lido_em_ms, registrada_em, justificativa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    ).run(presenca.id, presenca.encontro_id, presenca.participante_id, presenca.origem, presenca.lido_em,
+      Date.parse(presenca.lido_em), presenca.registrada_em, presenca.justificativa);
+    res.status(201).json(comoPresenca(presenca));
   });
 
   // R26: só quem tem presença registrada no encontro.
@@ -63,15 +96,7 @@ export function rotasDaPresenca({ db, relogio }) {
     const presencas = db.prepare(
       'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ?',
     ).all(req.params.id);
-    res.json(presencas.map((p) => ({
-      id: p.id,
-      encontroId: p.encontro_id,
-      participanteId: p.participante_id,
-      origem: p.origem,
-      lidoEm: p.lido_em,
-      registradaEm: p.registrada_em,
-      justificativa: p.justificativa,
-    })));
+    res.json(presencas.map(comoPresenca));
   });
 
   return rotas;

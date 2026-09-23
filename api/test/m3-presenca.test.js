@@ -221,6 +221,46 @@ describe('M3 — presença', () => {
     });
   });
 
+  describe('presença por QR offline (R16–R19, R28)', () => {
+    // Cenário base com as inscrições do M2 (R31): p-carla, p-diego e p-elisa confirmadas em A.
+    // Inscreve antes de mexer no relógio (reset em 13/10), longe do encerramento do M2.
+    const montarComInscritos = async () => {
+      const cenario = await montarCenario();
+      for (const participante of ['p-carla', 'p-diego', 'p-elisa']) {
+        const res = await pedir('POST', `/atividades/${cenario.A.id}/inscricoes`, { usuario: participante });
+        assert.equal(res.status, 201);
+        assert.equal(res.corpo.status, 'confirmada');
+      }
+      return cenario;
+    };
+
+    // "Código de E às hh:mm" (spec, seção 6): o que GET /encontros/E/codigo devolve nesse minuto.
+    const codigoAs = async (encontro, agora) => {
+      await relogio(agora);
+      const res = await pedir('GET', `/encontros/${encontro}/codigo`);
+      assert.equal(res.status, 200);
+      return res.corpo.codigo;
+    };
+
+    const enviar = (E, usuario, corpo) => pedir('POST', `/encontros/${E}/presencas`, { usuario, corpo });
+
+    it('R16/R25: envio com lidoEm → 201 origem qr_offline, lidoEm = o enviado, registradaEm = relógio', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:00-03:00');
+
+      await relogio('2026-10-19T21:00:00-03:00');
+      const res = await enviar(E, 'p-carla', { codigo, lidoEm: '2026-10-19T19:00:45-03:00' });
+      assert.equal(res.status, 201);
+      assert.match(res.corpo.id, /^pre_[0-9a-f]{8}$/);
+      assert.equal(res.corpo.encontroId, E);
+      assert.equal(res.corpo.participanteId, 'p-carla');
+      assert.equal(res.corpo.origem, 'qr_offline');
+      assert.equal(res.corpo.lidoEm, '2026-10-19T19:00:45-03:00');
+      assert.equal(res.corpo.registradaEm, '2026-10-19T21:00:00-03:00');
+      assert.equal(res.corpo.justificativa, null);
+    });
+  });
+
   describe('listagem (R26)', () => {
     it('R26: encontro existente sem presenças → 200 []', async () => {
       const { E } = await montarCenario();

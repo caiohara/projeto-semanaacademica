@@ -366,6 +366,29 @@ describe('M2 — inscrições', () => {
       const elisaDepois = await pedir('GET', `/inscricoes/${elisa.corpo.id}`, { usuario: 'p-elisa' });
       assert.equal(elisaDepois.corpo.status, 'convocada');
     });
+
+    it('R24: posicaoNaEspera é recalculada quando a primeira da fila cancela', async () => {
+      const m = await criarAtividadeM({ vagas: 1 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      await relogio('2026-10-13T09:00:00.001-03:00');
+      const elisa = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-elisa' });
+      await relogio('2026-10-13T09:00:00.002-03:00');
+      const fabio = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-fabio' });
+      assert.equal(diego.corpo.posicaoNaEspera, 1);
+      assert.equal(elisa.corpo.posicaoNaEspera, 2);
+      assert.equal(fabio.corpo.posicaoNaEspera, 3);
+
+      const cancelamento = await pedir('POST', `/inscricoes/${diego.corpo.id}/cancelamento`, { usuario: 'p-diego' });
+      assert.equal(cancelamento.status, 200);
+
+      const elisaDepois = await pedir('GET', `/inscricoes/${elisa.corpo.id}`, { usuario: 'p-elisa' });
+      assert.equal(elisaDepois.corpo.posicaoNaEspera, 1);
+      const fabioDepois = await pedir('GET', `/inscricoes/${fabio.corpo.id}`, { usuario: 'p-fabio' });
+      assert.equal(fabioDepois.corpo.posicaoNaEspera, 2);
+    });
   });
 
   describe('leitura (fatia 1)', () => {

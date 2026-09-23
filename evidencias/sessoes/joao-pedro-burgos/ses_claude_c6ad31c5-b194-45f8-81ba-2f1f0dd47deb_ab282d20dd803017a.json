@@ -1,0 +1,817 @@
+{
+ "info": {
+  "id": "ses_claude_c6ad31c5-b194-45f8-81ba-2f1f0dd47deb_ab282d20dd803017a",
+  "parentID": "ses_claude_c6ad31c5-b194-45f8-81ba-2f1f0dd47deb",
+  "title": "Audite o módulo M2 (api/src/modulos/m2-inscricoes e qualquer parte corresponden…",
+  "directory": "C:\\Faculdade\\semana academica\\projeto-semanaacademica",
+  "time": {
+   "created": 1790174952526,
+   "updated": 1790175258864
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790174952526
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "Audite o módulo M2 (api/src/modulos/m2-inscricoes e qualquer parte correspondente em app/) contra specs/M2-inscricoes.md.\n\nPara cada regra da spec: confira se ela nasceu de uma pergunta/decisão registrada em entrevistas/ e se existe um teste (api ou app) que a comprove. Aponte o que ficou sem prova (regra sem teste) ou sem origem (regra sem entrevista correspondente). Não corrija nada, apenas relate.",
+     "time": {
+      "start": 1790174952526
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790174955089
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01LL8uNuMks8JoHnq4ma9zv2",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cat \"C:\\Faculdade\\semana academica\\projeto-semanaacademica\\projeto.json\"",
+       "description": "Read projeto.json"
+      },
+      "time": {
+       "start": 1790174955812,
+       "end": 1790174957054
+      },
+      "output": "{\r\n  \"stack\": \"Node 22.13+ + Express 5 + SQLite (node:sqlite, em arquivo); interface web em Vite + React\",\r\n  \"api\": {\r\n    \"pasta\": \"api\",\r\n    \"instalar\": \"npm install\",\r\n    \"iniciar\": \"npm start\"\r\n  },\r\n  \"testes\": [\"npm test\", \"npx vitest run\"]\r\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "glob",
+     "callID": "toolu_015j7HJBzqv5uwr1eJietacY",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "specs/M2*"
+      },
+      "time": {
+       "start": 1790174956355,
+       "end": 1790174956481
+      },
+      "output": "[22 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "glob",
+     "callID": "toolu_015szj8K9n8qwiSPgahR2q7M",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "entrevistas/M2*"
+      },
+      "time": {
+       "start": 1790174956372,
+       "end": 1790174956484
+      },
+      "output": "[28 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3,
+      "reasoning": 0,
+      "cache": {
+       "read": 0,
+       "write": 11360
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790174960382
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01KABdQvUDXJ4Ux8uUVH9Bgw",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\specs\\M2-inscricoes.md"
+      },
+      "time": {
+       "start": 1790174960907,
+       "end": 1790174960929
+      },
+      "output": "[17116 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_015aaujt19mAeaDMn1JoFy25",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\entrevistas\\M2-inscricoes.md"
+      },
+      "time": {
+       "start": 1790174961312,
+       "end": 1790174961332
+      },
+      "output": "[19702 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 185,
+      "reasoning": 0,
+      "cache": {
+       "read": 11360,
+       "write": 2920
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790174965250
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "All origins check out — every rule cites a P-xx that exists and has a non-PENDENTE answer. Now let's find the test file and implementation.",
+     "time": {
+      "start": 1790174965250
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "glob",
+     "callID": "toolu_01TD4QHNBsMWEwBd81b6wNsL",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "api/test/m2-inscricoes.test.js"
+      },
+      "time": {
+       "start": 1790174965666,
+       "end": 1790174965759
+      },
+      "output": "[30 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "glob",
+     "callID": "toolu_013k6bmZGhU9GpNfs6a982Hf",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "api/src/modulos/m2-inscricoes/**"
+      },
+      "time": {
+       "start": 1790174965902,
+       "end": 1790174965987
+      },
+      "output": "[38 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "glob",
+     "callID": "toolu_01Vrr2ZXhbCDmPsPkCocVVEf",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "app/**/*inscric*"
+      },
+      "time": {
+       "start": 1790174966231,
+       "end": 1790174966318
+      },
+      "output": "[14 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 228,
+      "reasoning": 0,
+      "cache": {
+       "read": 14280,
+       "write": 18528
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790174968750
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01BSuZ1XMPH8fe41dw4BrAC1",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\api\\test\\m2-inscricoes.test.js"
+      },
+      "time": {
+       "start": 1790174969260,
+       "end": 1790174969531
+      },
+      "output": "[38543 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01GsjSkbGQv4v8eQ4muaeU2j",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\api\\src\\modulos\\m2-inscricoes\\rotas.js"
+      },
+      "time": {
+       "start": 1790174969704,
+       "end": 1790174969738
+      },
+      "output": "[14427 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 224,
+      "reasoning": 0,
+      "cache": {
+       "read": 32808,
+       "write": 390
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790174973764
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_01PXv4VPo7hkT4z8rFm3wRfQ",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "corpoTexto|DADOS_INVALIDOS|SOMENTE_PARTICIPANTE|USUARIO_DESCONHECIDO",
+       "path": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\api\\test\\m2-inscricoes.test.js",
+       "output_mode": "content"
+      },
+      "time": {
+       "start": 1790174975211,
+       "end": 1790174975295
+      },
+      "output": "[160 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 330,
+      "reasoning": 0,
+      "cache": {
+       "read": 33198,
+       "write": 25843
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790174987428
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_01Trcrd2k7yq4tRpc6uHN3cq",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "cancelamento|cancelada|inscricoes\" SET|UPDATE inscricoes\"",
+       "path": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\api\\src\\modulos\\m1-grade",
+       "output_mode": "content",
+       "-n": true
+      },
+      "time": {
+       "start": 1790174988729,
+       "end": 1790174988818
+      },
+      "output": "[2128 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1194,
+      "reasoning": 0,
+      "cache": {
+       "read": 59041,
+       "write": 453
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175033483
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01A6xxtNMYr8oijwuM9XTiGu",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\Faculdade\\semana academica\\projeto-semanaacademica\\api\" && npm test 2>&1 | tail -80",
+       "description": "Run API test suite"
+      },
+      "time": {
+       "start": 1790175034546,
+       "end": 1790175046811
+      },
+      "output": "    ✔ organização enviando presença por QR → 403 SOMENTE_PARTICIPANTE (77.1223ms)\n  ✔ perfil na presença por QR (contrato §1) (77.2853ms)\n  ▶ presença por QR online (R4, R10, R11, R13, R14, R24, R25, R28)\n    ✔ R10/R25: código do minuto atual → 201 origem qr, lidoEm = registradaEm = relógio, justificativa null (112.61ms)\n    ✔ R10/R8: código do minuto anterior ainda vale; em validoAte deixa de valer → 422 CODIGO_INVALIDO (166.8716ms)\n    ✔ R10: código de outro encontro ou inexistente → 422 CODIGO_INVALIDO (231.1659ms)\n    ✔ R11: código só é convertido para maiúsculas; espaço, hífen, tamanho ≠ 6 ou letra fora do alfabeto → 422 CODIGO_INVALIDO (205.1785ms)\n    ✔ R4/R2: sem lidoEm, relógio fora da janela de presença (inclusiva) → 422 FORA_DA_JANELA (200.7517ms)\n    ✔ R13: só inscrição confirmada registra presença; convocada, em_espera, cancelada ou nenhuma → 403 NAO_INSCRITO (353.7039ms)\n    ✔ R14: encontro de atividade cancelada → 403 NAO_INSCRITO (o cancelamento cancela as inscrições) (108.8209ms)\n    ✔ R24: presença repetida → 200 com a presença já gravada, sem alteração (187.5102ms)\n    ✔ R24/R28: repetição vem antes de FORA_DA_JANELA e de CODIGO_INVALIDO → 200 com a presença gravada (153.7069ms)\n    ✔ R28: NAO_INSCRITO vem antes de FORA_DA_JANELA, que vem antes de CODIGO_INVALIDO (124.7453ms)\n    ✔ R28/contrato §1: 401 USUARIO_DESCONHECIDO → 403 SOMENTE_PARTICIPANTE → 404 NAO_ENCONTRADO (137.0025ms)\n  ✔ presença por QR online (R4, R10, R11, R13, R14, R24, R25, R28) (1982.9058ms)\n  ▶ presença por QR offline (R16–R19, R28)\n    ✔ R16/R25: envio com lidoEm → 201 origem qr_offline, lidoEm = o enviado, registradaEm = relógio (128.6752ms)\n    ✔ R16: lidoEm igual ao relógio também grava origem qr_offline (123.3666ms)\n    ✔ R16/R10: o código é conferido com lidoEm — código de minuto futuro em relação a lidoEm → 422 CODIGO_INVALIDO (151.4025ms)\n    ✔ R16/R2: a janela de presença é conferida com lidoEm — lidoEm após fim + 30 min → 422 FORA_DA_JANELA (171.4483ms)\n    ✔ R17: envio com lidoEm aceito com o relógio até fim + 2 h, inclusive; depois → 422 SINCRONIZACAO_TARDIA (169.3416ms)\n    ✔ R17/R28: SINCRONIZACAO_TARDIA vem antes de FORA_DA_JANELA e de CODIGO_INVALIDO (107.7969ms)\n    ✔ R18/R28: lidoEm posterior ao relógio → 422 DADOS_INVALIDOS, mesmo com presença já gravada (não 200) (169.4546ms)\n    ✔ R19: lidoEm é guardado com os milissegundos enviados; o prazo usa o instante completo (186.3449ms)\n    ✔ R24: presença repetida no QR offline → 200 com a presença já gravada, sem alteração (107.9745ms)\n    ✔ R13: QR offline com participante sem inscrição confirmada → 403 NAO_INSCRITO (138.2609ms)\n    ✔ R14: QR offline em encontro de atividade cancelada → 403 NAO_INSCRITO (139.0928ms)\n  ✔ presença por QR offline (R16–R19, R28) (1593.9876ms)\n  ▶ presença manual (R5, R15, R21–R23, R25, R29)\n    ✔ R5/R25/R1: dentro da janela manual → 201 origem manual, lidoEm = registradaEm = relógio, justificativa enviada (95.9825ms)\n    ✔ R5: janela manual de inicio − 15 min até fim + 2 h, inclusiva → 422 FORA_DA_JANELA fora dela (149.7839ms)\n    ✔ R22: justificativa precisa de 10 caracteres após trim → 422 JUSTIFICATIVA_OBRIGATORIA (159.5064ms)\n    ✔ R25/R22: a justificativa é gravada exatamente como enviada, sem trim (critério 30a) (103.1884ms)\n    ✔ R21: participanteId ausente, não-string, inexistente, justificativa não-string ou campo desconhecido → 422 DADOS_INVALIDOS (155.0804ms)\n    ✔ R15: participanteId de alguém da organização → 403 NAO_INSCRITO (92.5226ms)\n    ✔ R13: participante sem inscrição confirmada → 403 NAO_INSCRITO (123.9091ms)\n    ✔ R14: presença manual em encontro de atividade cancelada → 403 NAO_INSCRITO (138.1942ms)\n    ✔ R23: LIMITE_DE_MANUAIS = ceil(10% das confirmadas) → 422 ao passar do limite (139.7156ms)\n    ✔ R23/R24: repetir uma manual já gravada não gasta o limite → 200, não LIMITE_DE_MANUAIS (122.9022ms)\n    ✔ R24: presença por qualquer origem não é substituída — manual não muda QR, QR não muda manual (215.9865ms)\n    ✔ R29: JUSTIFICATIVA_OBRIGATORIA vem antes da presença existente (R24) → 422, não 200 (139.4954ms)\n    ✔ R29: presença existente (R24) vem antes de FORA_DA_JANELA (R5) → 200 mesmo fora da janela (124.6637ms)\n    ✔ R29: NAO_INSCRITO vem antes de FORA_DA_JANELA, que vem antes de LIMITE_DE_MANUAIS (170.5258ms)\n    ✔ contrato §1: participante chamando a rota manual → 403 SOMENTE_ORGANIZACAO (123.8276ms)\n  ✔ presença manual (R5, R15, R21–R23, R25, R29) (2056.2363ms)\n  ▶ listagem (R26)\n    ✔ R26: encontro existente sem presenças → 200 [] (61.9681ms)\n    ✔ R26/R1: qualquer pessoa da organização lista; participante → 403 SOMENTE_ORGANIZACAO; encontro inexistente → 404 (60.9084ms)\n    ✔ R26: lista em ordem crescente de lidoEm; quem não tem presença não aparece (247.0185ms)\n    ✔ R26: duas presenças com o mesmo lidoEm vêm em ordem crescente de id (185.6353ms)\n  ✔ listagem (R26) (555.8442ms)\n✔ M3 — presença (7621.5104ms)\n▶ M3 — segredo do código (R9)\n  ✔ R9: mesmo encontroId, índice e segredo dão o mesmo código; segredos diferentes, códigos diferentes (0.7895ms)\n  ✔ R9: sem SEGREDO_CODIGO a API usa o valor fixo (326.089ms)\n  ✔ R9: com SEGREDO_CODIGO a API usa esse segredo, e POST /_teste/reset não o troca (373.1283ms)\n✔ M3 — segredo do código (R9) (700.2699ms)\n▶ modo de teste (contrato, seção 3)\n  ✔ POST /_teste/reset responde 204 sem corpo (8.6439ms)\n  ✔ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (24.7225ms)\n  ✔ PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado (74.1217ms)\n  ✔ POST /_teste/reset devolve o relógio a 2026-10-13T09:00:00-03:00 depois de um PUT (61.5045ms)\n  ✔ PUT /_teste/relogio com corpo que não é JSON responde 422 DADOS_INVALIDOS e não mexe no relógio (31.5547ms)\n  ✔ PUT /_teste/relogio com sem o campo agora responde 422 DADOS_INVALIDOS e não mexe no relógio (45.6704ms)\n  ✔ PUT /_teste/relogio com agora que não é texto responde 422 DADOS_INVALIDOS e não mexe no relógio (46.0403ms)\n  ✔ PUT /_teste/relogio com agora que não é uma data responde 422 DADOS_INVALIDOS e não mexe no relógio (30.4132ms)\n✔ modo de teste (contrato, seção 3) (654.4986ms)\n▶ sem MODO_TESTE (contrato, seção 3)\n  ✔ POST /_teste/reset responde 404 NAO_ENCONTRADO (12.0194ms)\n  ✔ GET /_teste/relogio responde 404 NAO_ENCONTRADO (1.8522ms)\n  ✔ PUT /_teste/relogio responde 404 NAO_ENCONTRADO (11.3518ms)\n✔ sem MODO_TESTE (contrato, seção 3) (293.7513ms)\nℹ tests 177\nℹ suites 19\nℹ pass 177\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 8439.178",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3,
+      "reasoning": 0,
+      "cache": {
+       "read": 59494,
+       "write": 2341
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175050872
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01RsEqJJNaZguXU5iZC2FmvF",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\Faculdade\\semana academica\\projeto-semanaacademica\\api\" && npm test 2>&1 | grep -n \"M2\" ",
+       "description": "Find M2 section in test output"
+      },
+      "time": {
+       "start": 1790175052081,
+       "end": 1790175065432
+      },
+      "output": "87:  ✔ R29 (M2): VAGAS_ACIMA_DA_CAPACIDADE vence mesmo com inscrições reais ocupando vagas (76.8852ms)\n89:▶ M2 — inscrições\n131:✔ M2 — inscrições (3243.5508ms)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01TdwPa3g7y8fCmWmbFhg29F",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\Faculdade\\semana academica\\projeto-semanaacademica\" && npx vitest run 2>&1 | tail -60",
+       "description": "Run interface tests via vitest"
+      },
+      "time": {
+       "start": 1790175052733,
+       "end": 1790175077940
+      },
+      "output": "      3| import { http, HttpResponse } from 'msw'\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯\n\n FAIL  app/src/modulos/m3-presenca/TelaCodigoEncontro.test.jsx [ app/src/modulos/m3-presenca/TelaCodigoEncontro.test.jsx ]\nError: Cannot find package '@testing-library/react' imported from C:/Faculdade/semana academica/projeto-semanaacademica/app/src/modulos/m3-presenca/TelaCodigoEncontro.test.jsx\n ❯ app/src/modulos/m3-presenca/TelaCodigoEncontro.test.jsx:1:1\n      1| import { act, render, screen } from '@testing-library/react'\n       | ^\n      2| import { http, HttpResponse } from 'msw'\n      3| import { afterEach, beforeEach, describe, expect, it, vi } from 'vites…\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯\n\n FAIL  app/src/modulos/m3-presenca/TelaLeituraPresenca.test.jsx [ app/src/modulos/m3-presenca/TelaLeituraPresenca.test.jsx ]\nError: Cannot find package '@testing-library/react' imported from C:/Faculdade/semana academica/projeto-semanaacademica/app/src/modulos/m3-presenca/TelaLeituraPresenca.test.jsx\n ❯ app/src/modulos/m3-presenca/TelaLeituraPresenca.test.jsx:1:1\n      1| import { render, screen } from '@testing-library/react'\n       | ^\n      2| import userEvent from '@testing-library/user-event'\n      3| import { http, HttpResponse } from 'msw'\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯\n\n FAIL  app/src/modulos/m1-grade/DetalheAtividade.test.jsx [ app/src/modulos/m1-grade/DetalheAtividade.test.jsx ]\nError: Cannot find package '@testing-library/react' imported from C:/Faculdade/semana academica/projeto-semanaacademica/app/src/modulos/m1-grade/DetalheAtividade.test.jsx\n ❯ app/src/modulos/m1-grade/DetalheAtividade.test.jsx:1:1\n      1| import { render, screen } from '@testing-library/react'\n       | ^\n      2| import { http, HttpResponse } from 'msw'\n      3| import { describe, expect, it } from 'vitest'\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯\n\n FAIL  app/src/modulos/m1-grade/FormularioAtividade.test.jsx [ app/src/modulos/m1-grade/FormularioAtividade.test.jsx ]\nError: Cannot find package '@testing-library/react' imported from C:/Faculdade/semana academica/projeto-semanaacademica/app/src/modulos/m1-grade/FormularioAtividade.test.jsx\n ❯ app/src/modulos/m1-grade/FormularioAtividade.test.jsx:1:1\n      1| import { render, screen, waitFor } from '@testing-library/react'\n       | ^\n      2| import userEvent from '@testing-library/user-event'\n      3| import { http, HttpResponse } from 'msw'\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/11]⎯\n\n FAIL  app/src/modulos/m1-grade/ProgramacaoPorDia.test.jsx [ app/src/modulos/m1-grade/ProgramacaoPorDia.test.jsx ]\nError: Cannot find package '@testing-library/react' imported from C:/Faculdade/semana academica/projeto-semanaacademica/app/src/modulos/m1-grade/ProgramacaoPorDia.test.jsx\n ❯ app/src/modulos/m1-grade/ProgramacaoPorDia.test.jsx:1:1\n      1| import { render, screen, waitFor } from '@testing-library/react'\n       | ^\n      2| import userEvent from '@testing-library/user-event'\n      3| import { http, HttpResponse } from 'msw'\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/11]⎯\n\n\n Test Files  11 failed (11)\n      Tests  no tests\n   Start at  11:51:17\n   Duration  798ms (transform 49%, worker 33%, import 17%)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 9,
+      "reasoning": 0,
+      "cache": {
+       "read": 61835,
+       "write": 7471
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175081679
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01QG4KJr5vZUogj4t2QRCbpy",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\Faculdade\\semana academica\\projeto-semanaacademica\\api\" && npm test 2>&1 | sed -n '89,131p'",
+       "description": "Show M2 test results detail"
+      },
+      "time": {
+       "start": 1790175082850,
+       "end": 1790175094993
+      },
+      "output": "▶ M2 — inscrições\n  ▶ inscrever sem fila (fatia 1)\n    ✔ R1: POST /atividades/:id/inscricoes com corpo {} responde 201 (corpo ignorado) (69.7464ms)\n    ✔ R2: com vaga disponível, a inscrição nasce confirmada (48.9637ms)\n    ✔ R3: 409 JA_INSCRITO ao tentar se inscrever de novo com uma inscrição confirmada ativa (51.3804ms)\n    ✔ R3: cancelar a inscrição anterior libera nova inscrição (65.9427ms)\n    ✔ R4: 422 ATIVIDADE_CANCELADA ao se inscrever numa atividade cancelada (31.482ms)\n    ✔ R5: 422 INSCRICOES_ENCERRADAS a 30 minutos ou menos do início do 1º encontro (117.7945ms)\n    ✔ R6: 409 CONFLITO_DE_HORARIO com um encontro confirmado em outra atividade no mesmo horário (77.0839ms)\n    ✔ R7: 422 LIMITE_DE_MINICURSOS ao ultrapassar 3 minicursos confirmados; uma palestra passa (204.561ms)\n    ✔ R8: com ATIVIDADE_CANCELADA, INSCRICOES_ENCERRADAS e JA_INSCRITO aplicáveis, a mais externa vence (74.0519ms)\n  ✔ inscrever sem fila (fatia 1) (742.5712ms)\n  ▶ cancelar sem convocação (fatia 2)\n    ✔ R9: 422 ATIVIDADE_JA_INICIADA no cancelamento no instante exato do início; um segundo antes, 200 (108.7796ms)\n    ✔ R10: 422 INSCRICAO_INATIVA ao cancelar a mesma inscrição pela 2ª vez (77.5701ms)\n    ✔ R11: ATIVIDADE_JA_INICIADA vence INSCRICAO_INATIVA quando as duas valem (123.5714ms)\n    ✔ R13: 404 NAO_ENCONTRADO ao tentar cancelar a inscrição de outro participante (46.4787ms)\n    ✔ R12: cancelar inscrição em_espera (única na fila) só muda o status para cancelada, sem convocar (93.082ms)\n  ✔ cancelar sem convocação (fatia 2) (449.8887ms)\n  ▶ fila e convocação (fatia 3)\n    ✔ R2: sem vaga, a inscrição nasce em_espera com posicaoNaEspera 1 (48.2932ms)\n    ✔ R12/R14: cancelar inscrição confirmada libera vaga e convoca o próximo da fila (105.4661ms)\n    ✔ R14/R15: PATCH aumentando vagas em mais de 1 convoca quantos couberem, em ordem de fila (107.9842ms)\n    ✔ R16: convocação vencida expira e convoca o próximo na mesma leitura (lazy) (186.0007ms)\n    ✔ R24: posicaoNaEspera é recalculada quando a primeira da fila cancela (155.3939ms)\n    ✔ R25: inscrição de atividade cancelada continua respondendo 200 com status cancelada (60.6476ms)\n  ✔ fila e convocação (fatia 3) (664.2145ms)\n  ▶ leitura (fatia 1)\n    ✔ R22: organização vê as inscrições de todos; participante só as próprias; empate por id; filtro sem match é [] (123.8648ms)\n    ✔ R22 (autoria plena): posicaoNaEspera aparece em GET /inscricoes para quem está em_espera (125.1788ms)\n    ✔ R23: participante só vê a própria inscrição por GET /inscricoes/:id; organização vê qualquer uma (79.3926ms)\n  ✔ leitura (fatia 1) (328.7154ms)\n  ▶ confirmar convocação (fatia 4)\n    ✔ R17: 422 SEM_CONVOCACAO ao confirmar uma inscrição confirmada que nunca foi convocada (43.4236ms)\n    ✔ R17: 422 SEM_CONVOCACAO ao confirmar de novo uma inscrição já confirmada por uma convocação anterior (93.5926ms)\n    ✔ R18: 422 CONVOCACAO_EXPIRADA ao confirmar depois que convocadaAte venceu (127.8487ms)\n    ✔ R19: 422 CONFLITO_DE_HORARIO na confirmação; convocação continua convocada, convocadaAte inalterado (197.0076ms)\n    ✔ R19: 422 LIMITE_DE_MINICURSOS na confirmação quando ultrapassaria 3 minicursos confirmados/convocados (219.2155ms)\n    ✔ R20/R20a: confirmação aceita após o início da atividade, enquanto convocadaAte não vence; sucesso zera convocadaAte (120.4415ms)\n    ✔ R21: convocação vencida e com conflito de horário → CONVOCACAO_EXPIRADA (vence CONFLITO_DE_HORARIO) (219.7514ms)\n    ✔ R21a: 404 NAO_ENCONTRADO ao tentar confirmar a inscrição de outro participante (104.5758ms)\n  ✔ confirmar convocação (fatia 4) (1126.4618ms)\n✔ M2 — inscrições (3699.9341ms)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2,
+      "reasoning": 0,
+      "cache": {
+       "read": 69306,
+       "write": 2334
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175098169
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "All 30 M2 tests pass. Now compiling the final report.",
+     "time": {
+      "start": 1790175098169
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "subagenthandback",
+     "callID": "toolu_019b4VEBoBo5iYizEhsEgW1g",
+     "state": {
+      "status": "completed",
+      "input": {
+       "message": "## Matriz de rastreabilidade\n\n| Regra | Origem | Teste que comprova | Veredito |\n|---|---|---|---|\n| R1 | P-19, P-20 | api/test/m2-inscricoes.test.js:72-76 «R1: POST … com corpo {} responde 201» | PROVA FRACA |\n| R2 | P-01; RN-205 | m2-inscricoes.test.js:78-90 (com vaga → confirmada) e :285-296 (sem vaga → em_espera, posicaoNaEspera 1) | COMPROVADA |\n| R3 | P-02; RN-204 | m2-inscricoes.test.js:92-98 (409 JA_INSCRITO) e :100-108 (cancelada libera) | COMPROVADA |\n| R4 | contrato §6 | m2-inscricoes.test.js:110-116 | COMPROVADA |\n| R5 | P-08, P-31; RN-202 | m2-inscricoes.test.js:118-126 | COMPROVADA |\n| R6 | P-07; RN-206 | m2-inscricoes.test.js:128-146 | PROVA FRACA |\n| R7 | P-06; RN-207 | m2-inscricoes.test.js:148-198 | PROVA FRACA |\n| R8 | P-15; RN-208 | m2-inscricoes.test.js:200-210 | COMPROVADA |\n| R9 | P-12; RN-209 | m2-inscricoes.test.js:214-228 | COMPROVADA |\n| R10 | P-11; RN-210 | m2-inscricoes.test.js:230-240 | COMPROVADA |\n| R11 | P-16, P-32; RN-209/210 | m2-inscricoes.test.js:242-253 | COMPROVADA |\n| R12 | P-10; RN-211 | m2-inscricoes.test.js:264-281 (em_espera) e :298-317 (confirmada/convocada) | COMPROVADA |\n| R13 | P-14; RN-218 | m2-inscricoes.test.js:255-262 | COMPROVADA |\n| R14 | P-03; RN-211/216 | m2-inscricoes.test.js:298-317 e :319-340 | COMPROVADA |\n| R15 | P-26 | m2-inscricoes.test.js:319-340 | COMPROVADA |\n| R16 | P-04, P-05, P-30; RN-211/212/213 | m2-inscricoes.test.js:342-368 | COMPROVADA |\n| R17 | P-13, P-17; RN-214/215 | m2-inscricoes.test.js:469-476 e :478-496 | COMPROVADA |\n| R18 | P-17; RN-214/215 | m2-inscricoes.test.js:498-514 | COMPROVADA |\n| R19 | P-13; RN-214 | m2-inscricoes.test.js:516-557 (CONFLITO) e :559-603 (LIMITE) | COMPROVADA |\n| R20 | P-27 | m2-inscricoes.test.js:605-629 | COMPROVADA |\n| R20a | P-33; contrato §5 | m2-inscricoes.test.js:605-629 (linhas 623-628) | COMPROVADA |\n| R21 | P-17; RN-214/215 | m2-inscricoes.test.js:631-667 | COMPROVADA |\n| R21a | P-34; RN-218 | m2-inscricoes.test.js:669-683 | COMPROVADA |\n| R22 | P-21, P-25 | m2-inscricoes.test.js:408-429 e :431-452 | COMPROVADA |\n| R23 | P-14, P-25; RN-218 | m2-inscricoes.test.js:454-465 | COMPROVADA |\n| R24 | P-22 | m2-inscricoes.test.js:370-391 | COMPROVADA |\n| R25 | P-24 | m2-inscricoes.test.js:393-404 | COMPROVADA |\n\nOrigem: todas as 27 regras citam P-xx existentes na entrevista, com resposta registrada (nenhuma `PENDENTE`). Conferi as 27 uma a uma contra `entrevistas/M2-inscricoes.md` — nenhuma \"SEM ORIGEM\".\n\n## Suíte\n\n`npm test` (api/, roda toda a suíte, node --test) → `ℹ tests 177 / pass 177 / fail 0`. Dentro dela, a suíte `M2 — inscrições` roda 30 casos, todos ✔ (api/test/m2-inscricoes.test.js, saída completa registrada linhas 89-131 da execução).\n\n`npx vitest run` (app/) → falha em 11 arquivos com `Error: Cannot find package '@testing-library/react'` (dependências da interface não instaladas nesta máquina); nenhum teste chegou a executar (`Test Files 11 failed (11)`, `Tests no tests`). Não há arquivo de teste de interface para M2 — não existe `app/**` correspondente a inscrições (busca por `app/**/*inscric*` não retornou nada).\n\n## Achados\n\n1. [PROVA FRACA] R1 — a spec exige três coisas: (a) corpo não-JSON em `POST /atividades/:id/inscricoes` → 422 `DADOS_INVALIDOS`; (b) qualquer JSON válido ignorado; (c) mesmo critério para o corpo de `/cancelamento` e `/confirmacao` (critério de aceite 27). O único teste existente (m2-inscricoes.test.js:72-76) cobre apenas (b), e só para `POST /inscricoes`. O helper `pedir` já suporta `corpoTexto` para simular corpo não-JSON (linha 21-23) mas nenhum teste de M2 o usa (busca por `corpoTexto` no arquivo só encontra a definição do helper). Não há teste de corpo não-JSON, nem de corpo ignorado em `/cancelamento` ou `/confirmacao`. Cenário que expõe: enviar `\"não é json\"` como corpo de `POST /atividades/:id/inscricoes` hoje não é verificado; se a rota devolvesse 201 em vez de 422, nenhum teste detectaria.\n\n2. [PROVA FRACA] R6 — a regra exige que a checagem valha para inscrição `confirmada` **ou** `convocada` do outro lado, e explicitamente que `em_espera` **não** conte (critério de aceite 5 da spec: \"Se a inscrição anterior fosse `em_espera`, a nova inscrição em M → 201\"). O único teste (m2-inscricoes.test.js:128-146) cobre só o caso `confirmada` bloqueando. Não há teste que comprove o caso `convocada` bloqueando no momento da inscrição, nem o caso negativo (`em_espera` não bloqueia) exigido pelo próprio critério de aceite da spec. A implementação (api/src/modulos/m2-inscricoes/rotas.js:78-87) já filtra por `status IN ('confirmada','convocada')`, mas nenhum cenário exercita a exclusão de `em_espera`.\n\n3. [PROVA FRACA] R7 — a regra manda contar `confirmada` **e** `convocada` para o limite de 3 minicursos. O teste (m2-inscricoes.test.js:148-198) só usa inscrições `confirmada`; não há cenário em que um dos três minicursos esteja `convocada` no momento da nova tentativa de inscrição, então a contagem de `convocada` nessa rota (rotas.js:90-100) não é exercitada por nenhum teste de inscrição (só é tocada indiretamente pelo teste de R19 na rota de confirmação, que é outro endpoint).\n\n4. Nenhum teste da API M2 cobre os itens herdados do contrato listados no critério de aceite 28 da própria spec (403 `SOMENTE_PARTICIPANTE` quando organização chama as três rotas de participante; 404 em atividade/inscrição inexistente nas três rotas de escrita e no `GET /inscricoes/:id`) — busca por `SOMENTE_PARTICIPANTE` e `USUARIO_DESCONHECIDO` no arquivo de teste não retorna nada. Não são regras R numeradas (são \"regra geral do contrato\", herdada do §1), então é passagem de fronteira com o `revisor-de-contrato`, mas o próprio critério de aceite 28 da spec M2 pede esse teste e ele não existe.\n\n5. Não há parte correspondente em `app/` para o M2 (nenhum arquivo bate com `app/**/*inscric*`); a spec/entrevista de M2 não menciona tela de inscrição, então isso não é lacuna de regra, só registro de que a auditoria não encontrou superfície de interface para conferir.\n\n## Veredito\n\nDas 27 regras da spec, 24 estão comprovadas por teste que exercita exatamente o cenário exigido; R1, R6 e R7 têm prova parcial — cobrem o caminho principal mas deixam sem teste ramos que a própria spec pede explicitamente (corpo não-JSON e corpo de `/cancelamento`/`/confirmacao` em R1; a contagem de `convocada` e a exclusão de `em_espera` em R6 e R7). Falta pelo menos um teste por lacuna (itens 1-3 dos achados) antes de aceitar o módulo como coberto pela sua própria spec."
+      },
+      "time": {
+       "start": 1790175129280,
+       "end": 1790175130534
+      },
+      "output": "{\"success\":true,\"message\":\"Report delivered to your caller.\"}"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2,
+      "reasoning": 0,
+      "cache": {
+       "read": 71640,
+       "write": 2247
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175133082
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Parecer entregue ao agente chamador via SubagentHandback.",
+     "time": {
+      "start": 1790175133082
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 25,
+      "reasoning": 0,
+      "cache": {
+       "read": 73910,
+       "write": 3363
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175218045
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_013Y3h8P4hXTuiWLXAAdQ1au",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "mkdir -p \"C:/Faculdade/semana academica/projeto-semanaacademica/auditorias\"",
+       "description": "Ensure auditorias directory exists"
+      },
+      "time": {
+       "start": 1790175218859,
+       "end": 1790175220258
+      },
+      "output": "(Bash completed with no output)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 5,
+      "reasoning": 0,
+      "cache": {
+       "read": 77273,
+       "write": 138
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175249858
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_017amHWjDjqi159icwfew5JR",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cat > \"C:/Faculdade/semana academica/projeto-semanaacademica/auditorias/M2-2026-09-23.md\" <<'PARECER_EOF'\n## Matriz de rastreabilidade\n\n| Regra | Origem | Teste que comprova | Veredito |\n|---|---|---|---|\n| R1 | P-19, P-20 | api/test/m2-inscricoes.test.js:72-76 «R1: POST … com corpo {} responde 201» | PROVA FRACA |\n| R2 | P-01; RN-205 | m2-inscricoes.test.js:78-90 (com vaga → confirmada) e :285-296 (sem vaga → em_espera, posicaoNaEspera 1) | COMPROVADA |\n| R3 | P-02; RN-204 | m2-inscricoes.test.js:92-98 (409 JA_INSCRITO) e :100-108 (cancelada libera) | COMPROVADA |\n| R4 | contrato §6 | m2-inscricoes.test.js:110-116 | COMPROVADA |\n| R5 | P-08, P-31; RN-202 | m2-inscricoes.test.js:118-126 | COMPROVADA |\n| R6 | P-07; RN-206 | m2-inscricoes.test.js:128-146 | PROVA FRACA |\n| R7 | P-06; RN-207 | m2-inscricoes.test.js:148-198 | PROVA FRACA |\n| R8 | P-15; RN-208 | m2-inscricoes.test.js:200-210 | COMPROVADA |\n| R9 | P-12; RN-209 | m2-inscricoes.test.js:214-228 | COMPROVADA |\n| R10 | P-11; RN-210 | m2-inscricoes.test.js:230-240 | COMPROVADA |\n| R11 | P-16, P-32; RN-209/210 | m2-inscricoes.test.js:242-253 | COMPROVADA |\n| R12 | P-10; RN-211 | m2-inscricoes.test.js:264-281 (em_espera) e :298-317 (confirmada/convocada) | COMPROVADA |\n| R13 | P-14; RN-218 | m2-inscricoes.test.js:255-262 | COMPROVADA |\n| R14 | P-03; RN-211/216 | m2-inscricoes.test.js:298-317 e :319-340 | COMPROVADA |\n| R15 | P-26 | m2-inscricoes.test.js:319-340 | COMPROVADA |\n| R16 | P-04, P-05, P-30; RN-211/212/213 | m2-inscricoes.test.js:342-368 | COMPROVADA |\n| R17 | P-13, P-17; RN-214/215 | m2-inscricoes.test.js:469-476 e :478-496 | COMPROVADA |\n| R18 | P-17; RN-214/215 | m2-inscricoes.test.js:498-514 | COMPROVADA |\n| R19 | P-13; RN-214 | m2-inscricoes.test.js:516-557 (CONFLITO) e :559-603 (LIMITE) | COMPROVADA |\n| R20 | P-27 | m2-inscricoes.test.js:605-629 | COMPROVADA |\n| R20a | P-33; contrato §5 | m2-inscricoes.test.js:605-629 (linhas 623-628) | COMPROVADA |\n| R21 | P-17; RN-214/215 | m2-inscricoes.test.js:631-667 | COMPROVADA |\n| R21a | P-34; RN-218 | m2-inscricoes.test.js:669-683 | COMPROVADA |\n| R22 | P-21, P-25 | m2-inscricoes.test.js:408-429 e :431-452 | COMPROVADA |\n| R23 | P-14, P-25; RN-218 | m2-inscricoes.test.js:454-465 | COMPROVADA |\n| R24 | P-22 | m2-inscricoes.test.js:370-391 | COMPROVADA |\n| R25 | P-24 | m2-inscricoes.test.js:393-404 | COMPROVADA |\n\nOrigem: todas as 27 regras citam P-xx existentes na entrevista, com resposta registrada (nenhuma `PENDENTE`). Conferi as 27 uma a uma contra `entrevistas/M2-inscricoes.md` — nenhuma \"SEM ORIGEM\".\n\n## Suíte\n\n`npm test` (api/, roda toda a suíte, node --test) → `ℹ tests 177 / pass 177 / fail 0`. Dentro dela, a suíte `M2 — inscrições` roda 30 casos, todos ✔ (api/test/m2-inscricoes.test.js, saída completa registrada linhas 89-131 da execução).\n\n`npx vitest run` (app/) → falha em 11 arquivos com `Error: Cannot find package '@testing-library/react'` (dependências da interface não instaladas nesta máquina); nenhum teste chegou a executar (`Test Files 11 failed (11)`, `Tests no tests`). Não há arquivo de teste de interface para M2 — não existe `app/**` correspondente a inscrições (busca por `app/**/*inscric*` não retornou nada).\n\n## Achados\n\n1. [PROVA FRACA] R1 — a spec exige três coisas: (a) corpo não-JSON em `POST /atividades/:id/inscricoes` → 422 `DADOS_INVALIDOS`; (b) qualquer JSON válido ignorado; (c) mesmo critério para o corpo de `/cancelamento` e `/confirmacao` (critério de aceite 27). O único teste existente (m2-inscricoes.test.js:72-76) cobre apenas (b), e só para `POST /inscricoes`. O helper `pedir` já suporta `corpoTexto` para simular corpo não-JSON (linha 21-23) mas nenhum teste de M2 o usa (busca por `corpoTexto` no arquivo só encontra a definição do helper). Não há teste de corpo não-JSON, nem de corpo ignorado em `/cancelamento` ou `/confirmacao`. Cenário que expõe: enviar `\"não é json\"` como corpo de `POST /atividades/:id/inscricoes` hoje não é verificado; se a rota devolvesse 201 em vez de 422, nenhum teste detectaria.\n\n2. [PROVA FRACA] R6 — a regra exige que a checagem valha para inscrição `confirmada` **ou** `convocada` do outro lado, e explicitamente que `em_espera` **não** conte (critério de aceite 5 da spec: \"Se a inscrição anterior fosse `em_espera`, a nova inscrição em M → 201\"). O único teste (m2-inscricoes.test.js:128-146) cobre só o caso `confirmada` bloqueando. Não há teste que comprove o caso `convocada` bloqueando no momento da inscrição, nem o caso negativo (`em_espera` não bloqueia) exigido pelo próprio critério de aceite da spec. A implementação (api/src/modulos/m2-inscricoes/rotas.js:78-87) já filtra por `status IN ('confirmada','convocada')`, mas nenhum cenário exercita a exclusão de `em_espera`.\n\n3. [PROVA FRACA] R7 — a regra manda contar `confirmada` **e** `convocada` para o limite de 3 minicursos. O teste (m2-inscricoes.test.js:148-198) só usa inscrições `confirmada`; não há cenário em que um dos três minicursos esteja `convocada` no momento da nova tentativa de inscrição, então a contagem de `convocada` nessa rota (rotas.js:90-100) não é exercitada por nenhum teste de inscrição (só é tocada indiretamente pelo teste de R19 na rota de confirmação, que é outro endpoint).\n\n4. Nenhum teste da API M2 cobre os itens herdados do contrato listados no critério de aceite 28 da própria spec (403 `SOMENTE_PARTICIPANTE` quando organização chama as três rotas de participante; 404 em atividade/inscrição inexistente nas três rotas de escrita e no `GET /inscricoes/:id`) — busca por `SOMENTE_PARTICIPANTE` e `USUARIO_DESCONHECIDO` no arquivo de teste não retorna nada. Não são regras R numeradas (são \"regra geral do contrato\", herdada do §1), então é passagem de fronteira com o `revisor-de-contrato`, mas o próprio critério de aceite 28 da spec M2 pede esse teste e ele não existe.\n\n5. Não há parte correspondente em `app/` para o M2 (nenhum arquivo bate com `app/**/*inscric*`); a spec/entrevista de M2 não menciona tela de inscrição, então isso não é lacuna de regra, só registro de que a auditoria não encontrou superfície de interface para conferir.\n\n## Veredito\n\nDas 27 regras da spec, 24 estão comprovadas por teste que exercita exatamente o cenário exigido; R1, R6 e R7 têm prova parcial — cobrem o caminho principal mas deixam sem teste ramos que a própria spec pede explicitamente (corpo não-JSON e corpo de `/cancelamento`/`/confirmacao` em R1; a contagem de `convocada` e a exclusão de `em_espera` em R6 e R7). Falta pelo menos um teste por lacuna (itens 1-3 dos achados) antes de aceitar o módulo como coberto pela sua própria spec.\nPARECER_EOF\necho \"SAVED\"",
+       "description": "Write audit report to auditorias/M2-2026-09-23.md verbatim"
+      },
+      "time": {
+       "start": 1790175249858,
+       "end": 1790175251853
+      },
+      "output": "SAVED",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 20,
+      "reasoning": 0,
+      "cache": {
+       "read": 77411,
+       "write": 903
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175255352
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "subagenthandback",
+     "callID": "toolu_01KFbBaiJhMHxxK5kXXi2qvg",
+     "state": {
+      "status": "completed",
+      "input": {
+       "message": "Parecer salvo, sem edições, em: C:\\Faculdade\\semana academica\\projeto-semanaacademica\\auditorias\\M2-2026-09-23.md\n\nConteúdo idêntico ao entregue anteriormente (matriz de rastreabilidade das 27 regras, resultado da suíte, 5 achados e veredito). Nenhum texto foi alterado ao salvar."
+      },
+      "time": {
+       "start": 1790175255352,
+       "end": 1790175256469
+      },
+      "output": "{\"success\":true,\"message\":\"Report delivered to your caller.\"}"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 26,
+      "reasoning": 0,
+      "cache": {
+       "read": 78314,
+       "write": 3466
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175258864
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Parecer salvo em `C:\\Faculdade\\semana academica\\projeto-semanaacademica\\auditorias\\M2-2026-09-23.md`, sem edições em relação ao texto entregue anteriormente.",
+     "time": {
+      "start": 1790175258864
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 74,
+      "reasoning": 0,
+      "cache": {
+       "read": 81780,
+       "write": 248
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

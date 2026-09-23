@@ -1,0 +1,262 @@
+{
+ "info": {
+  "id": "ses_claude_12d7ff61-3bc3-4ff0-a0ed-c706d08a0b08",
+  "title": "Perguntas pendentes entrevistas/M2-inscricoes.md",
+  "directory": "C:\\Faculdade\\semana academica\\projeto-semanaacademica",
+  "time": {
+   "created": 1790125396702,
+   "updated": 1790125434610
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790125396699
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "/model",
+     "time": {
+      "start": 1790125396699
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790125403462
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"a1e0\">\nVamos responder as perguntas marcadas como PENDENTE em\nentrevistas/M2-inscricoes.md, uma de cada vez. Eu respondo com o que li\nno documento de requisitos, citando a regra; registre a minha resposta\ne ponha a regra na coluna Fonte. Não crie perguntas novas e não mexa\nnas perguntas já respondidas.\n\nP-01: Sem vaga, a inscrição nasce com status em_espera, retornando 201.\nNão é erro. Fonte: RN-205.\n\nP-02: Bloqueiam nova inscrição: confirmada, em_espera e convocada.\nCancelada e expirada liberam. Fonte: RN-204.\n\nP-03: Toda vaga liberada — por cancelamento de confirmada/convocada,\npor convocação vencida ou por aumento de vagas via PATCH — convoca o\npróximo da fila FIFO por ordem de chegada. Fonte: RN-211, RN-216.\n\nP-04: O prazo de convocação é de 2 horas, respeitando o fechamento das\ninscrições. Atenção: o documento diz que a expiração ocorre em cascata\nmesmo sem acessos ao sistema, o que contradiz a decisão lazy da P-05.\nRegistre essa contradição e marque para resolver na spec. Fonte: RN-211,\nRN-212, RN-213.\n\nP-05: A convocação em cadeia ocorre imediatamente com base no tempo\ndecorrido, mesmo sem interação de usuário. Isso contradiz a decisão lazy\nregistrada na rodada 1. Registre a regra do documento e marque para\nresolver na spec: o grupo precisa decidir entre lazy (só ao tocar a\natividade) e cascade (na mesma requisição que detecta a expiração).\nFonte: RN-213.\n\nP-06: Máximo de 3 minicursos. Conta confirmada e convocada. em_espera\ne palestras não entram. Fonte: RN-207.\n\nP-07: Sobreposição bloqueia. Conta confirmada e convocada. em_espera não\nconta. Vale entre quaisquer tipos. Fonte: RN-206.\n\nP-08: Inscrições encerram 30 minutos antes do início do 1º encontro,\nnão no instante exato como a decisão da rodada 1 sugeria. Registre a\nregra do documento. Fonte: RN-202.\n\nP-09: O grupo não implementa M5 nesta entrega. INSCRICAO_BLOQUEADA fica\nfora do escopo e nunca é devolvido. Fonte: decisão do grupo; RN-208,\nRN-507 ficam fora do escopo.\n\nP-10: Cancelar confirmada ou convocada libera vaga e convoca o próximo.\nCancelar em_espera remove da fila sem liberar vaga. Fonte: RN-211.\n\nP-11: INSCRICAO_INATIVA cobre tentar cancelar inscrição já cancelada ou\njá expirada. Fonte: RN-210.\n\nP-12: Limite é o instante exato do início do 1º encontro, sem\nantecedência mínima. Vale para qualquer status ativo. Fonte: RN-209.\n\nP-13: /confirmacao reconfere CONFLITO_DE_HORARIO e LIMITE_DE_MINICURSOS.\nSe falhar, convocação continua convocada até convocadaAte. Fonte: RN-214.\n\nP-14: Participante tentando agir na inscrição de outro recebe 404\nNAO_ENCONTRADO. Fonte: RN-218.\n\nP-15: Ordem no POST /inscricoes: 404 (inexistente) → ATIVIDADE_CANCELADA\n→ INSCRICOES_ENCERRADAS → JA_INSCRITO → CONFLITO_DE_HORARIO →\nLIMITE_DE_MINICURSOS → (sem vaga → em_espera). INSCRICAO_BLOQUEADA fora\ndo escopo (P-09). Fonte: RN-208.\n\nP-16: O documento não deixa clara a ordem entre ATIVIDADE_JA_INICIADA e\nINSCRICAO_INATIVA. Registre as duas regras do documento (RN-209 e\nRN-210) e marque para resolver na spec. Fonte: RN-209, RN-210.\n\nP-17: Ordem na confirmação: SEM_CONVOCACAO → CONVOCACAO_EXPIRADA →\nCONFLITO_DE_HORARIO → LIMITE_DE_MINICURSOS. Fonte: RN-214, RN-215.\n\nP-18: Fora do escopo: inscrição manual pela organização, inscrever em\nnome de terceiros, listar fila diretamente, alterar posição na fila.\nFonte: RN-218, RN-219, Seção 7.\n\nRegistre todas as respostas e confirme quando terminar. Atualize a seção\nde pendentes para refletir que todas foram respondidas.\n</pasted_content id=\"a1e0\">\n",
+     "time": {
+      "start": 1790125403462
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790125404839
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01B9K7MVC2BRgH1rqQ4AZrsk",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\entrevistas\\M2-inscricoes.md"
+      },
+      "time": {
+       "start": 1790125405569,
+       "end": 1790125405608
+      },
+      "output": "[16785 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 111,
+      "reasoning": 0,
+      "cache": {
+       "read": 42263,
+       "write": 21108
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790125418076
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01ToB1wpnBujTYJ3NwjMxMph",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "| P-17 | Precedência na confirmação: `SEM_CONVOCACAO` × `CONVOCACAO_EXPIRADA` × `CONFLITO_DE_HORARIO` × `LIMITE_DE_MINICURSOS` — em que ordem? | consultar requisitos | Pendente |\n| P-18 | Fora do escopo: o M2 faz algum destes? Organização inscrever participante manualmente; participante se inscrever em nome de outro; desistir de uma convocação sem confirmar nem esperar expirar; listar a fila de espera de uma atividade (isso seria do M5?); alterar a própria posição na fila. | consultar requisitos | Pendente |",
+       "new_string": "| P-17 | Precedência na confirmação: `SEM_CONVOCACAO` × `CONVOCACAO_EXPIRADA` × `CONFLITO_DE_HORARIO` × `LIMITE_DE_MINICURSOS` — em que ordem? | Ordem: `SEM_CONVOCACAO` → `CONVOCACAO_EXPIRADA` → `CONFLITO_DE_HORARIO` → `LIMITE_DE_MINICURSOS`. | RN-214, RN-215 |\n| P-18 | Fora do escopo: o M2 faz algum destes? Organização inscrever participante manualmente; participante se inscrever em nome de outro; desistir de uma convocação sem confirmar nem esperar expirar; listar a fila de espera de uma atividade (isso seria do M5?); alterar a própria posição na fila. | Fora do escopo: inscrição manual pela organização, inscrever em nome de terceiros, listar a fila de espera diretamente, alterar a própria posição na fila. | RN-218, RN-219, Seção 7 |",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\entrevistas\\M2-inscricoes.md"
+      },
+      "time": {
+       "start": 1790125422436,
+       "end": 1790125422488
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\entrevistas\\M2-inscricoes.md has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2037,
+      "reasoning": 0,
+      "cache": {
+       "read": 63371,
+       "write": 8365
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790125425840
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01CWgoJEwojM8DboqpFhnxEK",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "## Pendentes (consultar requisitos)\n\n| # | Assunto | Código(s) afetado(s) |\n|---|---|---|\n| P-17 | Precedência na confirmação — resposta recebida incompleta (parou em `CONFLITO_DE_HORARIO →`); falta o restante da ordem e a fonte | `SEM_CONVOCACAO`, `CONVOCACAO_EXPIRADA`, `CONFLITO_DE_HORARIO`, `LIMITE_DE_MINICURSOS` |\n| P-18 | Limites de escopo do M2 | — |",
+       "new_string": "## Pendentes (consultar requisitos)\n\nNenhuma pendente. P-17 e P-18 foram respondidas na consulta ao documento de requisitos (ver Rodada 1).",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\entrevistas\\M2-inscricoes.md"
+      },
+      "time": {
+       "start": 1790125428321,
+       "end": 1790125428360
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\entrevistas\\M2-inscricoes.md has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 606,
+      "reasoning": 0,
+      "cache": {
+       "read": 71736,
+       "write": 2150
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790125432666
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01MrqZTs4iofVgs51jfc9G7k",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "Em 2026-09-22, consulta ao documento de requisitos resolveu P-01, P-02, P-03, P-06, P-07, P-08, P-09, P-10, P-11, P-12, P-13, P-14 e P-15. P-04, P-05 e P-16 também foram respondidas com a regra do documento, mas ficaram marcadas para decidir na spec por contradizerem (ou deixarem em aberto) decisões já tomadas — ver \"Contradições a resolver na spec\". P-17 ficou parcialmente respondida (falta completar a ordem e a fonte) e P-18 segue pendente. Próximo passo: completar P-17, resolver P-18, decidir as contradições registradas, e então a spec (`to-spec`).",
+       "new_string": "Em 2026-09-22, consulta ao documento de requisitos resolveu P-01, P-02, P-03, P-06, P-07, P-08, P-09, P-10, P-11, P-12, P-13, P-14, P-15, P-17 e P-18. P-04, P-05 e P-16 também foram respondidas com a regra do documento, mas ficaram marcadas para decidir na spec por contradizerem (ou deixarem em aberto) decisões já tomadas — ver \"Contradições a resolver na spec\". Nenhuma pergunta segue pendente. Próximo passo: decidir as contradições registradas e então a spec (`to-spec`).",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\entrevistas\\M2-inscricoes.md"
+      },
+      "time": {
+       "start": 1790125432666,
+       "end": 1790125432712
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\entrevistas\\M2-inscricoes.md has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 604,
+      "reasoning": 0,
+      "cache": {
+       "read": 73886,
+       "write": 719
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790125434610
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "P-17 e P-18 foram registradas e a seção de pendentes ficou vazia — nenhuma pergunta segue marcada como PENDENTE. As demais (P-01 a P-16), já respondidas, não foram alteradas. Restam só as três contradições (P-04, P-05, P-16) para decidir antes da spec.",
+     "time": {
+      "start": 1790125434610
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 113,
+      "reasoning": 0,
+      "cache": {
+       "read": 74605,
+       "write": 717
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

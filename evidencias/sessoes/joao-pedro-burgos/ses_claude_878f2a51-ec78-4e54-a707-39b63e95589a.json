@@ -1,0 +1,1585 @@
+{
+ "info": {
+  "id": "ses_claude_878f2a51-ec78-4e54-a707-39b63e95589a",
+  "title": "M2 telas de inscrições app",
+  "directory": "C:\\Faculdade\\semana academica\\projeto-semanaacademica",
+  "time": {
+   "created": 1790175357239,
+   "updated": 1790175754678
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790175357239
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"6c43\">\nImplemente as telas do M2 em app/. Quatro telas mínimas:\n\n1. Detalhe da atividade com botão de inscrever e botão de cancelar.\n   Chama POST /atividades/:id/inscricoes e DELETE /inscricoes/:id.\n   Mostra o erro da API quando ocorrer.\n\n2. \"Minhas inscrições\" — lista as inscrições do participante com\n   status, posição na espera (se em_espera) e contagem regressiva\n   até convocadaAte (se convocada).\n\n3. Botão de confirmar convocação — aparece quando status é \"convocada\".\n   Chama POST /inscricoes/:id/confirmacao. Mostra erro se\n   CONVOCACAO_EXPIRADA ou CONFLITO_DE_HORARIO.\n\n4. Botão de cancelar inscrição — em qualquer status ativo.\n\nPara cada tela, escreva o teste com MSW antes do componente.\nRode npx vitest run e veja falhar antes de escrever o código.\nA API é sempre a falsa (MSW) nos testes. Nenhum teste chama a API real.\nCommit por tela: \"app: tela de inscrições do M2\".\n</pasted_content id=\"6c43\">\n",
+     "time": {
+      "start": 1790175357239
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175358655
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vou começar explorando o app, o contrato e a spec do M2.",
+     "time": {
+      "start": 1790175358853
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Jw5ExTgX5oUZ3jrj9sx7Y6",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica\" && ls && cat projeto.json && git ls-files app | grep -v node_modules | head -80 && ls specs entrevistas"
+      },
+      "time": {
+       "start": 1790175359726,
+       "end": 1790175361033
+      },
+      "output": "AGENTS.md\nCLAUDE.md\nEQUIPE.md\nREADME.md\napi\napp\nauditorias\ncontrato-api.md\nentrevistas\nevidencias\nnode_modules\nprojeto.json\nspecs\n{\r\n  \"stack\": \"Node 22.13+ + Express 5 + SQLite (node:sqlite, em arquivo); interface web em Vite + React\",\r\n  \"api\": {\r\n    \"pasta\": \"api\",\r\n    \"instalar\": \"npm install\",\r\n    \"iniciar\": \"npm start\"\r\n  },\r\n  \"testes\": [\"npm test\", \"npx vitest run\"]\r\n}\r\napp/.gitignore\napp/.oxlintrc.json\napp/AGENTS.md\napp/CLAUDE.md\napp/README.md\napp/index.html\napp/package-lock.json\napp/package.json\napp/public/favicon.svg\napp/public/icons.svg\napp/src/App.jsx\napp/src/api/cliente.js\napp/src/index.css\napp/src/main.jsx\napp/src/modulos/m1-grade/DetalheAtividade.jsx\napp/src/modulos/m1-grade/DetalheAtividade.test.jsx\napp/src/modulos/m1-grade/FormularioAtividade.jsx\napp/src/modulos/m1-grade/FormularioAtividade.test.jsx\napp/src/modulos/m1-grade/ProgramacaoPorDia.jsx\napp/src/modulos/m1-grade/ProgramacaoPorDia.test.jsx\napp/src/modulos/m1-grade/dias.js\napp/src/modulos/m1-grade/situacao.js\napp/src/modulos/m3-presenca/FilaOfflineDePresencas.test.jsx\napp/src/modulos/m3-presenca/TelaCodigoEncontro.jsx\napp/src/modulos/m3-presenca/TelaCodigoEncontro.test.jsx\napp/src/modulos/m3-presenca/TelaLeituraPresenca.jsx\napp/src/modulos/m3-presenca/TelaLeituraPresenca.test.jsx\napp/src/modulos/m3-presenca/filaOfflineDePresencas.js\napp/src/testes/configurar.js\napp/src/testes/servidor.js\napp/vite.config.js\nentrevistas:\nM1-grade.md\nM2-inscricoes.md\nM3-presenca.md\n\nspecs:\nM1-grade.md\nM2-inscricoes.md\nM3-presenca.md",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01NZpMUapxXedHupNhktT9jD",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica\" && cat contrato-api.md"
+      },
+      "time": {
+       "start": 1790175360162,
+       "end": 1790175361186
+      },
+      "output": "# Contrato da API — Semana Acadêmica\r\n\r\n> **Restrição do cliente.** A interface e o juiz de aceitação consomem exatamente o que está aqui. Rota, nome de campo e código de retorno não se negociam.\r\n>\r\n> O contrato diz **o que** a API responde. **Quando** cada código aparece — com que prazo, que limite, em que ordem — está no documento de requisitos, que você consulta na rodada 2 da entrevista, e só nela.\r\n\r\n---\r\n\r\n## 1. Convenções\r\n\r\n- Entrada e saída em JSON UTF-8, exceto a planilha do M5.\r\n- **Identificação:** cabeçalho `X-Usuario: <id>` em toda rota, menos `GET /certificados/:codigo` e `/_teste/*`. Sem o cabeçalho, ou com um id que não existe → `401 USUARIO_DESCONHECIDO`.\r\n- **Datas:** ISO 8601 com fuso (`2026-10-19T19:00:00-03:00` ou `2026-10-19T22:00:00Z`). A API pode responder em qualquer fuso; o juiz compara o instante, não o texto.\r\n- **Identificadores gerados:** prefixo + 8 hexadecimais minúsculos — `atv_1a2b3c4d`, `enc_…`, `ins_…`, `pre_…`.\r\n- **Erro:** sempre `{\"erro\": \"CODIGO\", \"mensagem\": \"texto livre\"}`. O juiz confere o status e o `erro`; a mensagem é de vocês.\r\n- Corpo que não é JSON, campo obrigatório ausente ou de tipo errado → `422 DADOS_INVALIDOS`.\r\n- **Ordem das verificações:** identificação (401) → perfil (403 `SOMENTE_…`) → existência (404 `NAO_ENCONTRADO`) → corpo (422 `DADOS_INVALIDOS`) → regras do recurso. Quando mais de uma regra do recurso recusa a mesma operação, a ordem entre elas é regra de negócio.\r\n\r\n## 2. Como o juiz roda a API: `projeto.json`\r\n\r\nA stack é livre. Para o juiz rodar a API de todos os grupos do mesmo jeito, a raiz do repositório tem um `projeto.json`:\r\n\r\n```jsonc\r\n{\r\n  \"stack\": \"Node 22 + Express + SQLite; interface em Flutter web\",   // texto livre\r\n  \"api\": {\r\n    \"pasta\": \"api\",               // onde rodar os comandos, a partir da raiz\r\n    \"instalar\": \"npm install\",    // roda uma vez, antes de iniciar\r\n    \"iniciar\": \"npm start\"        // sobe a API e fica rodando\r\n  },\r\n  \"testes\": [\"npm test\", \"flutter test\"]   // os comandos que vocês usam para rodar os testes\r\n}\r\n```\r\n\r\n- O juiz roda `instalar` e depois `iniciar` dentro de `api.pasta`, com `MODO_TESTE=1` e `PORT=3000` no ambiente, e espera até 60 s pela primeira resposta.\r\n- Os dois comandos precisam funcionar no Linux só com o runtime da linguagem instalado. O que o `instalar` baixar, tudo bem.\r\n- A API não depende de serviço externo: banco embutido (SQLite ou arquivo), nada de servidor de banco, Docker ou nuvem.\r\n- A API escuta na porta da variável `PORT` (padrão 3000).\r\n- O script de evidências lê `testes` para reconhecer as execuções de teste nas sessões do OpenCode.\r\n\r\n## 3. Modo de teste\r\n\r\nCom `MODO_TESTE=1` no ambiente, a API expõe:\r\n\r\n| Rota | Retorno | O que faz |\r\n|---|---|---|\r\n| `POST /_teste/reset` | 204 | Apaga tudo, recarrega os dados iniciais (seção 4) e põe o relógio em `2026-10-13T09:00:00-03:00` |\r\n| `PUT /_teste/relogio` | 200 | Corpo `{\"agora\": \"<ISO>\"}`; responde `{\"agora\": \"<ISO>\"}` |\r\n| `GET /_teste/relogio` | 200 | Responde `{\"agora\": \"<ISO>\"}` |\r\n\r\n- No modo de teste **o relógio fica parado**: só muda por `PUT /_teste/relogio`. Toda regra que depende de tempo usa esse relógio — nunca a hora do sistema direto.\r\n- O juiz sempre começa com `POST /_teste/reset` e depois só avança o relógio.\r\n- Sem `MODO_TESTE`, as rotas `/_teste/*` respondem 404 e o relógio é o real.\r\n\r\n## 4. Dados iniciais\r\n\r\nCarregados na primeira subida e a cada `POST /_teste/reset`. Não há rota para criar usuário ou sala.\r\n\r\n**Evento:** Semana Acadêmica 2026, de 19/10/2026 (segunda) a 23/10/2026 (sexta), horário de Brasília.\r\n\r\n| id | nome | papel |\r\n|---|---|---|\r\n| `org-ana` | Ana Beatriz Lima | `organizacao` |\r\n| `org-bruno` | Bruno Tavares | `organizacao` |\r\n| `p-carla` | Carla Mendes Souza | `participante` |\r\n| `p-diego` | Diego Alves | `participante` |\r\n| `p-elisa` | Elisa Fernandes da Rocha | `participante` |\r\n| `p-fabio` | Fábio Nogueira | `participante` |\r\n| `p-gabriela` | Gabriela Moura Castro | `participante` |\r\n| `p-heitor` | Heitor Campos | `participante` |\r\n| `p-isadora` | Isadora Ribeiro dos Santos | `participante` |\r\n| `p-joao` | João Pedro Martins | `participante` |\r\n\r\n| id | nome | capacidade |\r\n|---|---|---|\r\n| `auditorio` | Auditório Central | 200 |\r\n| `sala-101` | Sala 101 | 40 |\r\n| `sala-102` | Sala 102 | 40 |\r\n| `lab-3` | Laboratório 3 | 20 |\r\n\r\n## 5. Rotas\r\n\r\n### M1 — Grade de atividades\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/salas` | todos | 200 `[Sala]` |\r\n| GET | `/atividades` | todos | 200 `[Atividade]` — filtros `?dia=AAAA-MM-DD` e `?tipo=palestra\\|minicurso` |\r\n| GET | `/atividades/:id` | todos | 200 `Atividade` |\r\n| POST | `/atividades` | organização | 201 `Atividade` |\r\n| PATCH | `/atividades/:id` | organização | 200 `Atividade` |\r\n| POST | `/atividades/:id/cancelamento` | organização | 200 `Atividade` |\r\n\r\n```jsonc\r\n// POST /atividades — entrada\r\n{\r\n  \"titulo\": \"Flutter do zero\",\r\n  \"tipo\": \"minicurso\",\r\n  \"salaId\": \"lab-3\",\r\n  \"vagas\": 20,\r\n  \"encontros\": [\r\n    { \"inicio\": \"2026-10-19T19:00:00-03:00\", \"fim\": \"2026-10-19T22:00:00-03:00\" },\r\n    { \"inicio\": \"2026-10-20T19:00:00-03:00\", \"fim\": \"2026-10-20T22:00:00-03:00\" }\r\n  ]\r\n}\r\n// PATCH /atividades/:id — entrada: qualquer subconjunto dos campos acima\r\n\r\n// Atividade\r\n{\r\n  \"id\": \"atv_1a2b3c4d\",\r\n  \"titulo\": \"Flutter do zero\",\r\n  \"tipo\": \"minicurso\",                  // \"palestra\" | \"minicurso\"\r\n  \"salaId\": \"lab-3\",\r\n  \"vagas\": 20,\r\n  \"encontros\": [                        // em ordem de início\r\n    { \"id\": \"enc_5e6f7a8b\", \"inicio\": \"…\", \"fim\": \"…\" }\r\n  ],\r\n  \"cargaHorariaMinutos\": 360,           // calculado\r\n  \"situacao\": \"prevista\",               // calculado: \"prevista\" | \"em_andamento\" | \"encerrada\" | \"cancelada\"\r\n  \"ocupadas\": 12,                       // calculado\r\n  \"vagasRestantes\": 8,                  // calculado\r\n  \"emEspera\": 3                         // calculado\r\n}\r\n\r\n// Sala\r\n{ \"id\": \"sala-101\", \"nome\": \"Sala 101\", \"capacidade\": 40 }\r\n```\r\n\r\n### M2 — Inscrições e lista de espera\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| POST | `/atividades/:id/inscricoes` | participante | 201 `Inscricao` (sem corpo na entrada) |\r\n| GET | `/inscricoes` | todos | 200 `[Inscricao]` — participante recebe só as próprias; filtro `?atividadeId=` |\r\n| GET | `/inscricoes/:id` | todos | 200 `Inscricao` |\r\n| POST | `/inscricoes/:id/cancelamento` | participante | 200 `Inscricao` |\r\n| POST | `/inscricoes/:id/confirmacao` | participante | 200 `Inscricao` |\r\n\r\n```jsonc\r\n// Inscricao\r\n{\r\n  \"id\": \"ins_9c0d1e2f\",\r\n  \"atividadeId\": \"atv_1a2b3c4d\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"status\": \"confirmada\",      // \"confirmada\" | \"em_espera\" | \"convocada\" | \"cancelada\" | \"expirada\"\r\n  \"posicaoNaEspera\": null,     // número (1, 2, …) só quando em_espera\r\n  \"convocadaAte\": null,        // instante, só quando convocada\r\n  \"criadaEm\": \"…\"\r\n}\r\n```\r\n\r\n### M3 — Presença por QR\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/encontros/:id/codigo` | organização | 200 `CodigoDoEncontro` |\r\n| POST | `/encontros/:id/presencas` | participante | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\r\n| POST | `/encontros/:id/presencas/manual` | organização | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\r\n| GET | `/encontros/:id/presencas` | organização | 200 `[Presenca]` |\r\n\r\n```jsonc\r\n// CodigoDoEncontro\r\n{\r\n  \"encontroId\": \"enc_5e6f7a8b\",\r\n  \"codigo\": \"K7M2QX\",           // 6 caracteres\r\n  \"trocaEm\": \"…\",               // quando a tela deve buscar o próximo código\r\n  \"validoAte\": \"…\"              // primeiro instante em que este código deixa de ser aceito\r\n}\r\n\r\n// POST /encontros/:id/presencas — entrada\r\n{ \"codigo\": \"K7M2QX\", \"lidoEm\": \"…\" }        // lidoEm é opcional: leitura feita sem internet\r\n\r\n// POST /encontros/:id/presencas/manual — entrada\r\n{ \"participanteId\": \"p-carla\", \"justificativa\": \"…\" }   // justificativa ausente também é JUSTIFICATIVA_OBRIGATORIA\r\n\r\n// Presenca\r\n{\r\n  \"id\": \"pre_3a4b5c6d\",\r\n  \"encontroId\": \"enc_5e6f7a8b\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"origem\": \"qr\",               // \"qr\" | \"qr_offline\" | \"manual\"\r\n  \"lidoEm\": \"…\",                // o instante que valeu para as regras\r\n  \"registradaEm\": \"…\",\r\n  \"justificativa\": null         // texto só quando manual\r\n}\r\n```\r\n\r\n### M4 — Certificados (grupos de 4 e de 5)\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| POST | `/atividades/:id/certificado` | participante | 201 `Certificado` na primeira vez; 200 `Certificado` depois |\r\n| GET | `/certificados` | participante | 200 `[Certificado]` — os já emitidos |\r\n| GET | `/certificados/:codigo` | **público, sem `X-Usuario`** | 200 `Verificacao` |\r\n| GET | `/extrato` | participante | 200 `Extrato` |\r\n\r\n```jsonc\r\n// Certificado\r\n{\r\n  \"codigo\": \"SA26-7K2M-9QXA\",\r\n  \"atividadeId\": \"atv_1a2b3c4d\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"cargaHorariaMinutos\": 360,\r\n  \"presencas\": 2,\r\n  \"encontros\": 2,\r\n  \"emitidoEm\": \"…\"\r\n}\r\n\r\n// Verificacao\r\n{\r\n  \"codigo\": \"SA26-7K2M-9QXA\",\r\n  \"participante\": \"Carla M. S.\",\r\n  \"atividade\": \"Flutter do zero\",\r\n  \"cargaHorariaMinutos\": 360,\r\n  \"emitidoEm\": \"…\"\r\n}\r\n\r\n// Extrato\r\n{\r\n  \"itens\": [\r\n    { \"atividadeId\": \"atv_1a2b3c4d\", \"titulo\": \"Flutter do zero\", \"tipo\": \"minicurso\",\r\n      \"cargaHorariaMinutos\": 360, \"codigo\": null }\r\n  ],\r\n  \"palestrasMinutos\": 0,        // bruto\r\n  \"minicursosMinutos\": 360,     // bruto\r\n  \"totalMinutos\": 360,          // bruto\r\n  \"aproveitadoMinutos\": 360     // o que conta como hora complementar\r\n}\r\n```\r\n\r\n### M5 — Painel da organização (grupos de 5)\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/painel/atividades` | organização | 200 `[LinhaDoPainel]` |\r\n| GET | `/painel/atividades/:id/sem-chance` | organização | 200 `[SemChance]` |\r\n| GET | `/painel/atividades/:id/frequencia.csv` | organização | 200 `text/csv` |\r\n| GET | `/painel/bloqueios` | organização | 200 `[Bloqueio]` |\r\n| DELETE | `/painel/bloqueios/:participanteId` | organização | 204 — quem não está bloqueado → 404 |\r\n\r\n```jsonc\r\n// LinhaDoPainel\r\n{\r\n  \"atividadeId\": \"atv_1a2b3c4d\", \"titulo\": \"Flutter do zero\",\r\n  \"vagas\": 20, \"ocupadas\": 12, \"emEspera\": 3,\r\n  \"ocupacaoPercentual\": 60.0,\r\n  \"frequenciaPercentual\": null\r\n}\r\n\r\n// SemChance\r\n{ \"participanteId\": \"p-heitor\", \"nome\": \"Heitor Campos\", \"faltas\": 2, \"faltasPermitidas\": 1 }\r\n\r\n// Bloqueio\r\n{ \"participanteId\": \"p-heitor\", \"nome\": \"Heitor Campos\",\r\n  \"atividades\": [\"atv_1a2b3c4d\", \"atv_7e8f9a0b\"], \"bloqueadoDesde\": \"…\" }\r\n```\r\n\r\n## 6. Códigos de retorno\r\n\r\n| Código | Status | Onde aparece |\r\n|---|---|---|\r\n| `USUARIO_DESCONHECIDO` | 401 | toda rota identificada |\r\n| `SOMENTE_ORGANIZACAO` | 403 | rotas de organização |\r\n| `SOMENTE_PARTICIPANTE` | 403 | rotas de participante |\r\n| `NAO_ENCONTRADO` | 404 | recurso inexistente |\r\n| `DADOS_INVALIDOS` | 422 | corpo mal formado |\r\n| `QUANTIDADE_DE_ENCONTROS` | 422 | criar atividade |\r\n| `ENCONTRO_INVALIDO` | 422 | criar atividade |\r\n| `VAGAS_ACIMA_DA_CAPACIDADE` | 422 | criar e alterar atividade |\r\n| `CONFLITO_DE_SALA` | 409 | criar atividade |\r\n| `CAMPO_NAO_EDITAVEL` | 422 | alterar atividade |\r\n| `VAGAS_ABAIXO_DOS_INSCRITOS` | 409 | alterar atividade |\r\n| `ATIVIDADE_JA_INICIADA` | 422 | cancelar atividade, cancelar inscrição |\r\n| `ATIVIDADE_CANCELADA` | 422 | alterar e cancelar atividade, inscrever, obter código, certificado |\r\n| `INSCRICOES_ENCERRADAS` | 422 | inscrever |\r\n| `INSCRICAO_BLOQUEADA` | 422 | inscrever — só em grupos com M5 |\r\n| `JA_INSCRITO` | 409 | inscrever |\r\n| `CONFLITO_DE_HORARIO` | 409 | inscrever, confirmar convocação |\r\n| `LIMITE_DE_MINICURSOS` | 422 | inscrever, confirmar convocação |\r\n| `INSCRICAO_INATIVA` | 422 | cancelar inscrição |\r\n| `SEM_CONVOCACAO` | 422 | confirmar convocação |\r\n| `CONVOCACAO_EXPIRADA` | 422 | confirmar convocação |\r\n| `FORA_DA_JANELA` | 422 | obter código, registrar presença, presença manual |\r\n| `CODIGO_INVALIDO` | 422 | registrar presença |\r\n| `NAO_INSCRITO` | 403 | registrar presença, presença manual, certificado |\r\n| `SINCRONIZACAO_TARDIA` | 422 | registrar presença com `lidoEm` |\r\n| `JUSTIFICATIVA_OBRIGATORIA` | 422 | presença manual |\r\n| `LIMITE_DE_MANUAIS` | 422 | presença manual |\r\n| `ATIVIDADE_NAO_ENCERRADA` | 422 | certificado |\r\n| `PRESENCA_INSUFICIENTE` | 422 | certificado |\r\n\r\n## 7. O que este contrato não diz\r\n\r\nCada código da seção 6 existe porque existe uma regra. Prazo, limite, janela, tolerância, arredondamento, ordem entre regras e o que acontece quando o tempo passa sem ninguém acessar o sistema: nada disso está aqui, e o juiz cobra tudo isso. Está no documento de requisitos, e o caminho até ele é a entrevista em duas rodadas: primeiro o agente pergunta, depois você consulta.",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 235,
+      "reasoning": 0,
+      "cache": {
+       "read": 28094,
+       "write": 17096
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175365144
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01AkWy9ekyUKrY1fvjVQELx5",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica\" && cat specs/M2-inscricoes.md && cd app && cat AGENTS.md package.json src/App.jsx src/api/cliente.js src/testes/*.js src/modulos/m1-grade/DetalheAtividade.jsx src/modulos/m1-grade/DetalheAtividade.test.jsx"
+      },
+      "time": {
+       "start": 1790175365202,
+       "end": 1790175366404
+      },
+      "output": "# Spec — M2 Inscrições e lista de espera\n\n> Origem: `entrevistas/M2-inscricoes.md` (rodadas 1 e 2, consulta ao documento de requisitos, rodada de revisão e rodada de revisão da spec, 2026-09-22).\n> Cada regra cita a pergunta que a originou (**P-xx**) e, quando houver, a regra do documento de requisitos (**RN-xxx**).\n> Rotas, campos e códigos de erro vêm de `contrato-api.md` §5 e §6 e não mudam.\n\n## 1. Objetivo\n\nO participante se inscreve numa atividade; se não há vaga, entra numa lista de espera FIFO e é convocado automaticamente quando uma vaga se abre, com um prazo para confirmar. Cancelar uma inscrição confirmada ou convocada libera a vaga e convoca o próximo da fila; cancelar uma inscrição em espera só sai da fila. Qualquer pessoa da organização e o próprio participante consultam as inscrições.\n\n## 2. Fora de escopo\n\nFonte: P-09, P-18 (RN-507, Seção 7).\n\n- `INSCRICAO_BLOQUEADA` e qualquer bloqueio de inscrição do M5 — o grupo não implementa o M5. (P-09; RN-208, RN-507)\n- Organização inscrever participante manualmente. (P-18; RN-218)\n- Participante se inscrever em nome de outro. (P-18; RN-218)\n- Desistir de uma convocação sem confirmar nem esperar `convocadaAte` vencer — não há rota para isso. (P-18)\n- Listar a fila de espera de uma atividade diretamente — é do M5. (P-18; RN-219)\n- Alterar a própria posição na fila. (P-18; RN-219)\n\n## 3. Modelo\n\n### Inscricao\n\n| Campo | Tipo | Origem |\n|---|---|---|\n| `id` | string `ins_` + 8 hex minúsculos | gerado na criação (contrato §1) |\n| `atividadeId` | string `atv_…` | rota (`:id` do POST); a atividade vem do M1 |\n| `participanteId` | string | informado pelo cliente: quem chama (`X-Usuario`) |\n| `status` | `\"confirmada\"` \\| `\"em_espera\"` \\| `\"convocada\"` \\| `\"cancelada\"` \\| `\"expirada\"` | calculado a cada leitura/ação (R2, R11; P-30) |\n| `posicaoNaEspera` | inteiro (1, 2, …) \\| `null` | derivado: só quando `status: \"em_espera\"` (P-22) |\n| `convocadaAte` | instante \\| `null` | gravado na convocação; só quando `status: \"convocada\"` |\n| `criadaEm` | instante | gravado na criação (relógio) |\n\nCampos derivados (`status`, `posicaoNaEspera`) não são gravados: são calculados a cada leitura ou ação que toca a inscrição/atividade (P-22, P-30). Instantes de saída em `-03:00` (P-23; mesmo critério do M1 P-20). `criadaEm`/`convocadaAte` guardados com a precisão do relógio, sem arredondamento (P-29).\n\nReinscrever depois de cancelar/expirar uma inscrição anterior cria uma linha nova de `Inscricao` (novo `id`, novo `criadaEm`), mantendo a anterior no histórico (P-28).\n\n## 4. Endpoints\n\n| Método | Rota | Quem | Corpo | Sucesso |\n|---|---|---|---|---|\n| POST | `/atividades/:id/inscricoes` | participante | ignorado | 201 `Inscricao` |\n| GET | `/inscricoes` | todos | — (filtro `?atividadeId=`) | 200 `[Inscricao]` |\n| GET | `/inscricoes/:id` | todos | — | 200 `Inscricao` |\n| POST | `/inscricoes/:id/cancelamento` | participante | ignorado | 200 `Inscricao` |\n| POST | `/inscricoes/:id/confirmacao` | participante | ignorado | 200 `Inscricao` |\n\nHerdado do contrato (§1, §6), vale para todas as rotas acima e não é regra R: sem `X-Usuario` ou id desconhecido → 401 `USUARIO_DESCONHECIDO`; organização em rota de participante → 403 `SOMENTE_PARTICIPANTE`; `:id` inexistente (atividade no POST de inscrição, inscrição nas demais) → 404 `NAO_ENCONTRADO`; corpo que não é JSON → 422 `DADOS_INVALIDOS`. Ordem: 401 → 403 → 404 → 422 `DADOS_INVALIDOS` → regras do recurso. Tempo sempre do relógio do modo de teste; a convocação em cadeia é **lazy**: só acontece quando uma requisição toca a atividade ou a inscrição (R11; P-30).\n\n## 5. Regras\n\n### Corpo\n\n- **R1** — Corpo de `POST /atividades/:id/inscricoes`: como não há campos de entrada definidos, qualquer JSON válido (`{}`, com ou sem campos) é ignorado; corpo não-JSON → 422 `DADOS_INVALIDOS` (regra geral do contrato §1, sem exceção). Mesmo critério para o corpo de `/cancelamento` e `/confirmacao`. (P-19, P-20; contrato §1)\n\n### Inscrever (`POST /atividades/:id/inscricoes`)\n\n- **R2** — Sem vaga (`vagasRestantes` da atividade em 0), a inscrição nasce com `status: \"em_espera\"` e responde 201 — não é erro. (P-01; RN-205)\n- **R3** — 409 `JA_INSCRITO` quando já existe, na mesma atividade e para o mesmo participante, uma inscrição com `status` `confirmada`, `em_espera` ou `convocada`. Uma inscrição anterior `cancelada` ou `expirada` libera nova inscrição. (P-02; RN-204)\n- **R4** — Inscrição em atividade cancelada → 422 `ATIVIDADE_CANCELADA`. (contrato §6)\n- **R5** — 422 `INSCRICOES_ENCERRADAS` quando o relógio está a 30 minutos ou menos do início do 1º encontro da atividade (relógio ≥ início do 1º encontro − 30 min). (P-08, P-31; RN-202)\n- **R6** — 409 `CONFLITO_DE_HORARIO` quando algum encontro da atividade se sobrepõe, no horário, a um encontro de outra atividade em que o participante tem inscrição `confirmada` ou `convocada`. `em_espera` não conta. Vale entre quaisquer tipos de atividade (palestra ou minicurso). (P-07; RN-206)\n- **R7** — 422 `LIMITE_DE_MINICURSOS` quando a inscrição levaria o participante a mais de 3 minicursos com inscrição `confirmada` ou `convocada` (contando esta, se fosse aceita direto como `confirmada`); `em_espera` e palestras não entram na conta. Limite: 3. (P-06; RN-207)\n- **R8** — Precedência em `POST /atividades/:id/inscricoes`: 404 (atividade inexistente) → `ATIVIDADE_CANCELADA` (R4) → `INSCRICOES_ENCERRADAS` (R5) → `JA_INSCRITO` (R3) → `CONFLITO_DE_HORARIO` (R6) → `LIMITE_DE_MINICURSOS` (R7) → sem vaga → `em_espera` (R2). (P-15; RN-208)\n\n### Cancelar (`POST /inscricoes/:id/cancelamento`)\n\n- **R9** — 422 `ATIVIDADE_JA_INICIADA` quando o relógio está no instante exato do início do 1º encontro da atividade ou depois. Vale para inscrição em qualquer status ativo (`confirmada`, `convocada`, `em_espera`). (P-12; RN-209)\n- **R10** — 422 `INSCRICAO_INATIVA` quando a inscrição já está `cancelada` ou `expirada`. (P-11; RN-210)\n- **R11** — Precedência no cancelamento: `ATIVIDADE_JA_INICIADA` (R9) vence `INSCRICAO_INATIVA` (R10) quando as duas valem. (P-16, P-32; RN-209, RN-210)\n- **R12** — Cancelar inscrição `confirmada` ou `convocada` muda o `status` para `cancelada`, libera a vaga e convoca o próximo da fila (R14). Cancelar `em_espera` muda o `status` para `cancelada` e só remove da fila, sem liberar vaga nem convocar ninguém. (P-10; RN-211)\n- **R13** — Um participante só cancela a própria inscrição; tentar cancelar a inscrição de outro participante → 404 `NAO_ENCONTRADO`. (P-14; RN-218)\n\n### Convocação (efeito de vaga liberada — sem rota própria)\n\n- **R14** — Toda vaga que se abre — por cancelamento de inscrição `confirmada`/`convocada` (R12), por convocação vencida (R16) ou por aumento de `vagas` via `PATCH /atividades/:id` do M1 — convoca o próximo da fila, FIFO por ordem de `criadaEm` (empate pelo `id`, mesmo critério de ordenação da R21). A convocação grava `status: \"convocada\"` e `convocadaAte`. (P-03; RN-211, RN-216)\n- **R15** — Se mais de uma vaga se abre de uma vez (vários cancelamentos juntos, ou `PATCH` aumentando `vagas` em mais de 1), convoca quantas pessoas couberem nas vagas livres, na mesma verificação, respeitando a ordem da fila. (P-26)\n- **R16** — `convocadaAte` é o instante da convocação mais 2 horas, sem limite pelo fechamento das inscrições (o encerramento das inscrições, R5, não bloqueia confirmação nem convocação já em curso). A expiração é **lazy**: uma requisição que toca a atividade ou a inscrição, ao detectar que o relógio já passou de `convocadaAte`, muda o `status` para `expirada`, libera a vaga e convoca o próximo — repetindo até esgotar a fila ou as vagas disponíveis. (P-04, P-05, P-30; RN-211, RN-212, RN-213)\n\n### Confirmar convocação (`POST /inscricoes/:id/confirmacao`)\n\n- **R17** — 422 `SEM_CONVOCACAO` quando a inscrição não está com `status: \"convocada\"` no momento da confirmação (nunca foi convocada, já confirmou, foi cancelada, ou já expirou — R16 roda antes e pode mudar o status para `expirada`). (P-13, P-17; RN-214, RN-215)\n- **R18** — 422 `CONVOCACAO_EXPIRADA` quando `convocadaAte` já venceu no momento da confirmação (a expiração lazy da R16 já teria mudado o status para `expirada`, então este código cobre o caso em que a checagem de tempo da confirmação roda antes de gravar a expiração). (P-17; RN-214, RN-215)\n- **R19** — A confirmação reconfere `CONFLITO_DE_HORARIO` (R6) e `LIMITE_DE_MINICURSOS` (R7) no momento da confirmação. Se falhar por um dos dois, a convocação **continua** `convocada` até `convocadaAte` vencer — não é cancelada nem expirada na hora. (P-13; RN-214)\n- **R20** — A confirmação é aceita mesmo depois que a atividade já começou; `ATIVIDADE_JA_INICIADA` não se aplica a `/confirmacao` (não está no contrato para esta rota) — só `convocadaAte` limita o prazo. (P-27)\n- **R20a** — Sucesso muda `status` para `confirmada`; `convocadaAte` volta a `null`. (P-33; contrato §5)\n- **R21** — Precedência na confirmação: `SEM_CONVOCACAO` (R17) → `CONVOCACAO_EXPIRADA` (R18) → `CONFLITO_DE_HORARIO` (R6) → `LIMITE_DE_MINICURSOS` (R7). (P-17; RN-214, RN-215)\n- **R21a** — Um participante só confirma a própria inscrição; tentar confirmar a inscrição de outro participante → 404 `NAO_ENCONTRADO`, mesmo critério do cancelamento (R13). (P-34; RN-218)\n\n### Leitura\n\n- **R22** — `GET /inscricoes` (organização): devolve todas as inscrições, de qualquer participante, sem restrição de autoria. `GET /inscricoes` (participante): devolve só as próprias. Ordem: `criadaEm` crescente, empate pelo `id`. Filtro `?atividadeId=` com valor que não corresponde a nenhuma inscrição → lista vazia (não é erro). (P-21, P-25; mesmo padrão do M1 P-17, M1 P-29, M3 P-18)\n- **R23** — `GET /inscricoes/:id`: qualquer pessoa da organização vê qualquer inscrição; um participante só vê a própria — inscrição de outro participante → 404 `NAO_ENCONTRADO` (mesmo critério de \"não encontrado para essa pessoa\" da R13). (P-14, P-25; RN-218)\n- **R24** — `posicaoNaEspera` é recalculada a cada leitura: 1-indexada, considerando só as inscrições `em_espera` da mesma atividade, ordenadas por `criadaEm` (empate pelo `id`). (P-22)\n- **R25** — Inscrição de uma atividade cancelada (efeito automático do M1) continua respondendo 200 normalmente, com `status: \"cancelada\"`. (P-24; mesmo critério do M1 P-13)\n\n## 6. Critérios de aceite\n\nTodos partem de `POST /_teste/reset` (relógio em `2026-10-13T09:00:00-03:00`) e usam as atividades e o relógio do M1. \"Atividade M\" = minicurso na `lab-3` com `vagas: 1` e um encontro de `2026-10-19T19:00:00-03:00` a `2026-10-19T21:00:00-03:00`, criado por `org-ana`.\n\n1. (R2) Atividade M com `vagasRestantes: 0`; `p-diego` se inscreve → 201, `status: \"em_espera\"`, `posicaoNaEspera: 1`.\n2. (R3) `p-carla` inscrita `confirmada` em M; nova tentativa de `p-carla` → 409 `JA_INSCRITO`. Cancelar a inscrição e tentar de novo → 201 (libera).\n3. (R4) M cancelada (pelo M1); `p-carla` tenta se inscrever → 422 `ATIVIDADE_CANCELADA`.\n4. (R5) Relógio em `2026-10-19T18:29:59-03:00` → 201; relógio em `2026-10-19T18:30:00-03:00` → 422 `INSCRICOES_ENCERRADAS`.\n5. (R6) `p-carla` `confirmada` numa atividade com encontro 19/10 19–21h; tenta se inscrever em M (mesmo horário, sala diferente) → 409 `CONFLITO_DE_HORARIO`. Se a inscrição anterior fosse `em_espera`, a nova inscrição em M → 201.\n6. (R7) `p-carla` `confirmada` em 3 minicursos sem conflito de horário; tenta um 4º → 422 `LIMITE_DE_MINICURSOS`. Uma 4ª palestra → 201.\n7. (R8) M cancelada + fora do prazo de inscrição + `JA_INSCRITO` aplicável → `ATIVIDADE_CANCELADA` (a mais externa vence).\n8. (R9) Inscrição `confirmada` em M; relógio em `2026-10-19T19:00:00-03:00` (início exato) → cancelar → 422 `ATIVIDADE_JA_INICIADA`; relógio um segundo antes → cancelar → 200.\n9. (R10) Cancelar a mesma inscrição duas vezes → a 2ª é 422 `INSCRICAO_INATIVA`.\n10. (R11) Inscrição `em_espera` numa atividade já iniciada (relógio no instante exato do início) e sem cancelamento anterior → cancelar → 422 `ATIVIDADE_JA_INICIADA` (vence `INSCRICAO_INATIVA`, que não se aplicaria aqui de qualquer forma — usar um cenário onde a inscrição já está `cancelada` e a atividade já iniciou: cancelar de novo → 422 `ATIVIDADE_JA_INICIADA`).\n11. (R12) Atividade M com `vagas: 1`; `p-carla` `confirmada`, `p-diego` `em_espera` (posição 1); `p-carla` cancela → `status: \"cancelada\"`, `p-diego` passa a `convocada` com `convocadaAte` = relógio + 2h.\n12. (R12) `p-diego` `em_espera` (único na fila) cancela → `status: \"cancelada\"`; nenhuma convocação acontece, vaga permanece livre.\n13. (R13) `p-carla` tenta cancelar a inscrição de `p-diego` → 404 `NAO_ENCONTRADO`.\n14. (R14, R15) Atividade M com `vagas: 2`, `p-carla` e `p-diego` `confirmada`, `p-elisa` e `p-fabio` `em_espera` nessa ordem; `PATCH /atividades/M {\"vagas\": 4}` (M1) → `p-elisa` e `p-fabio` passam a `convocada`.\n15. (R16) `p-diego` convocado às 19/10 10:00 (`convocadaAte` = 12:00); relógio avança para 12:00:01 e uma requisição toca a inscrição (`GET /inscricoes/:id`) → `status: \"expirada\"`, próximo da fila convocado nessa mesma leitura.\n16. (R17) Inscrição `confirmada` (nunca convocada); confirmar → 422 `SEM_CONVOCACAO`. Inscrição já `confirmada` por uma convocação anterior; confirmar de novo → 422 `SEM_CONVOCACAO`.\n17. (R18) `convocadaAte` vencido no exato instante da checagem de confirmação → 422 `CONVOCACAO_EXPIRADA`.\n18. (R19) `p-diego` convocado numa atividade que agora conflita de horário com outra `confirmada` dele; confirmar → 422 `CONFLITO_DE_HORARIO`; `status` continua `convocada`, `convocadaAte` inalterado.\n19. (R20) `p-diego` convocado numa atividade com relógio já depois do início; `convocadaAte` ainda não venceu; confirmar → 200, `status: \"confirmada\"`.\n20. (R20a) Confirmação bem-sucedida → `status: \"confirmada\"`, `convocadaAte: null`.\n21. (R21) Convocação vencida e com conflito de horário → `CONVOCACAO_EXPIRADA` (vence `CONFLITO_DE_HORARIO`).\n22. (R21a) `p-carla` tenta confirmar a convocação de `p-diego` → 404 `NAO_ENCONTRADO`.\n23. (R22) `org-ana` lista `GET /inscricoes` → vê inscrições de `p-carla` e `p-diego`; `p-carla` lista `GET /inscricoes` → só as próprias. Duas inscrições com o mesmo `criadaEm` → ordem por `id`. `?atividadeId=atv_inexistente` → `[]`.\n24. (R23) `p-carla` faz `GET /inscricoes/:id` da inscrição de `p-diego` → 404 `NAO_ENCONTRADO`; `org-bruno` faz o mesmo `GET` → 200.\n25. (R24) M com `vagas: 1`, três inscrições `em_espera` em ordem de chegada → `posicaoNaEspera` 1, 2, 3; a primeira cancela → as outras duas passam a 1 e 2 na leitura seguinte.\n26. (R25) Atividade M cancelada (efeito do M1); `GET /inscricoes/:id` de uma inscrição que estava `confirmada` nela → 200, `status: \"cancelada\"`.\n27. (R1) `POST /atividades/M/inscricoes` com corpo `\"não é json\"` → 422 `DADOS_INVALIDOS`; com `{}` ou `{\"qualquer\":1}` → 201 (corpo ignorado). Mesmo padrão em `/cancelamento` e `/confirmacao`.\n28. (contrato §1) Organização chamando `POST /atividades/:id/inscricoes`, `/cancelamento` ou `/confirmacao` → 403 `SOMENTE_PARTICIPANTE`; atividade inexistente → 404 `NAO_ENCONTRADO`; inscrição inexistente em `/cancelamento`, `/confirmacao` ou `GET /inscricoes/:id` → 404 `NAO_ENCONTRADO`.\n\n## 7. Como isto será verificado\n\nPela costura HTTP, a mesma dos demais módulos: `api/test/apoio/api.js` (`subirApi`) sobe a API com `MODO_TESTE=1` e banco temporário. Os testes ficam em `api/test/m2-inscricoes.test.js`, usam `fetch`, `POST /_teste/reset` antes de cada cenário e `PUT /_teste/relogio` para mover o tempo e expor a convocação/expiração lazy (R14, R16). Nenhum ponto de teste novo: convocação e expiração não têm rota própria, mas são observáveis tocando a atividade (`GET /atividades/:id`, do M1) ou a inscrição (`GET /inscricoes/:id`) depois de mover o relógio.\n\nCenários montam a atividade pelas rotas do M1 (`POST /atividades`, `PATCH /atividades/:id`, `POST /atividades/:id/cancelamento`), nunca por escrita direta no banco — mesmo critério do M3 (P-24 do M1, R31 do M3). A implementação do M2 depende do M1 existir (atividade, `vagasRestantes`) e é pré-requisito do M3 (inscrição `confirmada`).\n\n## 8. Fatias de entrega\n\n1. **Inscrever sem fila** — R1, R2 (só o 201 direto quando há vaga), R3, R4, R5, R6, R7, R8, R22 (sem `posicaoNaEspera`), R23. Critérios 2–7, 23 (parcial), 24, 27, 28.\n2. **Cancelar sem convocação** — R9, R10, R11, R13, R12 (só o caso `em_espera`, sem convocar). Critérios 8–10, 12, 13.\n3. **Fila e convocação** — R2 (com `em_espera`), R12 (caso `confirmada`/`convocada`), R14, R15, R16, R24, R25. Critérios 1, 11, 14, 15, 25, 26.\n4. **Confirmar convocação** — R17, R18, R19, R20, R20a, R21, R21a. Critérios 16–22.\n5. **Autoria e leitura completas** — R22 (autoria plena). Critério 23 (completo).\n# Interface\r\n\r\n- Nos testes, a API é sempre a falsa (MSW); nenhum teste chama a API real.\r\n- Interaja com a tela como usuário: por texto, papel e rótulo, nunca por estado interno do componente.\r\n- Rode os testes com: npx vitest run\r\n{\r\n  \"name\": \"app\",\r\n  \"private\": true,\r\n  \"version\": \"0.0.0\",\r\n  \"type\": \"module\",\r\n  \"scripts\": {\r\n    \"dev\": \"vite\",\r\n    \"build\": \"vite build\",\r\n    \"lint\": \"oxlint\",\r\n    \"preview\": \"vite preview\"\r\n  },\r\n  \"dependencies\": {\r\n    \"react\": \"^19.2.8\",\r\n    \"react-dom\": \"^19.2.8\"\r\n  },\r\n  \"devDependencies\": {\r\n    \"@testing-library/jest-dom\": \"^7.0.1\",\r\n    \"@testing-library/react\": \"^16.3.3\",\r\n    \"@testing-library/user-event\": \"^14.6.7\",\r\n    \"@types/react\": \"^19.2.18\",\r\n    \"@types/react-dom\": \"^19.2.7\",\r\n    \"@vitejs/plugin-react\": \"^6.1.1\",\r\n    \"fake-indexeddb\": \"^6.2.5\",\r\n    \"jsdom\": \"^30.1.1\",\r\n    \"msw\": \"^2.15.0\",\r\n    \"oxlint\": \"^1.81.0\",\r\n    \"vite\": \"^8.3.0\",\r\n    \"vitest\": \"^5.0.1\"\r\n  }\r\n}\r\nimport { useState } from 'react'\r\nimport { DetalheAtividade } from './modulos/m1-grade/DetalheAtividade.jsx'\r\nimport { FormularioAtividade } from './modulos/m1-grade/FormularioAtividade.jsx'\r\nimport { ProgramacaoPorDia } from './modulos/m1-grade/ProgramacaoPorDia.jsx'\r\n\r\nconst USUARIOS = [\r\n  { id: 'p-carla', papel: 'participante', nome: 'Carla Mendes Souza' },\r\n  { id: 'org-ana', papel: 'organizacao', nome: 'Ana Beatriz Lima' },\r\n]\r\n\r\nfunction App() {\r\n  const [usuarioId, setUsuarioId] = useState(USUARIOS[0].id)\r\n  const [atividadeSelecionadaId, setAtividadeSelecionadaId] = useState(null)\r\n  const [mostrarFormulario, setMostrarFormulario] = useState(false)\r\n\r\n  const usuario = USUARIOS.find((u) => u.id === usuarioId)\r\n\r\n  function irParaProgramacao() {\r\n    setAtividadeSelecionadaId(null)\r\n    setMostrarFormulario(false)\r\n  }\r\n\r\n  return (\r\n    <>\r\n      <header>\r\n        <label>\r\n          Usuário\r\n          <select\r\n            value={usuarioId}\r\n            onChange={(e) => {\r\n              setUsuarioId(e.target.value)\r\n              irParaProgramacao()\r\n            }}\r\n          >\r\n            {USUARIOS.map((u) => (\r\n              <option key={u.id} value={u.id}>\r\n                {u.nome}\r\n              </option>\r\n            ))}\r\n          </select>\r\n        </label>\r\n\r\n        <nav>\r\n          <button type=\"button\" onClick={irParaProgramacao}>\r\n            Programação\r\n          </button>\r\n          {usuario.papel === 'organizacao' && (\r\n            <button type=\"button\" onClick={() => setMostrarFormulario(true)}>\r\n              Nova atividade\r\n            </button>\r\n          )}\r\n        </nav>\r\n      </header>\r\n\r\n      {mostrarFormulario && (\r\n        <FormularioAtividade\r\n          usuarioId={usuarioId}\r\n          onCriada={() => {\r\n            setMostrarFormulario(false)\r\n          }}\r\n        />\r\n      )}\r\n\r\n      {!mostrarFormulario && atividadeSelecionadaId && (\r\n        <>\r\n          <button type=\"button\" onClick={() => setAtividadeSelecionadaId(null)}>\r\n            Voltar para a programação\r\n          </button>\r\n          <DetalheAtividade atividadeId={atividadeSelecionadaId} usuarioId={usuarioId} />\r\n        </>\r\n      )}\r\n\r\n      {!mostrarFormulario && !atividadeSelecionadaId && (\r\n        <ProgramacaoPorDia usuarioId={usuarioId} onSelecionarAtividade={setAtividadeSelecionadaId} />\r\n      )}\r\n    </>\r\n  )\r\n}\r\n\r\nexport default App\r\nexport class ErroApi extends Error {\r\n  constructor(status, codigo, mensagem) {\r\n    super(mensagem || codigo)\r\n    this.status = status\r\n    this.codigo = codigo\r\n  }\r\n}\r\n\r\nexport async function chamarApi(caminho, { metodo = 'GET', usuarioId, corpo } = {}) {\r\n  const cabecalhos = { 'Content-Type': 'application/json' }\r\n  if (usuarioId) cabecalhos['X-Usuario'] = usuarioId\r\n\r\n  const resposta = await fetch(caminho, {\r\n    method: metodo,\r\n    headers: cabecalhos,\r\n    body: corpo === undefined ? undefined : JSON.stringify(corpo),\r\n  })\r\n\r\n  const dados = resposta.status === 204 ? null : await resposta.json()\r\n\r\n  if (!resposta.ok) {\r\n    throw new ErroApi(resposta.status, dados?.erro, dados?.mensagem)\r\n  }\r\n\r\n  return dados\r\n}\r\nimport { cleanup } from '@testing-library/react'\r\nimport '@testing-library/jest-dom/vitest'\r\nimport 'fake-indexeddb/auto'\r\nimport { afterAll, afterEach, beforeAll } from 'vitest'\r\nimport { servidor } from './servidor.js'\r\n\r\nbeforeAll(() => servidor.listen({ onUnhandledRequest: 'error' }))\r\nafterEach(() => {\r\n  servidor.resetHandlers()\r\n  cleanup()\r\n})\r\nafterAll(() => servidor.close())\r\nimport { setupServer } from 'msw/node'\r\n\r\n// Handlers ficam vazios aqui; cada teste registra os seus com servidor.use(...).\r\nexport const servidor = setupServer()\r\nimport { useEffect, useState } from 'react'\r\nimport { chamarApi } from '../../api/cliente.js'\r\nimport { rotuloDaSituacao, rotuloDoTipo } from './situacao.js'\r\n\r\nconst formatadorDeInstante = new Intl.DateTimeFormat('pt-BR', {\r\n  dateStyle: 'short',\r\n  timeStyle: 'short',\r\n  timeZone: 'America/Sao_Paulo',\r\n})\r\n\r\nfunction formatarInstante(iso) {\r\n  return formatadorDeInstante.format(new Date(iso))\r\n}\r\n\r\nexport function DetalheAtividade({ atividadeId, usuarioId }) {\r\n  const [atividade, setAtividade] = useState(null)\r\n  const [erro, setErro] = useState(null)\r\n\r\n  useEffect(() => {\r\n    let cancelado = false\r\n    setAtividade(null)\r\n    setErro(null)\r\n\r\n    chamarApi(`/atividades/${atividadeId}`, { usuarioId })\r\n      .then((dados) => {\r\n        if (!cancelado) setAtividade(dados)\r\n      })\r\n      .catch((e) => {\r\n        if (!cancelado) setErro(e)\r\n      })\r\n\r\n    return () => {\r\n      cancelado = true\r\n    }\r\n  }, [atividadeId, usuarioId])\r\n\r\n  if (erro) return <p role=\"alert\">Não foi possível carregar a atividade.</p>\r\n  if (!atividade) return <p>Carregando…</p>\r\n\r\n  return (\r\n    <section>\r\n      <h1>{atividade.titulo}</h1>\r\n      <p>\r\n        {rotuloDoTipo(atividade.tipo)} — {rotuloDaSituacao(atividade.situacao)}\r\n      </p>\r\n\r\n      <dl>\r\n        <dt>Vagas</dt>\r\n        <dd>{atividade.vagas}</dd>\r\n        <dt>Ocupadas</dt>\r\n        <dd>{atividade.ocupadas}</dd>\r\n        <dt>Em espera</dt>\r\n        <dd>{atividade.emEspera}</dd>\r\n        <dt>Vagas restantes</dt>\r\n        <dd>{atividade.vagasRestantes}</dd>\r\n        <dt>Carga horária</dt>\r\n        <dd>{atividade.cargaHorariaMinutos} min</dd>\r\n      </dl>\r\n\r\n      <h2>Encontros</h2>\r\n      <ul>\r\n        {atividade.encontros.map((encontro) => (\r\n          <li key={encontro.id}>\r\n            {formatarInstante(encontro.inicio)} — {formatarInstante(encontro.fim)}\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </section>\r\n  )\r\n}\r\nimport { render, screen } from '@testing-library/react'\r\nimport { http, HttpResponse } from 'msw'\r\nimport { describe, expect, it } from 'vitest'\r\nimport { servidor } from '../../testes/servidor.js'\r\nimport { DetalheAtividade } from './DetalheAtividade.jsx'\r\n\r\nfunction atividade(sobrepor = {}) {\r\n  return {\r\n    id: 'atv_1a2b3c4d',\r\n    titulo: 'Flutter do zero',\r\n    tipo: 'minicurso',\r\n    salaId: 'lab-3',\r\n    vagas: 20,\r\n    encontros: [\r\n      { id: 'enc_11111111', inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' },\r\n      { id: 'enc_22222222', inicio: '2026-10-20T19:00:00-03:00', fim: '2026-10-20T22:00:00-03:00' },\r\n    ],\r\n    cargaHorariaMinutos: 360,\r\n    situacao: 'prevista',\r\n    ocupadas: 12,\r\n    vagasRestantes: 8,\r\n    emEspera: 3,\r\n    ...sobrepor,\r\n  }\r\n}\r\n\r\ndescribe('DetalheAtividade', () => {\r\n  it('mostra o título, a situação e as vagas da atividade', async () => {\r\n    servidor.use(http.get('/atividades/atv_1a2b3c4d', () => HttpResponse.json(atividade())))\r\n\r\n    render(<DetalheAtividade atividadeId=\"atv_1a2b3c4d\" usuarioId=\"p-carla\" />)\r\n\r\n    expect(await screen.findByRole('heading', { name: 'Flutter do zero' })).toBeInTheDocument()\r\n    expect(screen.getByText(/prevista/i)).toBeInTheDocument()\r\n    expect(screen.getByText('20')).toBeInTheDocument()\r\n    expect(screen.getByText('12')).toBeInTheDocument()\r\n    expect(screen.getByText('8')).toBeInTheDocument()\r\n  })\r\n\r\n  it('lista os encontros com início e fim', async () => {\r\n    servidor.use(http.get('/atividades/atv_1a2b3c4d', () => HttpResponse.json(atividade())))\r\n\r\n    render(<DetalheAtividade atividadeId=\"atv_1a2b3c4d\" usuarioId=\"p-carla\" />)\r\n\r\n    const encontros = await screen.findAllByRole('listitem')\r\n    expect(encontros).toHaveLength(2)\r\n  })\r\n\r\n  it('mostra mensagem de erro quando a atividade não existe', async () => {\r\n    servidor.use(\r\n      http.get('/atividades/atv_inexistente', () =>\r\n        HttpResponse.json({ erro: 'NAO_ENCONTRADO', mensagem: 'não encontrada' }, { status: 404 }),\r\n      ),\r\n    )\r\n\r\n    render(<DetalheAtividade atividadeId=\"atv_inexistente\" usuarioId=\"p-carla\" />)\r\n\r\n    expect(await screen.findByRole('alert')).toHaveTextContent(/não foi possível/i)\r\n  })\r\n})",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 359,
+      "reasoning": 0,
+      "cache": {
+       "read": 45190,
+       "write": 11684
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175388531
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01QgZ5TQzDk42oVTPwWKPq4z",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && cat vite.config.js && sed -n 1,60p src/modulos/m3-presenca/TelaLeituraPresenca.jsx && git log --oneline -3 -- src && npx vitest run 2>&1 | tail -8"
+      },
+      "time": {
+       "start": 1790175389549,
+       "end": 1790175393757
+      },
+      "output": "import react from '@vitejs/plugin-react'\r\nimport { defineConfig } from 'vite'\r\n\r\n// https://vite.dev/config/\r\nexport default defineConfig({\r\n  plugins: [react()],\r\n  server: {\r\n    proxy: {\r\n      '/salas': 'http://localhost:3000',\r\n      '/atividades': 'http://localhost:3000',\r\n      '/encontros': 'http://localhost:3000',\r\n    },\r\n  },\r\n  test: {\r\n    environment: 'jsdom',\r\n    setupFiles: './src/testes/configurar.js',\r\n    globals: false,\r\n  },\r\n})\r\nimport { useEffect, useState } from 'react'\nimport { chamarApi, ErroApi } from '../../api/cliente.js'\nimport { adicionarNaFila, listarFila, removerDaFila } from './filaOfflineDePresencas.js'\n\nexport function TelaLeituraPresenca({ encontroId, usuarioId }) {\n  const [codigo, setCodigo] = useState('')\n  const [mensagem, setMensagem] = useState(null)\n  const [erro, setErro] = useState(null)\n  const [enviando, setEnviando] = useState(false)\n  const [pendentes, setPendentes] = useState(0)\n\n  useEffect(() => {\n    let cancelado = false\n\n    async function atualizarPendentes() {\n      const fila = await listarFila()\n      if (!cancelado) setPendentes(fila.length)\n    }\n\n    async function sincronizar() {\n      const fila = await listarFila()\n      for (const leitura of fila) {\n        try {\n          await chamarApi(`/encontros/${leitura.encontroId}/presencas`, {\n            metodo: 'POST',\n            usuarioId,\n            corpo: { codigo: leitura.codigo, lidoEm: leitura.lidoEm },\n          })\n          await removerDaFila(leitura.id)\n        } catch {\n          // continua na fila para tentar depois\n        }\n      }\n      await atualizarPendentes()\n    }\n\n    atualizarPendentes()\n    window.addEventListener('online', sincronizar)\n    return () => {\n      cancelado = true\n      window.removeEventListener('online', sincronizar)\n    }\n  }, [usuarioId])\n\n  async function enviar(evento) {\n    evento.preventDefault()\n    setMensagem(null)\n    setErro(null)\n    setEnviando(true)\n\n    if (!navigator.onLine) {\n      await adicionarNaFila({ encontroId, codigo, lidoEm: new Date().toISOString() })\n      setPendentes((atual) => atual + 1)\n      setMensagem('Sem internet: a leitura foi guardada e será enviada quando a conexão voltar.')\n      setCodigo('')\n      setEnviando(false)\n      return\n    }\n\n    try {\ndba140e app: fila offline de presenças do M3\n769203d app: tela de leitura de presença do M3\n906e3fa app: tela de QR do M3\n    at #resolve (node:internal/modules/esm/loader:687:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:607:35)\n    at ModuleJob.syncLink (node:internal/modules/esm/module_job:276:33) {\n  code: 'ERR_MODULE_NOT_FOUND'\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1971,
+      "reasoning": 0,
+      "cache": {
+       "read": 56874,
+       "write": 12620
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175395323
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_012RiS8oWGzmnvdmTFhnEq9F",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && npx vitest run 2>&1 | head -20; ls node_modules 2>&1 | head -3; ls ../node_modules | head"
+      },
+      "time": {
+       "start": 1790175395323,
+       "end": 1790175399351
+      },
+      "output": "vite.config.js (1:379) \u001b[33m[UNRESOLVED_IMPORT] \u001b[0mCould not resolve '@vitejs/plugin-react' in vite.config.js\n - Module not found, treating it as an external dependency in vite.config.js at 379..401\n\nvite.config.js (2:29) \u001b[33m[UNRESOLVED_IMPORT] \u001b[0mCould not resolve 'vite' in vite.config.js\n   \u001b[38;5;246m╭\u001b[0m\u001b[38;5;246m─\u001b[0m\u001b[38;5;246m[\u001b[0m vite.config.js:2:30 \u001b[38;5;246m]\u001b[0m\n   \u001b[38;5;246m│\u001b[0m\n \u001b[38;5;246m2 │\u001b[0m \u001b[38;5;249mi\u001b[0m\u001b[38;5;249mm\u001b[0m\u001b[38;5;249mp\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mr\u001b[0m\u001b[38;5;249mt\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m{\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249md\u001b[0m\u001b[38;5;249me\u001b[0m\u001b[38;5;249mf\u001b[0m\u001b[38;5;249mi\u001b[0m\u001b[38;5;249mn\u001b[0m\u001b[38;5;249me\u001b[0m\u001b[38;5;249mC\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mn\u001b[0m\u001b[38;5;249mf\u001b[0m\u001b[38;5;249mi\u001b[0m\u001b[38;5;249mg\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249m}\u001b[0m\u001b[38;5;249m \u001b[0m\u001b[38;5;249mf\u001b[0m\u001b[38;5;249mr\u001b[0m\u001b[38;5;249mo\u001b[0m\u001b[38;5;249mm\u001b[0m\u001b[38;5;249m \u001b[0m'vite'\n \u001b[38;5;240m  │\u001b[0m                              ───┬──  \n \u001b[38;5;240m  │\u001b[0m                                 ╰──── Module not found, treating it as an external dependency\n\u001b[38;5;246m───╯\u001b[0m\n\n\u001b[31mfailed to load config from C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\vite.config.js\u001b[39m\n\n⎯⎯⎯⎯⎯⎯⎯ Startup Error ⎯⎯⎯⎯⎯⎯⎯⎯\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '@vitejs/plugin-react' imported from C:\\Faculdade\\semana academica\\projeto-semanaacademica\\node_modules\\.vite-temp\\vite.config.js.timestamp-1790175399215-ea868e43bb8218.mjs\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)\n    at packageResolve (node:internal/modules/esm/resolve:784:25)\n    at moduleResolve (node:internal/modules/esm/resolve:873:18)\n    at defaultResolve (node:internal/modules/esm/resolve:1006:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:705:20)\nls: cannot access 'node_modules': No such file or directory",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 121,
+      "reasoning": 0,
+      "cache": {
+       "read": 69494,
+       "write": 3111
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175400540
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "The dependencies for `app/` aren't installed. I'll install them from the lockfile.",
+     "time": {
+      "start": 1790175400540
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_018qDZQFJUr3TvR6kofUisFL",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && npm ci 2>&1 | tail -4 && git status --short && npx vitest run 2>&1 | tail -8",
+       "timeout": 300000
+      },
+      "time": {
+       "start": 1790175401482,
+       "end": 1790175437545
+      },
+      "output": "npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:\nnpm warn install-scripts   msw@2.15.0 (postinstall: node -e \"import('./config/scripts/postinstall.js').catch(() => void 0)\")\nnpm warn install-scripts\nnpm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.\n RUN  v5.0.1 C:/Faculdade/semana academica/projeto-semanaacademica/app\n\n\n Test Files  6 passed (6)\n      Tests  22 passed (22)\n   Start at  11:56:52\n   Duration  24.70s (environment 68%, setup 18%, import 8%, tests 5%, transform 1%)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 169,
+      "reasoning": 0,
+      "cache": {
+       "read": 72605,
+       "write": 1167
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175439855
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Base verde (22 testes). Como as telas 3 e 4 são botões que também aparecem nas telas 1 e 2, vou construir primeiro o componente de ações da inscrição, começando pelo cancelar (tela 4).",
+     "time": {
+      "start": 1790175439858
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01RxWwbraSvNcbhQazTB1YdL",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && mkdir -p src/modulos/m2-inscricoes && cat > src/modulos/m2-inscricoes/AcoesDaInscricao.test.jsx <<'EOF'\nimport { render, screen } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { http, HttpResponse } from 'msw'\nimport { describe, expect, it, vi } from 'vitest'\nimport { servidor } from '../../testes/servidor.js'\nimport { AcoesDaInscricao } from './AcoesDaInscricao.jsx'\n\nfunction inscricao(sobrepor = {}) {\n  return {\n    id: 'ins_9c0d1e2f',\n    atividadeId: 'atv_1a2b3c4d',\n    participanteId: 'p-carla',\n    status: 'confirmada',\n    posicaoNaEspera: null,\n    convocadaAte: null,\n    criadaEm: '2026-10-13T09:00:00-03:00',\n    ...sobrepor,\n  }\n}\n\ndescribe('AcoesDaInscricao — cancelar', () => {\n  it.each(['confirmada', 'em_espera', 'convocada'])(\n    'oferece o botão de cancelar quando o status é %s',\n    (status) => {\n      render(<AcoesDaInscricao inscricao={inscricao({ status })} usuarioId=\"p-carla\" />)\n\n      expect(screen.getByRole('button', { name: /cancelar inscrição/i })).toBeInTheDocument()\n    },\n  )\n\n  it.each(['cancelada', 'expirada'])('não oferece cancelar quando o status é %s', (status) => {\n    render(<AcoesDaInscricao inscricao={inscricao({ status })} usuarioId=\"p-carla\" />)\n\n    expect(screen.queryByRole('button', { name: /cancelar inscrição/i })).not.toBeInTheDocument()\n  })\n\n  it('chama POST /inscricoes/:id/cancelamento com o X-Usuario e devolve a inscrição atualizada', async () => {\n    let usuarioRecebido\n    servidor.use(\n      http.post('/inscricoes/ins_9c0d1e2f/cancelamento', ({ request }) => {\n        usuarioRecebido = request.headers.get('X-Usuario')\n        return HttpResponse.json(inscricao({ status: 'cancelada' }))\n      }),\n    )\n    const aoAtualizar = vi.fn()\n\n    render(\n      <AcoesDaInscricao inscricao={inscricao()} usuarioId=\"p-carla\" aoAtualizar={aoAtualizar} />,\n    )\n    await userEvent.click(screen.getByRole('button', { name: /cancelar inscrição/i }))\n\n    await vi.waitFor(() => expect(aoAtualizar).toHaveBeenCalledWith(inscricao({ status: 'cancelada' })))\n    expect(usuarioRecebido).toBe('p-carla')\n  })\n\n  it('mostra a mensagem da API quando o cancelamento é recusado', async () => {\n    servidor.use(\n      http.post('/inscricoes/ins_9c0d1e2f/cancelamento', () =>\n        HttpResponse.json(\n          { erro: 'ATIVIDADE_JA_INICIADA', mensagem: 'A atividade já começou.' },\n          { status: 422 },\n        ),\n      ),\n    )\n    const aoAtualizar = vi.fn()\n\n    render(\n      <AcoesDaInscricao inscricao={inscricao()} usuarioId=\"p-carla\" aoAtualizar={aoAtualizar} />,\n    )\n    await userEvent.click(screen.getByRole('button', { name: /cancelar inscrição/i }))\n\n    expect(await screen.findByRole('alert')).toHaveTextContent('A atividade já começou.')\n    expect(aoAtualizar).not.toHaveBeenCalled()\n  })\n})\nEOF\nnpx vitest run src/modulos/m2-inscricoes 2>&1 | grep -E \"FAIL|Error|Failed|Tests|passed\" | head",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175449383,
+       "end": 1790175454941
+      },
+      "output": "⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯\n FAIL  src/modulos/m2-inscricoes/AcoesDaInscricao.test.jsx [ src/modulos/m2-inscricoes/AcoesDaInscricao.test.jsx ]\nError: Failed to resolve import \"./AcoesDaInscricao.jsx\" from \"src/modulos/m2-inscricoes/AcoesDaInscricao.test.jsx\". Does the file exist?\n      Tests  no tests",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1606,
+      "reasoning": 0,
+      "cache": {
+       "read": 73772,
+       "write": 474
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175456116
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho, como esperado. Agora o componente (só o cancelar).",
+     "time": {
+      "start": 1790175456116
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01NCsaL8g2nFFyH4Siif5SFL",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && cat > src/modulos/m2-inscricoes/AcoesDaInscricao.jsx <<'EOF'\nimport { useState } from 'react'\nimport { chamarApi } from '../../api/cliente.js'\n\nconst STATUS_ATIVOS = ['confirmada', 'em_espera', 'convocada']\n\nexport function AcoesDaInscricao({ inscricao, usuarioId, aoAtualizar }) {\n  const [erro, setErro] = useState(null)\n  const [enviando, setEnviando] = useState(false)\n\n  async function chamar(acao) {\n    setErro(null)\n    setEnviando(true)\n    try {\n      const atualizada = await chamarApi(`/inscricoes/${inscricao.id}/${acao}`, {\n        metodo: 'POST',\n        usuarioId,\n      })\n      aoAtualizar?.(atualizada)\n    } catch (e) {\n      setErro(e)\n    } finally {\n      setEnviando(false)\n    }\n  }\n\n  return (\n    <div>\n      {STATUS_ATIVOS.includes(inscricao.status) && (\n        <button type=\"button\" disabled={enviando} onClick={() => chamar('cancelamento')}>\n          Cancelar inscrição\n        </button>\n      )}\n      {erro && <p role=\"alert\">{erro.message}</p>}\n    </div>\n  )\n}\nEOF\nnpx vitest run 2>&1 | grep -E \"FAIL|Tests|Test Files\"; npx oxlint 2>&1 | tail -3",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175459864,
+       "end": 1790175472606
+      },
+      "output": " Test Files  7 passed (7)\n      Tests  29 passed (29)\nsrc/modulos/m1-grade/DetalheAtividade.jsx:21:5: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders help: Effects should synchronize React with external systems. Calling setState synchronously inside an effect starts another render and is usually unnecessary. Derive the value during render, initialize state directly, or update it from the event that caused the change. Use an effect only when synchronizing with an external system.\nsrc/modulos/m1-grade/ProgramacaoPorDia.jsx:16:5: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders help: Effects should synchronize React with external systems. Calling setState synchronously inside an effect starts another render and is usually unnecessary. Derive the value during render, initialize state directly, or update it from the event that caused the change. Use an effect only when synchronizing with an external system.\nsrc/modulos/m1-grade/FormularioAtividade.jsx:25:27: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders help: Effects should synchronize React with external systems. Calling setState synchronously inside an effect starts another render and is usually unnecessary. Derive the value during render, initialize state directly, or update it from the event that caused the change. Use an effect only when synchronizing with an external system.",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 634,
+      "reasoning": 0,
+      "cache": {
+       "read": 74246,
+       "write": 1853
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175473684
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde. Commit da tela 4 (cancelar).",
+     "time": {
+      "start": 1790175473684
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01EkhjvJpqkmeecrHcfsGZ7m",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica\" && git add app/src/modulos/m2-inscricoes && git commit -q -m \"app: tela de inscrições do M2 — botão de cancelar inscrição\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\" && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790175474776,
+       "end": 1790175476245
+      },
+      "output": "warning: in the working copy of 'app/src/modulos/m2-inscricoes/AcoesDaInscricao.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/AcoesDaInscricao.test.jsx', LF will be replaced by CRLF the next time Git touches it\n2ca9337 app: tela de inscrições do M2 — botão de cancelar inscrição",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 190,
+      "reasoning": 0,
+      "cache": {
+       "read": 76099,
+       "write": 1167
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175478550
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Tela 3 (confirmar convocação): teste primeiro, em arquivo novo para não mexer no teste já commitado.",
+     "time": {
+      "start": 1790175478552
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Ent1aC35yEC4N1CMe7zHpR",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && cat > src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx <<'EOF'\nimport { render, screen } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { http, HttpResponse } from 'msw'\nimport { describe, expect, it, vi } from 'vitest'\nimport { servidor } from '../../testes/servidor.js'\nimport { AcoesDaInscricao } from './AcoesDaInscricao.jsx'\n\nfunction inscricao(sobrepor = {}) {\n  return {\n    id: 'ins_9c0d1e2f',\n    atividadeId: 'atv_1a2b3c4d',\n    participanteId: 'p-diego',\n    status: 'convocada',\n    posicaoNaEspera: null,\n    convocadaAte: '2026-10-19T12:00:00-03:00',\n    criadaEm: '2026-10-13T09:00:00-03:00',\n    ...sobrepor,\n  }\n}\n\ndescribe('AcoesDaInscricao — confirmar convocação', () => {\n  it('oferece o botão de confirmar quando o status é convocada', () => {\n    render(<AcoesDaInscricao inscricao={inscricao()} usuarioId=\"p-diego\" />)\n\n    expect(screen.getByRole('button', { name: /confirmar convocação/i })).toBeInTheDocument()\n  })\n\n  it.each(['confirmada', 'em_espera', 'cancelada', 'expirada'])(\n    'não oferece confirmar quando o status é %s',\n    (status) => {\n      render(\n        <AcoesDaInscricao\n          inscricao={inscricao({ status, convocadaAte: null })}\n          usuarioId=\"p-diego\"\n        />,\n      )\n\n      expect(screen.queryByRole('button', { name: /confirmar convocação/i })).not.toBeInTheDocument()\n    },\n  )\n\n  it('chama POST /inscricoes/:id/confirmacao com o X-Usuario e devolve a inscrição atualizada', async () => {\n    let usuarioRecebido\n    const confirmada = inscricao({ status: 'confirmada', convocadaAte: null })\n    servidor.use(\n      http.post('/inscricoes/ins_9c0d1e2f/confirmacao', ({ request }) => {\n        usuarioRecebido = request.headers.get('X-Usuario')\n        return HttpResponse.json(confirmada)\n      }),\n    )\n    const aoAtualizar = vi.fn()\n\n    render(\n      <AcoesDaInscricao inscricao={inscricao()} usuarioId=\"p-diego\" aoAtualizar={aoAtualizar} />,\n    )\n    await userEvent.click(screen.getByRole('button', { name: /confirmar convocação/i }))\n\n    await vi.waitFor(() => expect(aoAtualizar).toHaveBeenCalledWith(confirmada))\n    expect(usuarioRecebido).toBe('p-diego')\n  })\n\n  it.each([\n    ['CONVOCACAO_EXPIRADA', 'O prazo para confirmar acabou.'],\n    ['CONFLITO_DE_HORARIO', 'Você já tem outra atividade nesse horário.'],\n  ])('mostra o erro %s da API e mantém o botão disponível', async (codigo, mensagem) => {\n    servidor.use(\n      http.post('/inscricoes/ins_9c0d1e2f/confirmacao', () =>\n        HttpResponse.json({ erro: codigo, mensagem }, { status: codigo === 'CONFLITO_DE_HORARIO' ? 409 : 422 }),\n      ),\n    )\n    const aoAtualizar = vi.fn()\n\n    render(\n      <AcoesDaInscricao inscricao={inscricao()} usuarioId=\"p-diego\" aoAtualizar={aoAtualizar} />,\n    )\n    await userEvent.click(screen.getByRole('button', { name: /confirmar convocação/i }))\n\n    expect(await screen.findByRole('alert')).toHaveTextContent(mensagem)\n    expect(aoAtualizar).not.toHaveBeenCalled()\n    expect(screen.getByRole('button', { name: /confirmar convocação/i })).toBeEnabled()\n  })\n})\nEOF\nnpx vitest run src/modulos/m2-inscricoes/ConfirmarConvocacao 2>&1 | grep -E \"FAIL|×|Tests|Test Files\" | head",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175488735,
+       "end": 1790175495011
+      },
+      "output": "     × oferece o botão de confirmar quando o status é convocada 114ms\n     × chama POST /inscricoes/:id/confirmacao com o X-Usuario e devolve a inscrição atualizada 8ms\n     × mostra o erro CONVOCACAO_EXPIRADA da API e mantém o botão disponível 6ms\n     × mostra o erro CONFLITO_DE_HORARIO da API e mantém o botão disponível 6ms\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯\n FAIL  src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx > AcoesDaInscricao — confirmar convocação > oferece o botão de confirmar quando o status é convocada\n FAIL  src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx > AcoesDaInscricao — confirmar convocação > chama POST /inscricoes/:id/confirmacao com o X-Usuario e devolve a inscrição atualizada\n FAIL  src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx > AcoesDaInscricao — confirmar convocação > mostra o erro CONVOCACAO_EXPIRADA da API e mantém o botão disponível\n FAIL  src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx > AcoesDaInscricao — confirmar convocação > mostra o erro CONFLITO_DE_HORARIO da API e mantém o botão disponível\n Test Files  1 failed (1)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1754,
+      "reasoning": 0,
+      "cache": {
+       "read": 77266,
+       "write": 481
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175496548
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Falhou pelos motivos certos (os 4 casos negativos passam trivialmente). Implemento.",
+     "time": {
+      "start": 1790175496548
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01EQ5TD1VhL89fRyZQi959n1",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && python3 - <<'EOF' 2>/dev/null || node -e \"\nconst fs=require('fs');const p='src/modulos/m2-inscricoes/AcoesDaInscricao.jsx';let s=fs.readFileSync(p,'utf8');\ns=s.replace(\\\"    <div>\\n      {STATUS_ATIVOS\\\",\\\"    <div>\\n      {inscricao.status === 'convocada' && (\\n        <button type=\\\\\\\"button\\\\\\\" disabled={enviando} onClick={() => chamar('confirmacao')}>\\n          Confirmar convocação\\n        </button>\\n      )}\\n      {STATUS_ATIVOS\\\");\nfs.writeFileSync(p,s)\"\nEOF\ngrep -n \"confirmacao\" src/modulos/m2-inscricoes/AcoesDaInscricao.jsx; npx vitest run 2>&1 | grep -E \"FAIL|×|Tests|Test Files\"",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175499536,
+       "end": 1790175509282
+      },
+      "output": "     × oferece o botão de confirmar quando o status é convocada 154ms\n     × chama POST /inscricoes/:id/confirmacao com o X-Usuario e devolve a inscrição atualizada 10ms\n     × mostra o erro CONVOCACAO_EXPIRADA da API e mantém o botão disponível 11ms\n     × mostra o erro CONFLITO_DE_HORARIO da API e mantém o botão disponível 10ms\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯\n FAIL  src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx > AcoesDaInscricao — confirmar convocação > oferece o botão de confirmar quando o status é convocada\n FAIL  src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx > AcoesDaInscricao — confirmar convocação > chama POST /inscricoes/:id/confirmacao com o X-Usuario e devolve a inscrição atualizada\n FAIL  src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx > AcoesDaInscricao — confirmar convocação > mostra o erro CONVOCACAO_EXPIRADA da API e mantém o botão disponível\n FAIL  src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx > AcoesDaInscricao — confirmar convocação > mostra o erro CONFLITO_DE_HORARIO da API e mantém o botão disponível\n Test Files  1 failed | 7 passed (8)\n      Tests  4 failed | 33 passed (37)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 456,
+      "reasoning": 0,
+      "cache": {
+       "read": 77747,
+       "write": 2467
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175510917
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "O script de substituição não aplicou (nenhum `confirmacao` no arquivo). Uso o Edit direto.",
+     "time": {
+      "start": 1790175510917
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01LjeAowv2Y1Q2M8PxFtbU1f",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "    <div>\n      {STATUS_ATIVOS",
+       "new_string": "    <div>\n      {inscricao.status === 'convocada' && (\n        <button type=\"button\" disabled={enviando} onClick={() => chamar('confirmacao')}>\n          Confirmar convocação\n        </button>\n      )}\n      {STATUS_ATIVOS",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\modulos\\m2-inscricoes\\AcoesDaInscricao.jsx"
+      },
+      "time": {
+       "start": 1790175512413,
+       "end": 1790175512480
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\modulos\\m2-inscricoes\\AcoesDaInscricao.jsx has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 295,
+      "reasoning": 0,
+      "cache": {
+       "read": 80214,
+       "write": 1109
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175515037
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01QgysBBaHa8mEDu79Acw3U2",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && git status --short && npx vitest run 2>&1 | grep -E \"FAIL|×|Tests|Test Files\" && cd .. && git add app/src/modulos/m2-inscricoes && git commit -q -m \"app: tela de inscrições do M2 — botão de confirmar convocação\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\" && git log --oneline -1",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175515037,
+       "end": 1790175524872
+      },
+      "output": " M src/modulos/m2-inscricoes/AcoesDaInscricao.jsx\n?? src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx\n Test Files  8 passed (8)\n      Tests  37 passed (37)\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/AcoesDaInscricao.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/ConfirmarConvocacao.test.jsx', LF will be replaced by CRLF the next time Git touches it\n83c3e94 app: tela de inscrições do M2 — botão de confirmar convocação",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 240,
+      "reasoning": 0,
+      "cache": {
+       "read": 81323,
+       "write": 423
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175528599
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Tela 1 (detalhe com inscrever/cancelar): teste primeiro.",
+     "time": {
+      "start": 1790175528601
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Ac4RaEQmMPtrgw1ULV55sL",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && cat > src/modulos/m2-inscricoes/InscricaoNaAtividade.test.jsx <<'EOF'\nimport { render, screen } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { http, HttpResponse } from 'msw'\nimport { describe, expect, it, vi } from 'vitest'\nimport { servidor } from '../../testes/servidor.js'\nimport { InscricaoNaAtividade } from './InscricaoNaAtividade.jsx'\n\nfunction inscricao(sobrepor = {}) {\n  return {\n    id: 'ins_9c0d1e2f',\n    atividadeId: 'atv_1a2b3c4d',\n    participanteId: 'p-carla',\n    status: 'confirmada',\n    posicaoNaEspera: null,\n    convocadaAte: null,\n    criadaEm: '2026-10-13T09:00:00-03:00',\n    ...sobrepor,\n  }\n}\n\nfunction minhasInscricoes(lista) {\n  return http.get('/inscricoes', ({ request }) => {\n    const url = new URL(request.url)\n    const filtro = url.searchParams.get('atividadeId')\n    return HttpResponse.json(lista.filter((i) => !filtro || i.atividadeId === filtro))\n  })\n}\n\nfunction renderizar(props = {}) {\n  return render(<InscricaoNaAtividade atividadeId=\"atv_1a2b3c4d\" usuarioId=\"p-carla\" {...props} />)\n}\n\ndescribe('InscricaoNaAtividade', () => {\n  it('sem inscrição ativa, oferece inscrever-se e não oferece cancelar', async () => {\n    servidor.use(minhasInscricoes([inscricao({ status: 'cancelada' })]))\n\n    renderizar()\n\n    expect(await screen.findByRole('button', { name: /inscrever-se/i })).toBeInTheDocument()\n    expect(screen.queryByRole('button', { name: /cancelar inscrição/i })).not.toBeInTheDocument()\n  })\n\n  it('inscreve com POST /atividades/:id/inscricoes e passa a mostrar a inscrição com o botão de cancelar', async () => {\n    let usuarioRecebido\n    servidor.use(\n      minhasInscricoes([]),\n      http.post('/atividades/atv_1a2b3c4d/inscricoes', ({ request }) => {\n        usuarioRecebido = request.headers.get('X-Usuario')\n        return HttpResponse.json(inscricao(), { status: 201 })\n      }),\n    )\n    const aoMudar = vi.fn()\n\n    renderizar({ aoMudar })\n    await userEvent.click(await screen.findByRole('button', { name: /inscrever-se/i }))\n\n    expect(await screen.findByText(/confirmada/i)).toBeInTheDocument()\n    expect(screen.getByRole('button', { name: /cancelar inscrição/i })).toBeInTheDocument()\n    expect(screen.queryByRole('button', { name: /inscrever-se/i })).not.toBeInTheDocument()\n    expect(usuarioRecebido).toBe('p-carla')\n    expect(aoMudar).toHaveBeenCalled()\n  })\n\n  it('mostra a posição na espera quando a inscrição nasce em espera', async () => {\n    servidor.use(\n      minhasInscricoes([]),\n      http.post('/atividades/atv_1a2b3c4d/inscricoes', () =>\n        HttpResponse.json(inscricao({ status: 'em_espera', posicaoNaEspera: 2 }), { status: 201 }),\n      ),\n    )\n\n    renderizar()\n    await userEvent.click(await screen.findByRole('button', { name: /inscrever-se/i }))\n\n    expect(await screen.findByText(/em espera/i)).toBeInTheDocument()\n    expect(screen.getByText(/posição 2/i)).toBeInTheDocument()\n  })\n\n  it('mostra o erro da API quando a inscrição é recusada e mantém o botão de inscrever-se', async () => {\n    servidor.use(\n      minhasInscricoes([]),\n      http.post('/atividades/atv_1a2b3c4d/inscricoes', () =>\n        HttpResponse.json(\n          { erro: 'CONFLITO_DE_HORARIO', mensagem: 'Você já tem atividade nesse horário.' },\n          { status: 409 },\n        ),\n      ),\n    )\n\n    renderizar()\n    await userEvent.click(await screen.findByRole('button', { name: /inscrever-se/i }))\n\n    expect(await screen.findByRole('alert')).toHaveTextContent('Você já tem atividade nesse horário.')\n    expect(screen.getByRole('button', { name: /inscrever-se/i })).toBeEnabled()\n  })\n\n  it('com inscrição ativa carregada, mostra o status e cancela com POST /inscricoes/:id/cancelamento', async () => {\n    servidor.use(\n      minhasInscricoes([inscricao({ status: 'cancelada', id: 'ins_00000000' }), inscricao()]),\n      http.post('/inscricoes/ins_9c0d1e2f/cancelamento', () =>\n        HttpResponse.json(inscricao({ status: 'cancelada' })),\n      ),\n    )\n    const aoMudar = vi.fn()\n\n    renderizar({ aoMudar })\n    await userEvent.click(await screen.findByRole('button', { name: /cancelar inscrição/i }))\n\n    expect(await screen.findByRole('button', { name: /inscrever-se/i })).toBeInTheDocument()\n    expect(aoMudar).toHaveBeenCalled()\n  })\n\n  it('mostra o erro da API quando o cancelamento é recusado', async () => {\n    servidor.use(\n      minhasInscricoes([inscricao()]),\n      http.post('/inscricoes/ins_9c0d1e2f/cancelamento', () =>\n        HttpResponse.json(\n          { erro: 'ATIVIDADE_JA_INICIADA', mensagem: 'A atividade já começou.' },\n          { status: 422 },\n        ),\n      ),\n    )\n\n    renderizar()\n    await userEvent.click(await screen.findByRole('button', { name: /cancelar inscrição/i }))\n\n    expect(await screen.findByRole('alert')).toHaveTextContent('A atividade já começou.')\n  })\n\n  it('mostra o botão de confirmar quando a inscrição está convocada', async () => {\n    servidor.use(\n      minhasInscricoes([inscricao({ status: 'convocada', convocadaAte: '2026-10-19T12:00:00-03:00' })]),\n    )\n\n    renderizar()\n\n    expect(await screen.findByRole('button', { name: /confirmar convocação/i })).toBeInTheDocument()\n  })\n})\nEOF\nnpx vitest run src/modulos/m2-inscricoes/InscricaoNa 2>&1 | grep -E \"FAIL|Error:|Tests|Test Files\" | head -4",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175544689,
+       "end": 1790175550141
+      },
+      "output": " FAIL  src/modulos/m2-inscricoes/InscricaoNaAtividade.test.jsx [ src/modulos/m2-inscricoes/InscricaoNaAtividade.test.jsx ]\nError: Failed to resolve import \"./InscricaoNaAtividade.jsx\" from \"src/modulos/m2-inscricoes/InscricaoNaAtividade.test.jsx\". Does the file exist?\n Test Files  1 failed (1)\n      Tests  no tests",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2767,
+      "reasoning": 0,
+      "cache": {
+       "read": 81746,
+       "write": 625
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175554459
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Y61kaYnfWrGsi35DQdMoYr",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && cat > src/modulos/m2-inscricoes/statusDaInscricao.js <<'EOF'\nexport const STATUS_ATIVOS = ['confirmada', 'em_espera', 'convocada']\n\nconst ROTULOS = {\n  confirmada: 'Confirmada',\n  em_espera: 'Em espera',\n  convocada: 'Convocada',\n  cancelada: 'Cancelada',\n  expirada: 'Expirada',\n}\n\nexport function rotuloDoStatus(status) {\n  return ROTULOS[status] ?? status\n}\n\nexport function estaAtiva(inscricao) {\n  return STATUS_ATIVOS.includes(inscricao.status)\n}\nEOF\ncat > src/modulos/m2-inscricoes/InscricaoNaAtividade.jsx <<'EOF'\nimport { useEffect, useState } from 'react'\nimport { chamarApi } from '../../api/cliente.js'\nimport { AcoesDaInscricao } from './AcoesDaInscricao.jsx'\nimport { estaAtiva, rotuloDoStatus } from './statusDaInscricao.js'\n\nexport function InscricaoNaAtividade({ atividadeId, usuarioId, aoMudar }) {\n  const [carregando, setCarregando] = useState(true)\n  const [inscricao, setInscricao] = useState(null)\n  const [erro, setErro] = useState(null)\n  const [enviando, setEnviando] = useState(false)\n\n  useEffect(() => {\n    let cancelado = false\n\n    chamarApi(`/inscricoes?atividadeId=${encodeURIComponent(atividadeId)}`, { usuarioId })\n      .then((lista) => {\n        if (cancelado) return\n        setInscricao(lista.find(estaAtiva) ?? null)\n        setCarregando(false)\n      })\n      .catch((e) => {\n        if (cancelado) return\n        setErro(e)\n        setCarregando(false)\n      })\n\n    return () => {\n      cancelado = true\n    }\n  }, [atividadeId, usuarioId])\n\n  async function inscrever() {\n    setErro(null)\n    setEnviando(true)\n    try {\n      const criada = await chamarApi(`/atividades/${atividadeId}/inscricoes`, {\n        metodo: 'POST',\n        usuarioId,\n      })\n      setInscricao(criada)\n      aoMudar?.()\n    } catch (e) {\n      setErro(e)\n    } finally {\n      setEnviando(false)\n    }\n  }\n\n  function atualizada(nova) {\n    setInscricao(estaAtiva(nova) ? nova : null)\n    aoMudar?.()\n  }\n\n  if (carregando) return <p>Carregando inscrição…</p>\n\n  return (\n    <section>\n      <h2>Inscrição</h2>\n      {inscricao ? (\n        <>\n          <p>Situação: {rotuloDoStatus(inscricao.status)}</p>\n          {inscricao.status === 'em_espera' && <p>Posição {inscricao.posicaoNaEspera} na fila</p>}\n          <AcoesDaInscricao inscricao={inscricao} usuarioId={usuarioId} aoAtualizar={atualizada} />\n        </>\n      ) : (\n        <button type=\"button\" disabled={enviando} onClick={inscrever}>\n          Inscrever-se\n        </button>\n      )}\n      {erro && !inscricao && <p role=\"alert\">{erro.message}</p>}\n    </section>\n  )\n}\nEOF\nsed -i \"s/^const STATUS_ATIVOS = .*$//\" src/modulos/m2-inscricoes/AcoesDaInscricao.jsx\nsed -i \"s#^import { chamarApi } from '../../api/cliente.js'#import { chamarApi } from '../../api/cliente.js'\\nimport { estaAtiva } from './statusDaInscricao.js'#; s/STATUS_ATIVOS.includes(inscricao.status)/estaAtiva(inscricao)/\" src/modulos/m2-inscricoes/AcoesDaInscricao.jsx\nhead -8 src/modulos/m2-inscricoes/AcoesDaInscricao.jsx; npx vitest run 2>&1 | grep -E \"FAIL|×|Tests|Test Files\"",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175564243,
+       "end": 1790175574280
+      },
+      "output": "import { useState } from 'react'\nimport { chamarApi } from '../../api/cliente.js'\nimport { estaAtiva } from './statusDaInscricao.js'\n\n\n\nexport function AcoesDaInscricao({ inscricao, usuarioId, aoAtualizar }) {\n  const [erro, setErro] = useState(null)\n Test Files  9 passed (9)\n      Tests  44 passed (44)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1845,
+      "reasoning": 0,
+      "cache": {
+       "read": 82371,
+       "write": 3066
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175578859
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01YPyPdywv9gK1FfMj36LrhY",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && node -e \"\nconst fs=require('fs');\nlet p='src/modulos/m2-inscricoes/AcoesDaInscricao.jsx',s=fs.readFileSync(p,'utf8');\ns=s.replace(/\\r?\\n(\\r?\\n){2,}export/,'\\n\\nexport');fs.writeFileSync(p,s);\np='vite.config.js';s=fs.readFileSync(p,'utf8');\ns=s.replace(\\\"'/encontros': 'http://localhost:3000',\\\",\\\"'/encontros': 'http://localhost:3000',\\n      '/inscricoes': 'http://localhost:3000',\\\");fs.writeFileSync(p,s);\np='src/App.jsx';s=fs.readFileSync(p,'utf8');\ns=s.replace(\\\"import { ProgramacaoPorDia } from './modulos/m1-grade/ProgramacaoPorDia.jsx'\\\",\\\"import { ProgramacaoPorDia } from './modulos/m1-grade/ProgramacaoPorDia.jsx'\\nimport { InscricaoNaAtividade } from './modulos/m2-inscricoes/InscricaoNaAtividade.jsx'\\\");\ns=s.replace(\\\"const [mostrarFormulario, setMostrarFormulario] = useState(false)\\n\\\",\\\"const [mostrarFormulario, setMostrarFormulario] = useState(false)\\n  const [versaoDoDetalhe, setVersaoDoDetalhe] = useState(0)\\n\\\");\ns=s.replace(\\\"<DetalheAtividade atividadeId={atividadeSelecionadaId} usuarioId={usuarioId} />\\\",\\\"<DetalheAtividade\\n            key={versaoDoDetalhe}\\n            atividadeId={atividadeSelecionadaId}\\n            usuarioId={usuarioId}\\n          />\\n          {usuario.papel === 'participante' && (\\n            <InscricaoNaAtividade\\n              atividadeId={atividadeSelecionadaId}\\n              usuarioId={usuarioId}\\n              aoMudar={() => setVersaoDoDetalhe((v) => v + 1)}\\n            />\\n          )}\\\");\nfs.writeFileSync(p,s)\"\ngit diff --stat; npx vitest run 2>&1 | grep -E \"FAIL|×|Tests|Test Files\"; npx oxlint 2>&1 | grep -A3 m2- | head; npx vite build 2>&1 | tail -3",
+       "timeout": 180000
+      },
+      "time": {
+       "start": 1790175584054,
+       "end": 1790175600092
+      },
+      "output": "warning: in the working copy of 'app/src/App.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/AcoesDaInscricao.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/vite.config.js', LF will be replaced by CRLF the next time Git touches it\n app/src/App.jsx                                    | 14 +++++++++++++-\n app/src/modulos/m2-inscricoes/AcoesDaInscricao.jsx |  5 ++---\n app/vite.config.js                                 |  1 +\n 3 files changed, 16 insertions(+), 4 deletions(-)\n Test Files  9 passed (9)\n      Tests  44 passed (44)\ndist/assets/index-DRhOGffC.js   228.38 kB │ gzip: 71.23 kB\n\n\u001b[32m✓ built in 265ms\u001b[39m",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1147,
+      "reasoning": 0,
+      "cache": {
+       "read": 85437,
+       "write": 2601
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175602197
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01VVxJ1cJGWGCL6fQh8cLtgB",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica\" && git status --short | head; git add app/src app/vite.config.js && git commit -q -m \"app: tela de inscrições do M2 — inscrever e cancelar no detalhe da atividade\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\" && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790175602197,
+       "end": 1790175604012
+      },
+      "output": " M app/src/App.jsx\n M app/src/modulos/m2-inscricoes/AcoesDaInscricao.jsx\n M app/vite.config.js\n?? app/src/modulos/m2-inscricoes/InscricaoNaAtividade.jsx\n?? app/src/modulos/m2-inscricoes/InscricaoNaAtividade.test.jsx\n?? app/src/modulos/m2-inscricoes/statusDaInscricao.js\nwarning: in the working copy of 'app/src/App.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/AcoesDaInscricao.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/vite.config.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/InscricaoNaAtividade.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/InscricaoNaAtividade.test.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/statusDaInscricao.js', LF will be replaced by CRLF the next time Git touches it\n9e3a055 app: tela de inscrições do M2 — inscrever e cancelar no detalhe da atividade",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 179,
+      "reasoning": 0,
+      "cache": {
+       "read": 88038,
+       "write": 1746
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175610487
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Tela 2 (Minhas inscrições): teste primeiro, com relógio controlado para a contagem regressiva.",
+     "time": {
+      "start": 1790175610489
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01HjPwbgUdphMCEh9Ap5jPuz",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && cat > src/modulos/m2-inscricoes/MinhasInscricoes.test.jsx <<'EOF'\nimport { act, render, screen, within } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { http, HttpResponse } from 'msw'\nimport { afterEach, describe, expect, it, vi } from 'vitest'\nimport { servidor } from '../../testes/servidor.js'\nimport { MinhasInscricoes } from './MinhasInscricoes.jsx'\n\nfunction inscricao(sobrepor = {}) {\n  return {\n    id: 'ins_9c0d1e2f',\n    atividadeId: 'atv_1a2b3c4d',\n    participanteId: 'p-carla',\n    status: 'confirmada',\n    posicaoNaEspera: null,\n    convocadaAte: null,\n    criadaEm: '2026-10-13T09:00:00-03:00',\n    ...sobrepor,\n  }\n}\n\nfunction listaDe(inscricoes) {\n  return http.get('/inscricoes', () => HttpResponse.json(inscricoes))\n}\n\nafterEach(() => {\n  vi.useRealTimers()\n})\n\ndescribe('MinhasInscricoes', () => {\n  it('lista as inscrições do participante com o status de cada uma', async () => {\n    servidor.use(\n      listaDe([\n        inscricao({ id: 'ins_00000001', atividadeId: 'atv_aaaaaaaa', status: 'confirmada' }),\n        inscricao({ id: 'ins_00000002', atividadeId: 'atv_bbbbbbbb', status: 'cancelada' }),\n      ]),\n    )\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n\n    const itens = await screen.findAllByRole('listitem')\n    expect(itens).toHaveLength(2)\n    expect(within(itens[0]).getByText(/atv_aaaaaaaa/)).toBeInTheDocument()\n    expect(within(itens[0]).getByText(/confirmada/i)).toBeInTheDocument()\n    expect(within(itens[1]).getByText(/cancelada/i)).toBeInTheDocument()\n  })\n\n  it('envia o X-Usuario ao buscar as inscrições', async () => {\n    let usuarioRecebido\n    servidor.use(\n      http.get('/inscricoes', ({ request }) => {\n        usuarioRecebido = request.headers.get('X-Usuario')\n        return HttpResponse.json([])\n      }),\n    )\n\n    render(<MinhasInscricoes usuarioId=\"p-diego\" />)\n    await screen.findByText(/nenhuma inscrição/i)\n\n    expect(usuarioRecebido).toBe('p-diego')\n  })\n\n  it('avisa quando o participante não tem inscrições', async () => {\n    servidor.use(listaDe([]))\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n\n    expect(await screen.findByText(/nenhuma inscrição/i)).toBeInTheDocument()\n  })\n\n  it('mostra a posição na espera só para inscrição em espera', async () => {\n    servidor.use(\n      listaDe([\n        inscricao({ id: 'ins_00000001', status: 'em_espera', posicaoNaEspera: 3 }),\n        inscricao({ id: 'ins_00000002', status: 'confirmada' }),\n      ]),\n    )\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n\n    const itens = await screen.findAllByRole('listitem')\n    expect(within(itens[0]).getByText(/posição 3/i)).toBeInTheDocument()\n    expect(within(itens[1]).queryByText(/posição/i)).not.toBeInTheDocument()\n  })\n\n  it('mostra a contagem regressiva até convocadaAte e ela avança a cada segundo', async () => {\n    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] })\n    vi.setSystemTime(new Date('2026-10-19T10:30:00-03:00'))\n    servidor.use(\n      listaDe([inscricao({ status: 'convocada', convocadaAte: '2026-10-19T12:00:00-03:00' })]),\n    )\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n\n    expect(await screen.findByText(/01:30:00/)).toBeInTheDocument()\n\n    act(() => {\n      vi.advanceTimersByTime(1000)\n    })\n    expect(screen.getByText(/01:29:59/)).toBeInTheDocument()\n  })\n\n  it('mostra prazo encerrado quando convocadaAte já passou', async () => {\n    vi.useFakeTimers({ toFake: ['Date', 'setInterval', 'clearInterval'] })\n    vi.setSystemTime(new Date('2026-10-19T12:00:01-03:00'))\n    servidor.use(\n      listaDe([inscricao({ status: 'convocada', convocadaAte: '2026-10-19T12:00:00-03:00' })]),\n    )\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n\n    expect(await screen.findByText(/prazo encerrado/i)).toBeInTheDocument()\n  })\n\n  it('não mostra contagem para inscrição que não está convocada', async () => {\n    servidor.use(listaDe([inscricao({ status: 'confirmada' })]))\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n\n    await screen.findByText(/confirmada/i)\n    expect(screen.queryByText(/\\d{2}:\\d{2}:\\d{2}/)).not.toBeInTheDocument()\n  })\n\n  it('oferece confirmar só na convocada e cancelar em qualquer status ativo', async () => {\n    servidor.use(\n      listaDe([\n        inscricao({ id: 'ins_00000001', status: 'convocada', convocadaAte: '2099-01-01T00:00:00-03:00' }),\n        inscricao({ id: 'ins_00000002', status: 'em_espera', posicaoNaEspera: 1 }),\n        inscricao({ id: 'ins_00000003', status: 'expirada' }),\n      ]),\n    )\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n\n    const itens = await screen.findAllByRole('listitem')\n    expect(within(itens[0]).getByRole('button', { name: /confirmar convocação/i })).toBeInTheDocument()\n    expect(within(itens[0]).getByRole('button', { name: /cancelar inscrição/i })).toBeInTheDocument()\n    expect(within(itens[1]).queryByRole('button', { name: /confirmar convocação/i })).not.toBeInTheDocument()\n    expect(within(itens[1]).getByRole('button', { name: /cancelar inscrição/i })).toBeInTheDocument()\n    expect(within(itens[2]).queryByRole('button')).not.toBeInTheDocument()\n  })\n\n  it('atualiza a linha depois de cancelar', async () => {\n    servidor.use(\n      listaDe([inscricao()]),\n      http.post('/inscricoes/ins_9c0d1e2f/cancelamento', () =>\n        HttpResponse.json(inscricao({ status: 'cancelada' })),\n      ),\n    )\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n    await userEvent.click(await screen.findByRole('button', { name: /cancelar inscrição/i }))\n\n    expect(await screen.findByText(/cancelada/i)).toBeInTheDocument()\n    expect(screen.queryByRole('button', { name: /cancelar inscrição/i })).not.toBeInTheDocument()\n  })\n\n  it('mostra erro quando a lista não carrega', async () => {\n    servidor.use(\n      http.get('/inscricoes', () =>\n        HttpResponse.json({ erro: 'USUARIO_DESCONHECIDO', mensagem: 'sem usuário' }, { status: 401 }),\n      ),\n    )\n\n    render(<MinhasInscricoes usuarioId=\"p-carla\" />)\n\n    expect(await screen.findByRole('alert')).toHaveTextContent(/não foi possível/i)\n  })\n})\nEOF\nnpx vitest run src/modulos/m2-inscricoes/MinhasInscricoes 2>&1 | grep -E \"FAIL|Error:|Tests|Test Files\" | head -4",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175629993,
+       "end": 1790175635566
+      },
+      "output": " FAIL  src/modulos/m2-inscricoes/MinhasInscricoes.test.jsx [ src/modulos/m2-inscricoes/MinhasInscricoes.test.jsx ]\nError: Failed to resolve import \"./MinhasInscricoes.jsx\" from \"src/modulos/m2-inscricoes/MinhasInscricoes.test.jsx\". Does the file exist?\n Test Files  1 failed (1)\n      Tests  no tests",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3522,
+      "reasoning": 0,
+      "cache": {
+       "read": 89784,
+       "write": 845
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175644445
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_0191Aw4we88bgrU3JU2a6PDw",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && cat > src/modulos/m2-inscricoes/MinhasInscricoes.jsx <<'EOF'\nimport { useEffect, useState } from 'react'\nimport { chamarApi } from '../../api/cliente.js'\nimport { AcoesDaInscricao } from './AcoesDaInscricao.jsx'\nimport { rotuloDoStatus } from './statusDaInscricao.js'\n\nfunction doisDigitos(n) {\n  return String(n).padStart(2, '0')\n}\n\nfunction formatarRestante(ms) {\n  const total = Math.floor(ms / 1000)\n  const horas = Math.floor(total / 3600)\n  const minutos = Math.floor((total % 3600) / 60)\n  const segundos = total % 60\n  return `${doisDigitos(horas)}:${doisDigitos(minutos)}:${doisDigitos(segundos)}`\n}\n\nfunction ContagemRegressiva({ ate }) {\n  const [agora, setAgora] = useState(() => Date.now())\n\n  useEffect(() => {\n    const intervalo = setInterval(() => setAgora(Date.now()), 1000)\n    return () => clearInterval(intervalo)\n  }, [])\n\n  const restante = new Date(ate).getTime() - agora\n  if (restante <= 0) return <p>Prazo encerrado</p>\n  return <p>Tempo para confirmar: {formatarRestante(restante)}</p>\n}\n\nexport function MinhasInscricoes({ usuarioId }) {\n  const [inscricoes, setInscricoes] = useState(null)\n  const [erro, setErro] = useState(null)\n\n  useEffect(() => {\n    let cancelado = false\n\n    chamarApi('/inscricoes', { usuarioId })\n      .then((lista) => {\n        if (!cancelado) setInscricoes(lista)\n      })\n      .catch((e) => {\n        if (!cancelado) setErro(e)\n      })\n\n    return () => {\n      cancelado = true\n    }\n  }, [usuarioId])\n\n  function substituir(nova) {\n    setInscricoes((lista) => lista.map((i) => (i.id === nova.id ? nova : i)))\n  }\n\n  if (erro) return <p role=\"alert\">Não foi possível carregar suas inscrições.</p>\n  if (!inscricoes) return <p>Carregando…</p>\n\n  return (\n    <section>\n      <h1>Minhas inscrições</h1>\n      {inscricoes.length === 0 ? (\n        <p>Nenhuma inscrição ainda.</p>\n      ) : (\n        <ul>\n          {inscricoes.map((inscricao) => (\n            <li key={inscricao.id}>\n              <p>Atividade {inscricao.atividadeId}</p>\n              <p>Situação: {rotuloDoStatus(inscricao.status)}</p>\n              {inscricao.status === 'em_espera' && <p>Posição {inscricao.posicaoNaEspera} na fila</p>}\n              {inscricao.status === 'convocada' && <ContagemRegressiva ate={inscricao.convocadaAte} />}\n              <AcoesDaInscricao inscricao={inscricao} usuarioId={usuarioId} aoAtualizar={substituir} />\n            </li>\n          ))}\n        </ul>\n      )}\n    </section>\n  )\n}\nEOF\nnpx vitest run 2>&1 | grep -E \"FAIL|×|Tests|Test Files|Error\"",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175644445,
+       "end": 1790175654530
+      },
+      "output": " Test Files  10 passed (10)\n      Tests  54 passed (54)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1253,
+      "reasoning": 0,
+      "cache": {
+       "read": 90629,
+       "write": 3813
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175656443
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde. Ligo a tela no `App.jsx` com um botão de navegação para participantes.",
+     "time": {
+      "start": 1790175656446
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01CXVnuoMt8wYkfQxDJEuh6P",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && node -e \"\nconst fs=require('fs');const p='src/App.jsx';let s=fs.readFileSync(p,'utf8');\nconst r=(a,b)=>{if(!s.includes(a))throw new Error('falta: '+a);s=s.replace(a,b)};\nr(\\\"import { InscricaoNaAtividade }\\\",\\\"import { MinhasInscricoes } from './modulos/m2-inscricoes/MinhasInscricoes.jsx'\\nimport { InscricaoNaAtividade }\\\");\nr(\\\"const [versaoDoDetalhe\\\",\\\"const [mostrarMinhasInscricoes, setMostrarMinhasInscricoes] = useState(false)\\n  const [versaoDoDetalhe\\\");\nr(\\\"    setMostrarFormulario(false)\\n  }\\\",\\\"    setMostrarFormulario(false)\\n    setMostrarMinhasInscricoes(false)\\n  }\\\");\nr(\\\"          {usuario.papel === 'organizacao' && (\\\",\\\"          {usuario.papel === 'participante' && (\\n            <button\\n              type=\\\\\\\"button\\\\\\\"\\n              onClick={() => {\\n                irParaProgramacao()\\n                setMostrarMinhasInscricoes(true)\\n              }}\\n            >\\n              Minhas inscrições\\n            </button>\\n          )}\\n          {usuario.papel === 'organizacao' && (\\\");\nr(\\\"      {!mostrarFormulario && atividadeSelecionadaId && (\\\",\\\"      {!mostrarFormulario && mostrarMinhasInscricoes && <MinhasInscricoes usuarioId={usuarioId} />}\\n\\n      {!mostrarFormulario && !mostrarMinhasInscricoes && atividadeSelecionadaId && (\\\");\nr(\\\"      {!mostrarFormulario && !atividadeSelecionadaId && (\\\",\\\"      {!mostrarFormulario && !mostrarMinhasInscricoes && !atividadeSelecionadaId && (\\\");\nfs.writeFileSync(p,s)\" && npx vitest run 2>&1 | grep -E \"FAIL|×|Tests|Test Files\"; npx oxlint 2>&1 | grep -E \"m2-|App\" | head -3; npx vite build 2>&1 | tail -2",
+       "timeout": 180000
+      },
+      "time": {
+       "start": 1790175662075,
+       "end": 1790175669964
+      },
+      "output": "[eval]:3\r\nconst r=(a,b)=>{if(!s.includes(a))throw new Error('falta: '+a);s=s.replace(a,b)};\r\n                                  ^\r\n\r\nError: falta: const [versaoDoDetalhe\r\n    at r ([eval]:3:41)\r\n    at [eval]:5:1\r\n    at runScriptInThisContext (node:internal/vm:219:10)\r\n    at node:internal/process/execution:451:12\r\n    at [eval]-wrapper:6:24\r\n    at runScriptInContext (node:internal/process/execution:449:60)\r\n    at evalFunction (node:internal/process/execution:283:30)\r\n    at evalTypeScript (node:internal/process/execution:295:3)\r\n    at node:internal/main/eval_string:71:3\r\n\r\nNode.js v24.20.0\r\n\n\u001b[32m✓ built in 143ms\u001b[39m",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 963,
+      "reasoning": 0,
+      "cache": {
+       "read": 94442,
+       "write": 1324
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175671946
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "O padrão do script estava errado e nada foi gravado. Uso o Edit.",
+     "time": {
+      "start": 1790175671947
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01Q3UypMpxbxNkzu6idQSq7r",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "import { InscricaoNaAtividade }",
+       "new_string": "import { MinhasInscricoes } from './modulos/m2-inscricoes/MinhasInscricoes.jsx'\nimport { InscricaoNaAtividade }",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx"
+      },
+      "time": {
+       "start": 1790175673251,
+       "end": 1790175680237
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01AiMUkSwwuVHqgeexR7peGW",
+     "state": {
+      "status": "error",
+      "input": {
+       "replace_all": false,
+       "old_string": "  const [versaoDoDetalhe,",
+       "new_string": "  const [mostrarMinhasInscricoes, setMostrarMinhasInscricoes] = useState(false)\n  const [versaoDoDetalhe,",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx"
+      },
+      "time": {
+       "start": 1790175674524,
+       "end": 1790175680250
+      },
+      "output": "<tool_use_error>String to replace not found in file.\nString:   const [versaoDoDetalhe,</tool_use_error>"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01Cwn2jUYucQcC7Kf7RFsQwD",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "    setMostrarFormulario(false)\n  }",
+       "new_string": "    setMostrarFormulario(false)\n    setMostrarMinhasInscricoes(false)\n  }",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx"
+      },
+      "time": {
+       "start": 1790175675717,
+       "end": 1790175680294
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_014o2syg1zWX4xFQ3aJynrQz",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "          {usuario.papel === 'organizacao' && (",
+       "new_string": "          {usuario.papel === 'participante' && (\n            <button\n              type=\"button\"\n              onClick={() => {\n                irParaProgramacao()\n                setMostrarMinhasInscricoes(true)\n              }}\n            >\n              Minhas inscrições\n            </button>\n          )}\n          {usuario.papel === 'organizacao' && (",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx"
+      },
+      "time": {
+       "start": 1790175677336,
+       "end": 1790175680344
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_012NjBSTMtdeV4LKCF6xndtW",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "      {!mostrarFormulario && atividadeSelecionadaId && (",
+       "new_string": "      {!mostrarFormulario && mostrarMinhasInscricoes && <MinhasInscricoes usuarioId={usuarioId} />}\n\n      {!mostrarFormulario && !mostrarMinhasInscricoes && atividadeSelecionadaId && (",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx"
+      },
+      "time": {
+       "start": 1790175678954,
+       "end": 1790175680391
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01MaGNeUVkb3QHiudRaReRcJ",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "      {!mostrarFormulario && !atividadeSelecionadaId && (",
+       "new_string": "      {!mostrarFormulario && !mostrarMinhasInscricoes && !atividadeSelecionadaId && (",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx"
+      },
+      "time": {
+       "start": 1790175680190,
+       "end": 1790175680441
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1330,
+      "reasoning": 0,
+      "cache": {
+       "read": 95766,
+       "write": 1286
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175682061
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01MifbPqzDQvYZeynkdTrQJJ",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && sed -n 1,30p src/App.jsx; git diff --stat"
+      },
+      "time": {
+       "start": 1790175682701,
+       "end": 1790175682928
+      },
+      "output": "import { useState } from 'react'\nimport { DetalheAtividade } from './modulos/m1-grade/DetalheAtividade.jsx'\nimport { FormularioAtividade } from './modulos/m1-grade/FormularioAtividade.jsx'\nimport { ProgramacaoPorDia } from './modulos/m1-grade/ProgramacaoPorDia.jsx'\nimport { MinhasInscricoes } from './modulos/m2-inscricoes/MinhasInscricoes.jsx'\nimport { InscricaoNaAtividade } from './modulos/m2-inscricoes/InscricaoNaAtividade.jsx'\n\nconst USUARIOS = [\n  { id: 'p-carla', papel: 'participante', nome: 'Carla Mendes Souza' },\n  { id: 'org-ana', papel: 'organizacao', nome: 'Ana Beatriz Lima' },\n]\n\nfunction App() {\n  const [usuarioId, setUsuarioId] = useState(USUARIOS[0].id)\n  const [atividadeSelecionadaId, setAtividadeSelecionadaId] = useState(null)\n  const [mostrarFormulario, setMostrarFormulario] = useState(false)\n\n  const usuario = USUARIOS.find((u) => u.id === usuarioId)\n\n  function irParaProgramacao() {\n    setAtividadeSelecionadaId(null)\n    setMostrarFormulario(false)\n    setMostrarMinhasInscricoes(false)\n  }\n\n  return (\n    <>\n      <header>\n        <label>\n          Usuário\n app/src/App.jsx | 19 +++++++++++++++++--\n 1 file changed, 17 insertions(+), 2 deletions(-)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 148,
+      "reasoning": 0,
+      "cache": {
+       "read": 97052,
+       "write": 1871
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175688312
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "O estado `versaoDoDetalhe` não está no arquivo. Suspeito que a substituição anterior falhou por CRLF e o commit da tela 1 ficou com referência indefinida. Verifico.",
+     "time": {
+      "start": 1790175688314
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_0195dERa9NwCNymzWVAxZgwE",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && grep -n \"ersaoDoDetalhe\" src/App.jsx; git show HEAD:app/src/App.jsx | grep -n \"ersaoDoDetalhe\"; file src/App.jsx"
+      },
+      "time": {
+       "start": 1790175689170,
+       "end": 1790175689485
+      },
+      "output": "86:            key={versaoDoDetalhe}\n94:              aoMudar={() => setVersaoDoDetalhe((v) => v + 1)}\n71:            key={versaoDoDetalhe}\n79:              aoMudar={() => setVersaoDoDetalhe((v) => v + 1)}\nsrc/App.jsx: JavaScript source, Unicode text, UTF-8 text, with CRLF line terminators",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 412,
+      "reasoning": 0,
+      "cache": {
+       "read": 98923,
+       "write": 771
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175696838
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01VAWocToqDSuD5rPGVzjHmP",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && sed -n 1,60p src/modulos/m1-grade/ProgramacaoPorDia.jsx | head -50"
+      },
+      "time": {
+       "start": 1790175696843,
+       "end": 1790175697011
+      },
+      "output": "import { useEffect, useState } from 'react'\nimport { chamarApi } from '../../api/cliente.js'\nimport { DIAS_DO_EVENTO, formatarDia } from './dias.js'\nimport { rotuloDaSituacao, rotuloDoTipo } from './situacao.js'\n\nexport function ProgramacaoPorDia({ usuarioId, onSelecionarAtividade }) {\n  const [indiceDoDia, setIndiceDoDia] = useState(0)\n  const [tipo, setTipo] = useState('')\n  const [atividades, setAtividades] = useState(null)\n  const [erro, setErro] = useState(null)\n\n  const dia = DIAS_DO_EVENTO[indiceDoDia]\n\n  useEffect(() => {\n    let cancelado = false\n    setAtividades(null)\n    setErro(null)\n\n    const parametros = new URLSearchParams({ dia })\n    if (tipo) parametros.set('tipo', tipo)\n\n    chamarApi(`/atividades?${parametros}`, { usuarioId })\n      .then((dados) => {\n        if (!cancelado) setAtividades(dados)\n      })\n      .catch((e) => {\n        if (!cancelado) setErro(e)\n      })\n\n    return () => {\n      cancelado = true\n    }\n  }, [dia, tipo, usuarioId])\n\n  return (\n    <section>\n      <h1>Programação</h1>\n\n      <div role=\"group\" aria-label=\"Navegação por dia\">\n        <button type=\"button\" onClick={() => setIndiceDoDia((i) => i - 1)} disabled={indiceDoDia === 0}>\n          Dia anterior\n        </button>\n        <span>{formatarDia(dia)}</span>\n        <button\n          type=\"button\"\n          onClick={() => setIndiceDoDia((i) => i + 1)}\n          disabled={indiceDoDia === DIAS_DO_EVENTO.length - 1}\n        >\n          Próximo dia\n        </button>",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 445,
+      "reasoning": 0,
+      "cache": {
+       "read": 99694,
+       "write": 597
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175699824
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_0152ufRdAeDA1zgVd1NAgbnj",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && sed -n 60,110p src/modulos/m1-grade/ProgramacaoPorDia.jsx"
+      },
+      "time": {
+       "start": 1790175699824,
+       "end": 1790175699962
+      },
+      "output": "      </label>\n\n      {erro && <p role=\"alert\">Não foi possível carregar a programação.</p>}\n\n      {atividades && atividades.length === 0 && <p>Nenhuma atividade neste dia.</p>}\n\n      {atividades && atividades.length > 0 && (\n        <ul>\n          {atividades.map((atividade) => (\n            <li key={atividade.id}>\n              <button type=\"button\" onClick={() => onSelecionarAtividade?.(atividade.id)}>\n                <strong>{atividade.titulo}</strong> — {rotuloDoTipo(atividade.tipo)} — {rotuloDaSituacao(atividade.situacao)}\n              </button>\n            </li>\n          ))}\n        </ul>\n      )}\n    </section>\n  )\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 113,
+      "reasoning": 0,
+      "cache": {
+       "read": 100291,
+       "write": 1147
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175710158
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01RBRzEnDS9D43tAgfvrWEoL",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && cat > src/App.test.jsx <<'EOF'\nimport { render, screen } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { http, HttpResponse } from 'msw'\nimport { describe, expect, it } from 'vitest'\nimport App from './App.jsx'\nimport { servidor } from './testes/servidor.js'\n\nconst atividade = {\n  id: 'atv_1a2b3c4d',\n  titulo: 'Flutter do zero',\n  tipo: 'minicurso',\n  salaId: 'lab-3',\n  vagas: 20,\n  encontros: [{ id: 'enc_11111111', inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' }],\n  cargaHorariaMinutos: 180,\n  situacao: 'prevista',\n  ocupadas: 12,\n  vagasRestantes: 8,\n  emEspera: 0,\n}\n\nconst inscricao = {\n  id: 'ins_9c0d1e2f',\n  atividadeId: 'atv_1a2b3c4d',\n  participanteId: 'p-carla',\n  status: 'confirmada',\n  posicaoNaEspera: null,\n  convocadaAte: null,\n  criadaEm: '2026-10-13T09:00:00-03:00',\n}\n\nfunction api() {\n  servidor.use(\n    http.get('/atividades', () => HttpResponse.json([atividade])),\n    http.get('/atividades/atv_1a2b3c4d', () => HttpResponse.json(atividade)),\n    http.get('/inscricoes', ({ request }) => {\n      const filtro = new URL(request.url).searchParams.get('atividadeId')\n      return HttpResponse.json(!filtro || filtro === inscricao.atividadeId ? [inscricao] : [])\n    }),\n  )\n}\n\ndescribe('App — M2', () => {\n  it('participante abre o detalhe de uma atividade e vê a inscrição', async () => {\n    api()\n\n    render(<App />)\n    await userEvent.click(await screen.findByRole('button', { name: /flutter do zero/i }))\n\n    expect(await screen.findByRole('heading', { name: 'Flutter do zero' })).toBeInTheDocument()\n    expect(await screen.findByRole('button', { name: /cancelar inscrição/i })).toBeInTheDocument()\n  })\n\n  it('participante abre Minhas inscrições pela navegação', async () => {\n    api()\n\n    render(<App />)\n    await userEvent.click(screen.getByRole('button', { name: /minhas inscrições/i }))\n\n    expect(await screen.findByRole('heading', { name: /minhas inscrições/i })).toBeInTheDocument()\n    expect(await screen.findByText(/atv_1a2b3c4d/)).toBeInTheDocument()\n  })\n\n  it('organização não vê a inscrição nem Minhas inscrições', async () => {\n    api()\n\n    render(<App />)\n    await userEvent.selectOptions(screen.getByLabelText(/usuário/i), 'org-ana')\n\n    expect(screen.queryByRole('button', { name: /minhas inscrições/i })).not.toBeInTheDocument()\n  })\n})\nEOF\nnpx vitest run src/App.test 2>&1 | grep -E \"FAIL|×|ReferenceError|Tests|Test Files\" | head",
+       "timeout": 120000
+      },
+      "time": {
+       "start": 1790175710158,
+       "end": 1790175717169
+      },
+      "output": "     × participante abre o detalhe de uma atividade e vê a inscrição 19ms\n     × participante abre Minhas inscrições pela navegação 2ms\n     × organização não vê a inscrição nem Minhas inscrições 2ms\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯\n FAIL  src/App.test.jsx > App — M2 > participante abre o detalhe de uma atividade e vê a inscrição\n FAIL  src/App.test.jsx > App — M2 > participante abre Minhas inscrições pela navegação\n FAIL  src/App.test.jsx > App — M2 > organização não vê a inscrição nem Minhas inscrições\nReferenceError: mostrarMinhasInscricoes is not defined\n Test Files  1 failed (1)\n      Tests  3 failed (3)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1246,
+      "reasoning": 0,
+      "cache": {
+       "read": 101438,
+       "write": 414
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175718508
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho pelo motivo certo (referências sem declaração). Agora declaro os dois estados.",
+     "time": {
+      "start": 1790175718508
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01TgBEbJqhXryu9XmEviaQ3x",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "  const [mostrarFormulario, setMostrarFormulario] = useState(false)\n",
+       "new_string": "  const [mostrarFormulario, setMostrarFormulario] = useState(false)\n  const [mostrarMinhasInscricoes, setMostrarMinhasInscricoes] = useState(false)\n  const [versaoDoDetalhe, setVersaoDoDetalhe] = useState(0)\n",
+       "filePath": "C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx"
+      },
+      "time": {
+       "start": 1790175720167,
+       "end": 1790175720213
+      },
+      "output": "The file C:\\Faculdade\\semana academica\\projeto-semanaacademica\\app\\src\\App.jsx has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 292,
+      "reasoning": 0,
+      "cache": {
+       "read": 101852,
+       "write": 1606
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175722355
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_014kte7mQbYKtEnirqsUDuyC",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica/app\" && npx vitest run 2>&1 | grep -E \"FAIL|×|Error|Tests|Test Files\"; npx oxlint 2>&1 | grep -E \"no-undef|m2-|App\" | head -3; npx oxlint 2>&1 | tail -2",
+       "timeout": 180000
+      },
+      "time": {
+       "start": 1790175722355,
+       "end": 1790175738113
+      },
+      "output": " Test Files  11 passed (11)\n      Tests  57 passed (57)\nsrc/modulos/m1-grade/ProgramacaoPorDia.jsx:16:5: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders help: Effects should synchronize React with external systems. Calling setState synchronously inside an effect starts another render and is usually unnecessary. Derive the value during render, initialize state directly, or update it from the event that caused the change. Use an effect only when synchronizing with an external system.\nsrc/modulos/m1-grade/FormularioAtividade.jsx:25:27: warning react(set-state-in-effect): Calling setState synchronously within an effect can trigger cascading renders help: Effects should synchronize React with external systems. Calling setState synchronously inside an effect starts another render and is usually unnecessary. Derive the value during render, initialize state directly, or update it from the event that caused the change. Use an effect only when synchronizing with an external system.",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 190,
+      "reasoning": 0,
+      "cache": {
+       "read": 103458,
+       "write": 398
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175740023
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "57 testes verdes. Commit da tela 2, já com a correção do `App` e o teste dele.",
+     "time": {
+      "start": 1790175740024
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01AfkLK8LEecJ6aj1w8Qcz8y",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/Faculdade/semana academica/projeto-semanaacademica\" && git add app/src && git commit -q -m \"app: tela de inscrições do M2 — minhas inscrições\n\nInclui a correção do App.jsx, que no commit anterior usava\nversaoDoDetalhe sem declarar, e um teste do App que cobre a navegação.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\" 2>&1 | grep -v warning; git log --oneline -5; git status --short"
+      },
+      "time": {
+       "start": 1790175741703,
+       "end": 1790175743920
+      },
+      "output": "warning: in the working copy of 'app/src/App.test.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/MinhasInscricoes.jsx', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'app/src/modulos/m2-inscricoes/MinhasInscricoes.test.jsx', LF will be replaced by CRLF the next time Git touches it\nb55029d app: tela de inscrições do M2 — minhas inscrições\n9e3a055 app: tela de inscrições do M2 — inscrever e cancelar no detalhe da atividade\n83c3e94 app: tela de inscrições do M2 — botão de confirmar convocação\n2ca9337 app: tela de inscrições do M2 — botão de cancelar inscrição\n4b04147 M2: auditoria",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 289,
+      "reasoning": 0,
+      "cache": {
+       "read": 103856,
+       "write": 570
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790175754678
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "As quatro telas do M2 estão prontas em `app/src/modulos/m2-inscricoes/`, com um commit por tela. `npx vitest run` passa (57 testes, todos com MSW). Só rodei a suíte; não abri a interface no navegador nem contra a API real.\n\nEm cada tela escrevi o teste, rodei e vi falhar antes de escrever o componente.\n\n**Cancelamento**: o pedido cita `DELETE /inscricoes/:id`, mas o `contrato-api.md` define `POST /inscricoes/:id/cancelamento`, e o contrato não muda. Usei a rota do contrato. Se o `DELETE` foi de propósito, é um pedido para o cliente, não algo a mudar aqui.\n\n**Ordem dos commits**: fiz 4 → 3 → 1 → 2, e não 1 → 2 → 3 → 4. Os botões de confirmar e cancelar são um componente só, usado nas telas 1 e 2, então vieram antes.\n\n| Commit | Tela |\n|---|---|\n| `2ca9337` | Cancelar, em qualquer status ativo (tela 4) |\n| `83c3e94` | Confirmar convocação, com o erro da API (`CONVOCACAO_EXPIRADA`, `CONFLITO_DE_HORARIO`) (tela 3) |\n| `9e3a055` | Inscrever e cancelar no detalhe da atividade (tela 1) |\n| `b55029d` | Minhas inscrições, com posição na espera e contagem regressiva até `convocadaAte` (tela 2) |\n\n**Erro no commit `9e3a055`**: ele deixou o `App.jsx` com `versaoDoDetalhe` e `setVersaoDoDetalhe` sem declaração, o que travaria ao abrir qualquer detalhe. Os testes e o build passaram porque nenhum teste cobria o `App`. No commit seguinte escrevi `App.test.jsx`, vi falhar com `ReferenceError` e corrigi.\n\n**Mensagens dos commits**: em vez de quatro commits idênticos com \"app: tela de inscrições do M2\", acrescentei o nome da tela depois de um travessão.\n\n**Outros pontos**:\n- Não editei nenhum teste ou arquivo do M1: as ações de inscrição são um componente à parte, que o `App` monta abaixo do detalhe.\n- A lista de inscrições mostra o `atividadeId` em vez do título da atividade, porque o contrato só devolve o id na inscrição. Mostrar o título exigiria uma busca extra por atividade.\n- Adicionei `/inscricoes` ao proxy do Vite.\n- O `app/` estava sem `node_modules`, então rodei `npm ci` antes.\n- Não criei nenhuma spec nova (o `specs/M2-inscricoes.md` já cobre a API); as telas seguem as regras R17–R21 para os erros de confirmação.",
+     "time": {
+      "start": 1790175754678
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1009,
+      "reasoning": 0,
+      "cache": {
+       "read": 104426,
+       "write": 731
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

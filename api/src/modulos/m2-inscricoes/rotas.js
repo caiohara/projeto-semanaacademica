@@ -195,6 +195,22 @@ export function rotasDeInscricoes({ db, relogio }) {
       throw new ErroDaApi(422, 'CONVOCACAO_EXPIRADA', 'a convocação já venceu');
     }
 
+    // R19: reconfere CONFLITO_DE_HORARIO (R6) na confirmação; se falhar, a convocação
+    // continua convocada até convocadaAte vencer, sem cancelar nem expirar na hora.
+    const encontrosDaAtividade = db.prepare(
+      'SELECT inicio_ms, fim_ms FROM encontros WHERE atividade_id = ?',
+    ).all(inscricao.atividade_id);
+    const encontrosConflitantes = db.prepare(
+      `SELECT e.inicio_ms AS inicioMs, e.fim_ms AS fimMs
+       FROM inscricoes i
+       JOIN encontros e ON e.atividade_id = i.atividade_id
+       WHERE i.participante_id = ? AND i.atividade_id != ? AND i.status IN ('confirmada', 'convocada')`,
+    ).all(req.usuario.id, inscricao.atividade_id);
+    const sobrepoe = (a, b) => a.inicio_ms < b.fimMs && b.inicioMs < a.fim_ms;
+    if (encontrosDaAtividade.some((novo) => encontrosConflitantes.some((outro) => sobrepoe(novo, outro)))) {
+      throw new ErroDaApi(409, 'CONFLITO_DE_HORARIO', 'conflito de horário com outra inscrição ativa');
+    }
+
     res.json(lerInscricao(db, req.params.id));
   });
 

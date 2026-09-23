@@ -167,6 +167,26 @@ export function rotasDaPresenca({ db, relogio }) {
     res.status(201).json(comoPresenca(presenca));
   });
 
+  rotas.post('/encontros/:id/presencas/manual', somenteOrganizacao, (req, res) => {
+    const corpo = req.body ?? {};
+    const encontro = db.prepare('SELECT id, atividade_id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
+    if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
+
+    const agoraMs = relogio.agora().getTime();
+    // R25: manual grava origem manual, lidoEm = registradaEm = relógio, justificativa como veio.
+    const presenca = {
+      id: novoId(),
+      encontro_id: encontro.id,
+      participante_id: corpo.participanteId,
+      origem: 'manual',
+      lido_em: emBrasilia(agoraMs),
+      registrada_em: emBrasilia(agoraMs),
+      justificativa: corpo.justificativa,
+    };
+    gravar(presenca, agoraMs);
+    res.status(201).json(comoPresenca(presenca));
+  });
+
   // R26: só quem tem presença registrada no encontro.
   rotas.get('/encontros/:id/presencas', somenteOrganizacao, (req, res) => {
     const encontro = db.prepare('SELECT id FROM encontros WHERE id = ?').get(req.params.id);

@@ -591,6 +591,25 @@ describe('M3 — presença', () => {
     });
   });
 
+  describe('presença manual (R5, R15, R21–R23, R25, R29)', () => {
+    const enviarManual = (E, usuario, corpo) => pedir('POST', `/encontros/${E}/presencas/manual`, { usuario, corpo });
+
+    it('R5/R25/R1: dentro da janela manual → 201 origem manual, lidoEm = registradaEm = relógio, justificativa enviada', async () => {
+      const { E } = await montarComInscritos(); // criado por org-ana
+      await relogio('2026-10-19T19:30:00-03:00');
+
+      const res = await enviarManual(E, 'org-bruno', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 201);
+      assert.match(res.corpo.id, /^pre_[0-9a-f]{8}$/);
+      assert.equal(res.corpo.encontroId, E);
+      assert.equal(res.corpo.participanteId, 'p-carla');
+      assert.equal(res.corpo.origem, 'manual');
+      assert.equal(res.corpo.lidoEm, '2026-10-19T19:30:00-03:00');
+      assert.equal(res.corpo.registradaEm, '2026-10-19T19:30:00-03:00');
+      assert.equal(res.corpo.justificativa, 'Celular sem bateria');
+    });
+  });
+
   describe('listagem (R26)', () => {
     it('R26: encontro existente sem presenças → 200 []', async () => {
       const { E } = await montarCenario();

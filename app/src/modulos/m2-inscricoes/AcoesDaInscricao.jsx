@@ -25,6 +25,11 @@ export function AcoesDaInscricao({ inscricao, usuarioId, aoAtualizar }) {
 
   return (
     <div>
+      {inscricao.status === 'convocada' && (
+        <button type="button" disabled={enviando} onClick={() => chamar('confirmacao')}>
+          Confirmar convocação
+        </button>
+      )}
       {STATUS_ATIVOS.includes(inscricao.status) && (
         <button type="button" disabled={enviando} onClick={() => chamar('cancelamento')}>
           Cancelar inscrição

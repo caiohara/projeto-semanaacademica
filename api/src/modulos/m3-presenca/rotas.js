@@ -56,5 +56,21 @@ export function rotasDaPresenca({ db, relogio }) {
     next();
   });
 
+  // R26: só quem tem presença registrada no encontro.
+  rotas.get('/encontros/:id/presencas', (req, res) => {
+    const presencas = db.prepare(
+      'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ?',
+    ).all(req.params.id);
+    res.json(presencas.map((p) => ({
+      id: p.id,
+      encontroId: p.encontro_id,
+      participanteId: p.participante_id,
+      origem: p.origem,
+      lidoEm: p.lido_em,
+      registradaEm: p.registrada_em,
+      justificativa: p.justificativa,
+    })));
+  });
+
   return rotas;
 }

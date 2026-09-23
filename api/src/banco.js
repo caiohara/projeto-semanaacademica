@@ -7,7 +7,7 @@ import { SALAS, USUARIOS } from './dados-iniciais.js';
 const ARQUIVO_PADRAO = fileURLToPath(new URL('../dados/semana-academica.db', import.meta.url));
 
 // Ordem de criação; o reset apaga na ordem inversa por causa das chaves estrangeiras.
-const TABELAS = ['usuarios', 'salas', 'atividades', 'encontros'];
+const TABELAS = ['usuarios', 'salas', 'atividades', 'encontros', 'presencas'];
 
 export function abrirBanco(arquivo = process.env.ARQUIVO_BANCO || ARQUIVO_PADRAO) {
   mkdirSync(dirname(arquivo), { recursive: true });
@@ -41,6 +41,18 @@ export function abrirBanco(arquivo = process.env.ARQUIVO_BANCO || ARQUIVO_PADRAO
       fim          TEXT NOT NULL,
       inicio_ms    INTEGER NOT NULL,
       fim_ms       INTEGER NOT NULL
+    );
+    -- M3: lido_em e registrada_em guardam o texto com a precisão enviada (R19); lido_em_ms ordena.
+    CREATE TABLE IF NOT EXISTS presencas (
+      id              TEXT PRIMARY KEY,
+      encontro_id     TEXT NOT NULL REFERENCES encontros (id),
+      participante_id TEXT NOT NULL REFERENCES usuarios (id),
+      origem          TEXT NOT NULL CHECK (origem IN ('qr', 'qr_offline', 'manual')),
+      lido_em         TEXT NOT NULL,
+      lido_em_ms      INTEGER NOT NULL,
+      registrada_em   TEXT NOT NULL,
+      justificativa   TEXT,
+      UNIQUE (encontro_id, participante_id) -- P-23
     );
   `);
   // Banco criado antes da coluna cancelada existir.

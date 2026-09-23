@@ -210,6 +210,15 @@ describe('M3 — presença', () => {
       assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
     });
   });
+
+  describe('listagem (R26)', () => {
+    it('R26: encontro existente sem presenças → 200 []', async () => {
+      const { E } = await montarCenario();
+      const res = await pedir('GET', `/encontros/${E}/presencas`);
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.corpo, []);
+    });
+  });
 });
 
 describe('M3 — segredo do código (R9)', () => {

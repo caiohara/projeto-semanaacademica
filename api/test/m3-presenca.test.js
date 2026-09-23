@@ -273,6 +273,24 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'CODIGO_INVALIDO');
     });
+
+    it('R10: código de outro encontro ou inexistente → 422 CODIGO_INVALIDO', async () => {
+      const { E, F } = await montarComInscritos();
+      const deE = await codigoAs(E, '2026-10-19T18:59:00-03:00');
+      const deF = await codigoAs(F, '2026-10-19T19:00:00-03:00');
+      const deEAs19 = await codigoAs(E, '2026-10-19T19:00:00-03:00');
+      assert.notEqual('ZZZZZZ', deE);
+      assert.notEqual('ZZZZZZ', deEAs19);
+
+      await relogio('2026-10-19T19:00:30-03:00');
+      let res = await enviar(E, 'p-carla', { codigo: deF });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'CODIGO_INVALIDO');
+
+      res = await enviar(E, 'p-carla', { codigo: 'ZZZZZZ' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'CODIGO_INVALIDO');
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

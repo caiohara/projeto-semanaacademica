@@ -557,6 +557,18 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'SINCRONIZACAO_TARDIA');
     });
+
+    it('R24: presença repetida no QR offline → 200 com a presença já gravada, sem alteração', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:30-03:00');
+      const primeira = await enviar(E, 'p-carla', { codigo });
+      assert.equal(primeira.status, 201);
+
+      // Repetição via QR offline: código inválido e fora da janela, mas repetição vem antes (R28).
+      const res = await enviar(E, 'p-carla', { codigo: 'ZZZZZZ', lidoEm: '2026-10-19T19:00:30-03:00' });
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.corpo, primeira.corpo);
+    });
   });
 
   describe('listagem (R26)', () => {

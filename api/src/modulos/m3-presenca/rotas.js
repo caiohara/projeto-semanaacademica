@@ -127,6 +127,12 @@ export function rotasDaPresenca({ db, relogio }) {
     const lidoEmMs = Date.parse(corpo.lidoEm);
     if (lidoEmMs > agoraMs) throw dadosInvalidos('lidoEm não pode ser posterior ao relógio');
 
+    // R24: presença já gravada volta 200, sem alteração; vem antes de NAO_INSCRITO (R28).
+    const existente = db.prepare(
+      'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ? AND participante_id = ?',
+    ).get(encontro.id, req.usuario.id);
+    if (existente) return res.json(comoPresenca(existente));
+
     // R17: com o relógio, aceito até fim + 2 h, inclusive. Vem antes da janela (R28).
     if (agoraMs > encontro.fim_ms + 2 * 60 * MINUTO_MS) {
       throw new ErroDaApi(422, 'SINCRONIZACAO_TARDIA', 'leitura offline enviada depois de fim + 2 h');

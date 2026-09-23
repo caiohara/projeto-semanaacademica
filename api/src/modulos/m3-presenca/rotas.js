@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { somenteOrganizacao } from '../../autenticacao.js';
 import { ErroDaApi } from '../../erros.js';
 import { derivarCodigo, indiceDoMinuto } from './codigo.js';
 
@@ -18,8 +19,10 @@ const dentroDaJanela = (encontro, agoraMs) =>
 export function rotasDaPresenca({ db, relogio }) {
   const rotas = Router();
 
-  rotas.get('/encontros/:id/codigo', (req, res) => {
+  // R27: 401 (identificar) → 403 (somenteOrganizacao) → 404 → R12 → R3.
+  rotas.get('/encontros/:id/codigo', somenteOrganizacao, (req, res) => {
     const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
+    if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
     const agoraMs = relogio.agora().getTime();
     // R3
     if (!dentroDaJanela(encontro, agoraMs)) {

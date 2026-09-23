@@ -121,5 +121,26 @@ describe('M3 — presença', () => {
       assert.equal(await codigo(E, '2026-10-19T19:00:00-03:00'), deE);
       assert.notEqual(await codigo(E, '2026-10-19T19:01:00-03:00'), deE);
     });
+
+    it('R27: 401 USUARIO_DESCONHECIDO → 403 SOMENTE_ORGANIZACAO → 404 NAO_ENCONTRADO', async () => {
+      const { E } = await montarCenario();
+      await relogio('2026-10-19T19:00:30-03:00');
+
+      let res = await pedir('GET', '/encontros/enc_00000000/codigo', { usuario: null });
+      assert.equal(res.status, 401);
+      assert.equal(res.corpo.erro, 'USUARIO_DESCONHECIDO');
+
+      res = await pedir('GET', '/encontros/enc_00000000/codigo', { usuario: 'p-carla' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'SOMENTE_ORGANIZACAO');
+
+      res = await pedir('GET', `/encontros/${E}/codigo`, { usuario: 'p-carla' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'SOMENTE_ORGANIZACAO');
+
+      res = await pedir('GET', '/encontros/enc_00000000/codigo');
+      assert.equal(res.status, 404);
+      assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');
+    });
   });
 });

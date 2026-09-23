@@ -88,5 +88,23 @@ describe('M2 — inscrições', () => {
       assert.equal(typeof res.corpo.criadaEm, 'string');
       assert.equal(Date.parse(res.corpo.criadaEm), Date.parse('2026-10-13T09:00:00-03:00'));
     });
+
+    it('R3: 409 JA_INSCRITO ao tentar se inscrever de novo com uma inscrição confirmada ativa', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const primeira = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(primeira.status, 201);
+      const segunda = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      esperarErro(segunda, 409, 'JA_INSCRITO');
+    });
+
+    it('R3: cancelar a inscrição anterior libera nova inscrição', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const primeira = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(primeira.status, 201);
+      const cancelamento = await pedir('POST', `/inscricoes/${primeira.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(cancelamento.status, 200);
+      const segunda = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(segunda.status, 201);
+    });
   });
 });

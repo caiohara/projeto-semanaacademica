@@ -19,6 +19,12 @@ export function rotasDeInscricoes({ db, relogio }) {
     const atividade = db.prepare('SELECT id FROM atividades WHERE id = ?').get(req.params.id);
     if (!atividade) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${req.params.id} não existe`);
 
+    // R3: uma inscrição ativa (confirmada, em_espera ou convocada) bloqueia nova inscrição.
+    const jaInscrito = db.prepare(
+      "SELECT id FROM inscricoes WHERE atividade_id = ? AND participante_id = ? AND status IN ('confirmada', 'em_espera', 'convocada')",
+    ).get(req.params.id, req.usuario.id);
+    if (jaInscrito) throw new ErroDaApi(409, 'JA_INSCRITO', 'já existe uma inscrição ativa nesta atividade');
+
     const agora = relogio.agora();
     const id = novoId();
     // R2: só o caso "há vaga" nesta fatia — a inscrição nasce sempre confirmada.
@@ -27,6 +33,17 @@ export function rotasDeInscricoes({ db, relogio }) {
     ).run(id, req.params.id, req.usuario.id, 'confirmada', agora.toISOString(), agora.getTime());
 
     res.status(201).json(lerInscricao(db, id));
+  });
+
+  // R12 (parcial nesta fatia; guardas R9-R11 e convocação R14 ficam para as próximas fatias):
+  // cancelar muda o status para cancelada.
+  rotas.post('/inscricoes/:id/cancelamento', somenteParticipante, (req, res) => {
+    const inscricao = db.prepare('SELECT id, participante_id FROM inscricoes WHERE id = ?').get(req.params.id);
+    if (!inscricao || inscricao.participante_id !== req.usuario.id) {
+      throw new ErroDaApi(404, 'NAO_ENCONTRADO', `inscrição ${req.params.id} não existe`);
+    }
+    db.prepare("UPDATE inscricoes SET status = 'cancelada' WHERE id = ?").run(req.params.id);
+    res.json(lerInscricao(db, req.params.id));
   });
 
   return rotas;

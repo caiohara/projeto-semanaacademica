@@ -42,6 +42,10 @@ const comoPresenca = (p) => ({
 export function rotasDaPresenca({ db, relogio }) {
   const rotas = Router();
 
+  const confirmado = (atividadeId, participanteId) => Boolean(db.prepare(
+    "SELECT 1 FROM inscricoes WHERE atividade_id = ? AND participante_id = ? AND status = 'confirmada'",
+  ).get(atividadeId, participanteId));
+
   const gravar = (presenca, lidoEmMs) => db.prepare(
     'INSERT INTO presencas (id, encontro_id, participante_id, origem, lido_em, lido_em_ms, registrada_em, justificativa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
   ).run(presenca.id, presenca.encontro_id, presenca.participante_id, presenca.origem, presenca.lido_em,
@@ -80,10 +84,14 @@ export function rotasDaPresenca({ db, relogio }) {
     // R20: lidoEm é opcional, mas null não equivale a ausente.
     if ('lidoEm' in corpo) lerInstante(corpo.lidoEm, 'lidoEm');
 
-    const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
+    const encontro = db.prepare('SELECT id, atividade_id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
     if (!('lidoEm' in corpo)) {
+      // R13: só inscrição confirmada na atividade dona do encontro; vem antes da janela (R28).
+      if (!confirmado(encontro.atividade_id, req.usuario.id)) {
+        throw new ErroDaApi(403, 'NAO_INSCRITO', 'sem inscrição confirmada na atividade');
+      }
       const agoraMs = relogio.agora().getTime();
       // R4: sem lidoEm, a janela é conferida com o relógio; vem antes do código (R28).
       if (!dentroDaJanela(encontro, agoraMs)) {

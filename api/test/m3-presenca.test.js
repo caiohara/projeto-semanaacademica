@@ -327,6 +327,56 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
     });
+
+    it('R13: só inscrição confirmada registra presença; convocada, em_espera, cancelada ou nenhuma → 403 NAO_INSCRITO', async () => {
+      const { A, E } = await montarComInscritos();
+      const inscrever = async (atividadeId, participante, status) => {
+        const res = await pedir('POST', `/atividades/${atividadeId}/inscricoes`, { usuario: participante });
+        assert.equal(res.status, 201);
+        assert.equal(res.corpo.status, status);
+        return res.corpo;
+      };
+      const cancelar = async (inscricao, participante) => {
+        const res = await pedir('POST', `/inscricoes/${inscricao.id}/cancelamento`, { usuario: participante });
+        assert.equal(res.status, 200);
+      };
+
+      // p-fabio: inscrição em A com status diferente de confirmada (cancelada).
+      await cancelar(await inscrever(A.id, 'p-fabio', 'confirmada'), 'p-fabio');
+
+      // Atividade C com 1 vaga, para ter convocada e em_espera pelo M2.
+      const C = await pedir('POST', '/atividades', {
+        corpo: {
+          titulo: 'Atividade C',
+          tipo: 'palestra',
+          salaId: 'lab-3',
+          vagas: 1,
+          encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' }],
+        },
+      });
+      assert.equal(C.status, 201);
+      const G = C.corpo.encontros[0].id;
+      const deHeitor = await inscrever(C.corpo.id, 'p-heitor', 'confirmada');
+      // Relógio avança entre as duas para a fila FIFO (M2 R14) não depender do desempate por id.
+      await relogio('2026-10-15T10:00:00-03:00');
+      await inscrever(C.corpo.id, 'p-isadora', 'em_espera');
+      await relogio('2026-10-15T10:01:00-03:00');
+      await inscrever(C.corpo.id, 'p-joao', 'em_espera');
+      await cancelar(deHeitor, 'p-heitor'); // p-isadora é convocada (M2 R14)
+      const isadora = await pedir('GET', '/inscricoes', { usuario: 'p-isadora' });
+      assert.equal(isadora.corpo[0].status, 'convocada');
+
+      const deE = await codigoAs(E, '2026-10-19T19:00:30-03:00');
+      const deG = await codigoAs(G, '2026-10-19T19:00:30-03:00');
+      for (const [encontro, codigo, participante] of [
+        [E, deE, 'p-fabio'], [E, deE, 'p-gabriela'],
+        [G, deG, 'p-heitor'], [G, deG, 'p-isadora'], [G, deG, 'p-joao'],
+      ]) {
+        const res = await enviar(encontro, participante, { codigo });
+        assert.equal(res.status, 403, participante);
+        assert.equal(res.corpo.erro, 'NAO_INSCRITO', participante);
+      }
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

@@ -626,6 +626,36 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
     });
+
+    it('R22: justificativa precisa de 10 caracteres após trim → 422 JUSTIFICATIVA_OBRIGATORIA', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T19:30:00-03:00');
+
+      for (const justificativa of [undefined, '', '          ', '  curta  ']) {
+        const corpo = justificativa === undefined
+          ? { participanteId: 'p-carla' }
+          : { participanteId: 'p-carla', justificativa };
+        const res = await enviarManual(E, 'org-ana', corpo);
+        assert.equal(res.status, 422, JSON.stringify(justificativa));
+        assert.equal(res.corpo.erro, 'JUSTIFICATIVA_OBRIGATORIA', JSON.stringify(justificativa));
+      }
+
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: '  0123456789  ' });
+      assert.equal(res.status, 201);
+    });
+
+    it('R25/R22: a justificativa é gravada exatamente como enviada, sem trim (critério 30a)', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T19:30:00-03:00');
+
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: '  0123456789  ' });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.justificativa, '  0123456789  ');
+
+      const lista = await pedir('GET', `/encontros/${E}/presencas`);
+      assert.equal(lista.status, 200);
+      assert.equal(lista.corpo[0].justificativa, '  0123456789  ');
+    });
   });
 
   describe('listagem (R26)', () => {

@@ -176,6 +176,12 @@ export function rotasDaPresenca({ db, relogio }) {
     const encontro = db.prepare('SELECT id, atividade_id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
+    // R22: justificativa precisa de pelo menos 10 caracteres depois do trim.
+    const justificativa = typeof corpo.justificativa === 'string' ? corpo.justificativa : '';
+    if (justificativa.trim().length < 10) {
+      throw new ErroDaApi(422, 'JUSTIFICATIVA_OBRIGATORIA', 'justificativa precisa de pelo menos 10 caracteres');
+    }
+
     const agoraMs = relogio.agora().getTime();
     // R5: janela manual de inicio − 15 min até fim + 2 h, os dois limites inclusivos.
     if (!dentroDaJanelaManual(encontro, agoraMs)) {

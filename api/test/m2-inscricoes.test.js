@@ -210,6 +210,24 @@ describe('M2 — inscrições', () => {
     });
   });
 
+  describe('cancelar sem convocação (fatia 2)', () => {
+    it('R9: 422 ATIVIDADE_JA_INICIADA no cancelamento no instante exato do início; um segundo antes, 200', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const antes = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(antes.status, 201);
+      const depois = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(depois.status, 201);
+
+      await relogio('2026-10-19T18:59:59-03:00');
+      const umSegundoAntes = await pedir('POST', `/inscricoes/${antes.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(umSegundoAntes.status, 200);
+
+      await relogio('2026-10-19T19:00:00-03:00');
+      const noInicio = await pedir('POST', `/inscricoes/${depois.corpo.id}/cancelamento`, { usuario: 'p-diego' });
+      esperarErro(noInicio, 422, 'ATIVIDADE_JA_INICIADA');
+    });
+  });
+
   describe('leitura (fatia 1)', () => {
     it('R22: organização vê as inscrições de todos; participante só as próprias; empate por id; filtro sem match é []', async () => {
       const m = await criarAtividadeM({ vagas: 2 });

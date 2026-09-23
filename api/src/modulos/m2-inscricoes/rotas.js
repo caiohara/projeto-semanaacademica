@@ -22,6 +22,14 @@ export function rotasDeInscricoes({ db, relogio }) {
     // R8: ATIVIDADE_CANCELADA (R4) vem antes de JA_INSCRITO (R3).
     if (atividade.cancelada) throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade está cancelada');
 
+    // R5: a 30 minutos ou menos do início do 1º encontro, as inscrições encerram.
+    const primeiroEncontro = db.prepare(
+      'SELECT inicio_ms FROM encontros WHERE atividade_id = ? ORDER BY inicio_ms, id LIMIT 1',
+    ).get(req.params.id);
+    if (relogio.agora().getTime() >= primeiroEncontro.inicio_ms - 30 * 60 * 1000) {
+      throw new ErroDaApi(422, 'INSCRICOES_ENCERRADAS', 'as inscrições para esta atividade já encerraram');
+    }
+
     // R3: uma inscrição ativa (confirmada, em_espera ou convocada) bloqueia nova inscrição.
     const jaInscrito = db.prepare(
       "SELECT id FROM inscricoes WHERE atividade_id = ? AND participante_id = ? AND status IN ('confirmada', 'em_espera', 'convocada')",

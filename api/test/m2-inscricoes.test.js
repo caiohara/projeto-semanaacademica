@@ -114,5 +114,15 @@ describe('M2 — inscrições', () => {
       const res = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
       esperarErro(res, 422, 'ATIVIDADE_CANCELADA');
     });
+
+    it('R5: 422 INSCRICOES_ENCERRADAS a 30 minutos ou menos do início do 1º encontro', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      await relogio('2026-10-19T18:29:59-03:00');
+      const antes = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(antes.status, 201);
+      await relogio('2026-10-19T18:30:00-03:00');
+      const depois = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      esperarErro(depois, 422, 'INSCRICOES_ENCERRADAS');
+    });
   });
 });

@@ -233,5 +233,18 @@ describe('M2 — inscrições', () => {
       assert.equal(semMatch.status, 200);
       assert.deepEqual(semMatch.corpo, []);
     });
+
+    it('R23: participante só vê a própria inscrição por GET /inscricoes/:id; organização vê qualquer uma', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.status, 201);
+
+      const deOutroParticipante = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-carla' });
+      esperarErro(deOutroParticipante, 404, 'NAO_ENCONTRADO');
+
+      const daOrganizacao = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'org-bruno' });
+      assert.equal(daOrganizacao.status, 200);
+      assert.deepEqual(daOrganizacao.corpo, diego.corpo);
+    });
   });
 });

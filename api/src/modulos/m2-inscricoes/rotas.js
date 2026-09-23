@@ -90,6 +90,15 @@ export function rotasDeInscricoes({ db, relogio }) {
     res.json(linhas.map(({ id }) => lerInscricao(db, id)));
   });
 
+  // R23: organização vê qualquer inscrição; participante só a própria.
+  rotas.get('/inscricoes/:id', (req, res) => {
+    const inscricao = db.prepare('SELECT id, participante_id FROM inscricoes WHERE id = ?').get(req.params.id);
+    const visivel = inscricao
+      && (req.usuario.papel === 'organizacao' || inscricao.participante_id === req.usuario.id);
+    if (!visivel) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `inscrição ${req.params.id} não existe`);
+    res.json(lerInscricao(db, req.params.id));
+  });
+
   // R12 (parcial nesta fatia; guardas R9-R11 e convocação R14 ficam para as próximas fatias):
   // cancelar muda o status para cancelada.
   rotas.post('/inscricoes/:id/cancelamento', somenteParticipante, (req, res) => {

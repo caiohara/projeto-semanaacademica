@@ -1,0 +1,1284 @@
+{
+ "info": {
+  "id": "ses_claude_b42172cd-7bb9-4106-b2a0-56a7e7374043",
+  "title": "API skeleton with test mode",
+  "directory": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica",
+  "time": {
+   "created": 1790116446058,
+   "updated": 1790116805732
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790116446058
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"ecb4\">\nLeia o contrato-api.md, seções 2 e 3, e o AGENTS.md. Monte o esqueleto da API\nem api/ (Express, node:sqlite em arquivo) e preencha o projeto.json conforme o\nmodelo da seção 2. Implemente só o modo de teste da seção 3: reset, controle do\nrelógio e dados iniciais. Nenhuma rota de módulo ainda.\nUse a skill tdd: primeiro um teste de POST /_teste/reset falhando, depois o código.\nOs comandos do projeto.json precisam funcionar no Linux só com o Node instalado,\ne também no Windows, onde desenvolvemos: não coloque variável de ambiente na\nlinha de comando (nada de MODO_TESTE=1 npm test); resolva no próprio código ou\nno arquivo de teste. O arquivo do banco vai no .gitignore.\n</pasted_content id=\"ecb4\">\n",
+     "time": {
+      "start": 1790116446058
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116450073
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "skill",
+     "callID": "toolu_01Cf8vYCXNVACmt1BKEpTVCf",
+     "state": {
+      "status": "completed",
+      "input": {
+       "skill": "tdd",
+       "name": "tdd"
+      },
+      "time": {
+       "start": 1790116450412,
+       "end": 1790116450431
+      },
+      "output": "Launching skill: tdd"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_011st2rt2sTE8y9DsAU2mtbG",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && ls -la && cat contrato-api.md && cat projeto.json 2>/dev/null; cat .gitignore 2>/dev/null; ls api app specs entrevistas 2>/dev/null; node --version",
+       "description": "List repo and read contract, project config"
+      },
+      "time": {
+       "start": 1790116451562,
+       "end": 1790116452540
+      },
+      "output": "total 41\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 19:21 .\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 18:59 ..\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 19:21 .claude\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 19:33 .git\n-rw-r--r-- 1 caiot 197609   279 Sep 22 18:49 .gitignore\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 18:49 .opencode\n-rw-r--r-- 1 caiot 197609   668 Sep 22 19:18 AGENTS.md\n-rw-r--r-- 1 caiot 197609    10 Sep 22 19:19 CLAUDE.md\n-rw-r--r-- 1 caiot 197609   574 Sep 22 19:13 EQUIPE.md\n-rw-r--r-- 1 caiot 197609  3030 Sep 22 18:49 README.md\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 19:19 api\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 19:19 app\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 18:49 auditorias\n-rw-r--r-- 1 caiot 197609 12925 Sep 22 18:49 contrato-api.md\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 18:49 entrevistas\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 19:11 evidencias\n-rw-r--r-- 1 caiot 197609   264 Sep 22 18:49 projeto.json\ndrwxr-xr-x 1 caiot 197609     0 Sep 22 18:49 specs\n# Contrato da API — Semana Acadêmica\r\n\r\n> **Restrição do cliente.** A interface e o juiz de aceitação consomem exatamente o que está aqui. Rota, nome de campo e código de retorno não se negociam.\r\n>\r\n> O contrato diz **o que** a API responde. **Quando** cada código aparece — com que prazo, que limite, em que ordem — está no documento de requisitos, que você consulta na rodada 2 da entrevista, e só nela.\r\n\r\n---\r\n\r\n## 1. Convenções\r\n\r\n- Entrada e saída em JSON UTF-8, exceto a planilha do M5.\r\n- **Identificação:** cabeçalho `X-Usuario: <id>` em toda rota, menos `GET /certificados/:codigo` e `/_teste/*`. Sem o cabeçalho, ou com um id que não existe → `401 USUARIO_DESCONHECIDO`.\r\n- **Datas:** ISO 8601 com fuso (`2026-10-19T19:00:00-03:00` ou `2026-10-19T22:00:00Z`). A API pode responder em qualquer fuso; o juiz compara o instante, não o texto.\r\n- **Identificadores gerados:** prefixo + 8 hexadecimais minúsculos — `atv_1a2b3c4d`, `enc_…`, `ins_…`, `pre_…`.\r\n- **Erro:** sempre `{\"erro\": \"CODIGO\", \"mensagem\": \"texto livre\"}`. O juiz confere o status e o `erro`; a mensagem é de vocês.\r\n- Corpo que não é JSON, campo obrigatório ausente ou de tipo errado → `422 DADOS_INVALIDOS`.\r\n- **Ordem das verificações:** identificação (401) → perfil (403 `SOMENTE_…`) → existência (404 `NAO_ENCONTRADO`) → corpo (422 `DADOS_INVALIDOS`) → regras do recurso. Quando mais de uma regra do recurso recusa a mesma operação, a ordem entre elas é regra de negócio.\r\n\r\n## 2. Como o juiz roda a API: `projeto.json`\r\n\r\nA stack é livre. Para o juiz rodar a API de todos os grupos do mesmo jeito, a raiz do repositório tem um `projeto.json`:\r\n\r\n```jsonc\r\n{\r\n  \"stack\": \"Node 22 + Express + SQLite; interface em Flutter web\",   // texto livre\r\n  \"api\": {\r\n    \"pasta\": \"api\",               // onde rodar os comandos, a partir da raiz\r\n    \"instalar\": \"npm install\",    // roda uma vez, antes de iniciar\r\n    \"iniciar\": \"npm start\"        // sobe a API e fica rodando\r\n  },\r\n  \"testes\": [\"npm test\", \"flutter test\"]   // os comandos que vocês usam para rodar os testes\r\n}\r\n```\r\n\r\n- O juiz roda `instalar` e depois `iniciar` dentro de `api.pasta`, com `MODO_TESTE=1` e `PORT=3000` no ambiente, e espera até 60 s pela primeira resposta.\r\n- Os dois comandos precisam funcionar no Linux só com o runtime da linguagem instalado. O que o `instalar` baixar, tudo bem.\r\n- A API não depende de serviço externo: banco embutido (SQLite ou arquivo), nada de servidor de banco, Docker ou nuvem.\r\n- A API escuta na porta da variável `PORT` (padrão 3000).\r\n- O script de evidências lê `testes` para reconhecer as execuções de teste nas sessões do OpenCode.\r\n\r\n## 3. Modo de teste\r\n\r\nCom `MODO_TESTE=1` no ambiente, a API expõe:\r\n\r\n| Rota | Retorno | O que faz |\r\n|---|---|---|\r\n| `POST /_teste/reset` | 204 | Apaga tudo, recarrega os dados iniciais (seção 4) e põe o relógio em `2026-10-13T09:00:00-03:00` |\r\n| `PUT /_teste/relogio` | 200 | Corpo `{\"agora\": \"<ISO>\"}`; responde `{\"agora\": \"<ISO>\"}` |\r\n| `GET /_teste/relogio` | 200 | Responde `{\"agora\": \"<ISO>\"}` |\r\n\r\n- No modo de teste **o relógio fica parado**: só muda por `PUT /_teste/relogio`. Toda regra que depende de tempo usa esse relógio — nunca a hora do sistema direto.\r\n- O juiz sempre começa com `POST /_teste/reset` e depois só avança o relógio.\r\n- Sem `MODO_TESTE`, as rotas `/_teste/*` respondem 404 e o relógio é o real.\r\n\r\n## 4. Dados iniciais\r\n\r\nCarregados na primeira subida e a cada `POST /_teste/reset`. Não há rota para criar usuário ou sala.\r\n\r\n**Evento:** Semana Acadêmica 2026, de 19/10/2026 (segunda) a 23/10/2026 (sexta), horário de Brasília.\r\n\r\n| id | nome | papel |\r\n|---|---|---|\r\n| `org-ana` | Ana Beatriz Lima | `organizacao` |\r\n| `org-bruno` | Bruno Tavares | `organizacao` |\r\n| `p-carla` | Carla Mendes Souza | `participante` |\r\n| `p-diego` | Diego Alves | `participante` |\r\n| `p-elisa` | Elisa Fernandes da Rocha | `participante` |\r\n| `p-fabio` | Fábio Nogueira | `participante` |\r\n| `p-gabriela` | Gabriela Moura Castro | `participante` |\r\n| `p-heitor` | Heitor Campos | `participante` |\r\n| `p-isadora` | Isadora Ribeiro dos Santos | `participante` |\r\n| `p-joao` | João Pedro Martins | `participante` |\r\n\r\n| id | nome | capacidade |\r\n|---|---|---|\r\n| `auditorio` | Auditório Central | 200 |\r\n| `sala-101` | Sala 101 | 40 |\r\n| `sala-102` | Sala 102 | 40 |\r\n| `lab-3` | Laboratório 3 | 20 |\r\n\r\n## 5. Rotas\r\n\r\n### M1 — Grade de atividades\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/salas` | todos | 200 `[Sala]` |\r\n| GET | `/atividades` | todos | 200 `[Atividade]` — filtros `?dia=AAAA-MM-DD` e `?tipo=palestra\\|minicurso` |\r\n| GET | `/atividades/:id` | todos | 200 `Atividade` |\r\n| POST | `/atividades` | organização | 201 `Atividade` |\r\n| PATCH | `/atividades/:id` | organização | 200 `Atividade` |\r\n| POST | `/atividades/:id/cancelamento` | organização | 200 `Atividade` |\r\n\r\n```jsonc\r\n// POST /atividades — entrada\r\n{\r\n  \"titulo\": \"Flutter do zero\",\r\n  \"tipo\": \"minicurso\",\r\n  \"salaId\": \"lab-3\",\r\n  \"vagas\": 20,\r\n  \"encontros\": [\r\n    { \"inicio\": \"2026-10-19T19:00:00-03:00\", \"fim\": \"2026-10-19T22:00:00-03:00\" },\r\n    { \"inicio\": \"2026-10-20T19:00:00-03:00\", \"fim\": \"2026-10-20T22:00:00-03:00\" }\r\n  ]\r\n}\r\n// PATCH /atividades/:id — entrada: qualquer subconjunto dos campos acima\r\n\r\n// Atividade\r\n{\r\n  \"id\": \"atv_1a2b3c4d\",\r\n  \"titulo\": \"Flutter do zero\",\r\n  \"tipo\": \"minicurso\",                  // \"palestra\" | \"minicurso\"\r\n  \"salaId\": \"lab-3\",\r\n  \"vagas\": 20,\r\n  \"encontros\": [                        // em ordem de início\r\n    { \"id\": \"enc_5e6f7a8b\", \"inicio\": \"…\", \"fim\": \"…\" }\r\n  ],\r\n  \"cargaHorariaMinutos\": 360,           // calculado\r\n  \"situacao\": \"prevista\",               // calculado: \"prevista\" | \"em_andamento\" | \"encerrada\" | \"cancelada\"\r\n  \"ocupadas\": 12,                       // calculado\r\n  \"vagasRestantes\": 8,                  // calculado\r\n  \"emEspera\": 3                         // calculado\r\n}\r\n\r\n// Sala\r\n{ \"id\": \"sala-101\", \"nome\": \"Sala 101\", \"capacidade\": 40 }\r\n```\r\n\r\n### M2 — Inscrições e lista de espera\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| POST | `/atividades/:id/inscricoes` | participante | 201 `Inscricao` (sem corpo na entrada) |\r\n| GET | `/inscricoes` | todos | 200 `[Inscricao]` — participante recebe só as próprias; filtro `?atividadeId=` |\r\n| GET | `/inscricoes/:id` | todos | 200 `Inscricao` |\r\n| POST | `/inscricoes/:id/cancelamento` | participante | 200 `Inscricao` |\r\n| POST | `/inscricoes/:id/confirmacao` | participante | 200 `Inscricao` |\r\n\r\n```jsonc\r\n// Inscricao\r\n{\r\n  \"id\": \"ins_9c0d1e2f\",\r\n  \"atividadeId\": \"atv_1a2b3c4d\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"status\": \"confirmada\",      // \"confirmada\" | \"em_espera\" | \"convocada\" | \"cancelada\" | \"expirada\"\r\n  \"posicaoNaEspera\": null,     // número (1, 2, …) só quando em_espera\r\n  \"convocadaAte\": null,        // instante, só quando convocada\r\n  \"criadaEm\": \"…\"\r\n}\r\n```\r\n\r\n### M3 — Presença por QR\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/encontros/:id/codigo` | organização | 200 `CodigoDoEncontro` |\r\n| POST | `/encontros/:id/presencas` | participante | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\r\n| POST | `/encontros/:id/presencas/manual` | organização | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\r\n| GET | `/encontros/:id/presencas` | organização | 200 `[Presenca]` |\r\n\r\n```jsonc\r\n// CodigoDoEncontro\r\n{\r\n  \"encontroId\": \"enc_5e6f7a8b\",\r\n  \"codigo\": \"K7M2QX\",           // 6 caracteres\r\n  \"trocaEm\": \"…\",               // quando a tela deve buscar o próximo código\r\n  \"validoAte\": \"…\"              // primeiro instante em que este código deixa de ser aceito\r\n}\r\n\r\n// POST /encontros/:id/presencas — entrada\r\n{ \"codigo\": \"K7M2QX\", \"lidoEm\": \"…\" }        // lidoEm é opcional: leitura feita sem internet\r\n\r\n// POST /encontros/:id/presencas/manual — entrada\r\n{ \"participanteId\": \"p-carla\", \"justificativa\": \"…\" }   // justificativa ausente também é JUSTIFICATIVA_OBRIGATORIA\r\n\r\n// Presenca\r\n{\r\n  \"id\": \"pre_3a4b5c6d\",\r\n  \"encontroId\": \"enc_5e6f7a8b\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"origem\": \"qr\",               // \"qr\" | \"qr_offline\" | \"manual\"\r\n  \"lidoEm\": \"…\",                // o instante que valeu para as regras\r\n  \"registradaEm\": \"…\",\r\n  \"justificativa\": null         // texto só quando manual\r\n}\r\n```\r\n\r\n### M4 — Certificados (grupos de 4 e de 5)\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| POST | `/atividades/:id/certificado` | participante | 201 `Certificado` na primeira vez; 200 `Certificado` depois |\r\n| GET | `/certificados` | participante | 200 `[Certificado]` — os já emitidos |\r\n| GET | `/certificados/:codigo` | **público, sem `X-Usuario`** | 200 `Verificacao` |\r\n| GET | `/extrato` | participante | 200 `Extrato` |\r\n\r\n```jsonc\r\n// Certificado\r\n{\r\n  \"codigo\": \"SA26-7K2M-9QXA\",\r\n  \"atividadeId\": \"atv_1a2b3c4d\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"cargaHorariaMinutos\": 360,\r\n  \"presencas\": 2,\r\n  \"encontros\": 2,\r\n  \"emitidoEm\": \"…\"\r\n}\r\n\r\n// Verificacao\r\n{\r\n  \"codigo\": \"SA26-7K2M-9QXA\",\r\n  \"participante\": \"Carla M. S.\",\r\n  \"atividade\": \"Flutter do zero\",\r\n  \"cargaHorariaMinutos\": 360,\r\n  \"emitidoEm\": \"…\"\r\n}\r\n\r\n// Extrato\r\n{\r\n  \"itens\": [\r\n    { \"atividadeId\": \"atv_1a2b3c4d\", \"titulo\": \"Flutter do zero\", \"tipo\": \"minicurso\",\r\n      \"cargaHorariaMinutos\": 360, \"codigo\": null }\r\n  ],\r\n  \"palestrasMinutos\": 0,        // bruto\r\n  \"minicursosMinutos\": 360,     // bruto\r\n  \"totalMinutos\": 360,          // bruto\r\n  \"aproveitadoMinutos\": 360     // o que conta como hora complementar\r\n}\r\n```\r\n\r\n### M5 — Painel da organização (grupos de 5)\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/painel/atividades` | organização | 200 `[LinhaDoPainel]` |\r\n| GET | `/painel/atividades/:id/sem-chance` | organização | 200 `[SemChance]` |\r\n| GET | `/painel/atividades/:id/frequencia.csv` | organização | 200 `text/csv` |\r\n| GET | `/painel/bloqueios` | organização | 200 `[Bloqueio]` |\r\n| DELETE | `/painel/bloqueios/:participanteId` | organização | 204 — quem não está bloqueado → 404 |\r\n\r\n```jsonc\r\n// LinhaDoPainel\r\n{\r\n  \"atividadeId\": \"atv_1a2b3c4d\", \"titulo\": \"Flutter do zero\",\r\n  \"vagas\": 20, \"ocupadas\": 12, \"emEspera\": 3,\r\n  \"ocupacaoPercentual\": 60.0,\r\n  \"frequenciaPercentual\": null\r\n}\r\n\r\n// SemChance\r\n{ \"participanteId\": \"p-heitor\", \"nome\": \"Heitor Campos\", \"faltas\": 2, \"faltasPermitidas\": 1 }\r\n\r\n// Bloqueio\r\n{ \"participanteId\": \"p-heitor\", \"nome\": \"Heitor Campos\",\r\n  \"atividades\": [\"atv_1a2b3c4d\", \"atv_7e8f9a0b\"], \"bloqueadoDesde\": \"…\" }\r\n```\r\n\r\n## 6. Códigos de retorno\r\n\r\n| Código | Status | Onde aparece |\r\n|---|---|---|\r\n| `USUARIO_DESCONHECIDO` | 401 | toda rota identificada |\r\n| `SOMENTE_ORGANIZACAO` | 403 | rotas de organização |\r\n| `SOMENTE_PARTICIPANTE` | 403 | rotas de participante |\r\n| `NAO_ENCONTRADO` | 404 | recurso inexistente |\r\n| `DADOS_INVALIDOS` | 422 | corpo mal formado |\r\n| `QUANTIDADE_DE_ENCONTROS` | 422 | criar atividade |\r\n| `ENCONTRO_INVALIDO` | 422 | criar atividade |\r\n| `VAGAS_ACIMA_DA_CAPACIDADE` | 422 | criar e alterar atividade |\r\n| `CONFLITO_DE_SALA` | 409 | criar atividade |\r\n| `CAMPO_NAO_EDITAVEL` | 422 | alterar atividade |\r\n| `VAGAS_ABAIXO_DOS_INSCRITOS` | 409 | alterar atividade |\r\n| `ATIVIDADE_JA_INICIADA` | 422 | cancelar atividade, cancelar inscrição |\r\n| `ATIVIDADE_CANCELADA` | 422 | alterar e cancelar atividade, inscrever, obter código, certificado |\r\n| `INSCRICOES_ENCERRADAS` | 422 | inscrever |\r\n| `INSCRICAO_BLOQUEADA` | 422 | inscrever — só em grupos com M5 |\r\n| `JA_INSCRITO` | 409 | inscrever |\r\n| `CONFLITO_DE_HORARIO` | 409 | inscrever, confirmar convocação |\r\n| `LIMITE_DE_MINICURSOS` | 422 | inscrever, confirmar convocação |\r\n| `INSCRICAO_INATIVA` | 422 | cancelar inscrição |\r\n| `SEM_CONVOCACAO` | 422 | confirmar convocação |\r\n| `CONVOCACAO_EXPIRADA` | 422 | confirmar convocação |\r\n| `FORA_DA_JANELA` | 422 | obter código, registrar presença, presença manual |\r\n| `CODIGO_INVALIDO` | 422 | registrar presença |\r\n| `NAO_INSCRITO` | 403 | registrar presença, presença manual, certificado |\r\n| `SINCRONIZACAO_TARDIA` | 422 | registrar presença com `lidoEm` |\r\n| `JUSTIFICATIVA_OBRIGATORIA` | 422 | presença manual |\r\n| `LIMITE_DE_MANUAIS` | 422 | presença manual |\r\n| `ATIVIDADE_NAO_ENCERRADA` | 422 | certificado |\r\n| `PRESENCA_INSUFICIENTE` | 422 | certificado |\r\n\r\n## 7. O que este contrato não diz\r\n\r\nCada código da seção 6 existe porque existe uma regra. Prazo, limite, janela, tolerância, arredondamento, ordem entre regras e o que acontece quando o tempo passa sem ninguém acessar o sistema: nada disso está aqui, e o juiz cobra tudo isso. Está no documento de requisitos, e o caminho até ele é a entrevista em duas rodadas: primeiro o agente pergunta, depois você consulta.\r\n{\r\n  \"stack\": \"PREENCHER — linguagem e framework da API; tipo e framework da interface\",\r\n  \"api\": {\r\n    \"pasta\": \"api\",\r\n    \"instalar\": \"PREENCHER — por exemplo: npm install\",\r\n    \"iniciar\": \"PREENCHER — por exemplo: npm start\"\r\n  },\r\n  \"testes\": []\r\n}\r\n# dependências e builds das stacks mais comuns\r\nnode_modules/\r\n.dart_tool/\r\nbuild/\r\ndist/\r\ntarget/\r\n__pycache__/\r\n.venv/\r\n*.pyc\r\n\r\n# banco de dados local\r\n*.sqlite\r\n*.sqlite3\r\n*.db\r\n\r\n# segredos\r\n.env\r\n\r\n# dependências que o próprio OpenCode instala\r\n.opencode/node_modules/\r\napi:\nAGENTS.md\nCLAUDE.md\n\napp:\nAGENTS.md\nCLAUDE.md\n\nentrevistas:\n\nspecs:\nv24.21.0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 469,
+      "reasoning": 0,
+      "cache": {
+       "read": 31242,
+       "write": 14359
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116455158
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01W8CubecWL7dYywGNPepjii",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && cat api/AGENTS.md api/CLAUDE.md; cat README.md | head -60",
+       "description": "Read api instructions and README"
+      },
+      "time": {
+       "start": 1790116455712,
+       "end": 1790116455872
+      },
+      "output": "# API\r\n- Tempo sempre pelo relógio do modo de teste, nunca Date.now() direto.\r\n- Testes em api/test/, um arquivo por módulo.@AGENTS.md# Semana Acadêmica — repositório inicial\r\n\r\nPonto de partida do projeto final da disciplina de desenvolvimento com agentes de IA (UniFil, 2026). O enunciado completo está no Classroom; aqui fica o que o grupo precisa para começar.\r\n\r\n## Como começar\r\n\r\n1. Um integrante clica em **Use this template → Create a new repository**, escolhe **PUBLIC** e dá o nome do repositório do grupo.\r\n2. Em **Settings → Collaborators**, adiciona os colegas.\r\n3. Cada integrante clona o repositório, abre o OpenCode na raiz e confere o que veio da aula: `opencode debug skill` precisa listar `grilling`, `to-spec`, `tdd` e `novo-subagente`, e `opencode debug agent auditor` precisa mostrar `write`, `edit` e `task` como `false`.\r\n4. Preencham o `EQUIPE.md` e o `projeto.json`.\r\n5. Escrevam o `AGENTS.md` da raiz (com a stack escolhida) e o de cada subprojeto.\r\n6. Marco 1: a API responde `POST /_teste/reset` no modo de teste (seção 3 do `contrato-api.md`).\r\n\r\n## O que já vem\r\n\r\n| Caminho | O que é | O que fazer |\r\n|---|---|---|\r\n| `contrato-api.md` | Rotas, campos, códigos de retorno, `projeto.json`, dados iniciais e modo de teste | Não alterar |\r\n| `projeto.json` | Como o juiz instala, inicia e testa a API | Preencher (modelo na seção 2 do contrato) |\r\n| `EQUIPE.md` | O dono de cada módulo | Preencher |\r\n| `.opencode/skills/` | As skills da aula: `grilling`, `to-spec`, `tdd`, `novo-subagente` | Ler. A `tdd` ainda fala do `biblioteca-api` e de `node --test`: adaptem para a stack de vocês |\r\n| `.opencode/agent/auditor.md` | O subagente auditor: para cada regra da spec, confere a pergunta da entrevista que a originou e o teste que a comprova. Só lê | Ler antes de usar. Chamar com `@auditor audite o módulo M2 contra specs/M2-inscricoes.md` |\r\n| `entrevistas/` | As duas rodadas da entrevista de cada módulo | Um arquivo por módulo, criado na rodada 1 |\r\n| `specs/` | Uma spec por módulo | Criada com a skill `to-spec` depois das duas rodadas |\r\n| `auditorias/` | Pareceres do `auditor` e do `revisor-de-contrato` | Salvar inteiros, sem editar |\r\n| `evidencias/exportar-evidencias.js` | Exporta as sessões do OpenCode e gera a linha do tempo de cada uma | Cada integrante roda toda semana: `node evidencias/exportar-evidencias.js` |\r\n\r\n## O que vocês criam\r\n\r\n- `AGENTS.md` na raiz e em cada subprojeto.\r\n- A API e a interface, com os testes.\r\n- As skills do grupo em `.opencode/skills/` (`novo-endpoint`, `nova-tela`, `regra-de-tempo`) e o subagente `revisor-de-contrato` em `.opencode/agent/`, criado com a skill `novo-subagente`.\r\n\r\n## O documento de requisitos fica fora daqui\r\n\r\nO documento de requisitos é para vocês consultarem na rodada 2 da entrevista, e só nela. Guardem o arquivo fora desta pasta. Não façam commit dele, não o anexem à conversa e não peçam ao agente para lê-lo: as sessões exportadas e o histórico do git mostram as três coisas.\r\n\r\n---\r\n\r\nAs skills da aula foram reescritas pelo professor a partir de [mattpocock/skills](https://github.com/mattpocock/skills).",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 265,
+      "reasoning": 0,
+      "cache": {
+       "read": 45601,
+       "write": 9208
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116484882
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "The contract's sections 3–4 act as the spec for this part, since the test mode has no business rules. First the `package.json` and the test, with no code yet.",
+     "time": {
+      "start": 1790116484885
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01L79D3Gp2pdKhKT4yiBqxt3",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && mkdir -p test/apoio && cat > package.json <<'EOF'\n{\n  \"name\": \"semana-academica-api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"engines\": {\n    \"node\": \">=22.13\"\n  },\n  \"scripts\": {\n    \"start\": \"node src/servidor.js\",\n    \"test\": \"node --test\"\n  }\n}\nEOF\ncat > test/apoio/api.js <<'EOF'\n// Sobe a API de verdade num processo separado, como o juiz faz: MODO_TESTE e PORT\n// vão no ambiente do processo filho, e o banco é um arquivo temporário descartável.\nimport { spawn } from 'node:child_process';\nimport { once } from 'node:events';\nimport { mkdtempSync, rmSync } from 'node:fs';\nimport { createServer } from 'node:net';\nimport { tmpdir } from 'node:os';\nimport { join } from 'node:path';\nimport { fileURLToPath } from 'node:url';\n\nconst pastaApi = fileURLToPath(new URL('../..', import.meta.url));\n\nfunction portaLivre() {\n  return new Promise((resolve, reject) => {\n    const servidor = createServer();\n    servidor.on('error', reject);\n    servidor.listen(0, () => {\n      const { port } = servidor.address();\n      servidor.close(() => resolve(port));\n    });\n  });\n}\n\nconst esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\n\nexport async function subirApi({ modoTeste = true } = {}) {\n  const porta = await portaLivre();\n  const pastaBanco = mkdtempSync(join(tmpdir(), 'semana-api-'));\n  const env = { ...process.env, PORT: String(porta), ARQUIVO_BANCO: join(pastaBanco, 'teste.db') };\n  delete env.MODO_TESTE;\n  if (modoTeste) env.MODO_TESTE = '1';\n\n  const processo = spawn(process.execPath, ['src/servidor.js'], {\n    cwd: pastaApi,\n    env,\n    stdio: ['ignore', 'ignore', 'pipe'],\n  });\n  let saidaDeErro = '';\n  processo.stderr.on('data', (trecho) => { saidaDeErro += trecho; });\n\n  const url = `http://127.0.0.1:${porta}`;\n  for (let tentativa = 0; ; tentativa++) {\n    if (processo.exitCode !== null) throw new Error(`a API encerrou ao subir:\\n${saidaDeErro}`);\n    try {\n      await fetch(url);\n      break;\n    } catch {\n      if (tentativa >= 200) throw new Error(`a API não respondeu em ${url}:\\n${saidaDeErro}`);\n      await esperar(50);\n    }\n  }\n\n  return {\n    url,\n    async parar() {\n      if (processo.exitCode === null) {\n        processo.kill();\n        await once(processo, 'exit');\n      }\n      rmSync(pastaBanco, { recursive: true, force: true });\n    },\n  };\n}\nEOF\ncat > test/modo-teste.test.js <<'EOF'\nimport { after, before, describe, it } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { subirApi } from './apoio/api.js';\n\ndescribe('modo de teste (contrato, seção 3)', () => {\n  let api;\n  before(async () => { api = await subirApi(); });\n  after(async () => { await api?.parar(); });\n\n  it('POST /_teste/reset responde 204 sem corpo', async () => {\n    const res = await fetch(`${api.url}/_teste/reset`, { method: 'POST' });\n    assert.equal(res.status, 204);\n    assert.equal(await res.text(), '');\n  });\n});\nEOF\nnpm test 2>&1 | tail -25",
+       "description": "Create package.json, test helper and first reset test; run it"
+      },
+      "time": {
+       "start": 1790116494051,
+       "end": 1790116499862
+      },
+      "output": "  node:internal/modules/cjs/loader:1568\n    throw err;\n    ^\n  \n  Error: Cannot find module 'C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\servidor.js'\n      at Module._resolveFilename (node:internal/modules/cjs/loader:1564:15)\n      at wrapResolveFilename (node:internal/modules/cjs/loader:1118:27)\n      at defaultResolveImplForCJSLoading (node:internal/modules/cjs/loader:1142:10)\n      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1169:12)\n      at Module._load (node:internal/modules/cjs/loader:1341:5)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)\n      at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\n      at node:internal/main/run_main_module:33:47 {\n    code: 'MODULE_NOT_FOUND',\n    requireStack: []\n  }\n  \n  Node.js v24.21.0\n  \n      at subirApi (file:///C:/dev/Atividade%20Final%20IA/projeto-semanaacademica/api/test/apoio/api.js:43:43)\n      at async SuiteContext.<anonymous> (file:///C:/dev/Atividade%20Final%20IA/projeto-semanaacademica/api/test/modo-teste.test.js:7:30)\n      at async TestHook.run (node:internal/test_runner/test:1409:7)\n      at async Suite.runHook (node:internal/test_runner/test:1289:9)\n      at async Suite.run (node:internal/test_runner/test:1899:7)\n      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 4184,
+      "reasoning": 0,
+      "cache": {
+       "read": 54809,
+       "write": 1679
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116502535
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Red, but only because no server exists yet. Next I'll add the bare skeleton (Express, SQLite, no `/_teste` routes) so the test fails for the right reason.",
+     "time": {
+      "start": 1790116502539
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01V3YyjATeW6BGnLiV3hawAH",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm install express@5 2>&1 | tail -3 && mkdir -p src && cat > src/servidor.js <<'EOF'\nimport { criarApp } from './app.js';\n\nconst porta = Number(process.env.PORT) || 3000;\nconst modoTeste = process.env.MODO_TESTE === '1';\n\ncriarApp({ modoTeste }).listen(porta, () => {\n  console.log(`API da Semana Acadêmica na porta ${porta}${modoTeste ? ' (modo de teste)' : ''}`);\n});\nEOF\ncat > src/app.js <<'EOF'\nimport express from 'express';\n\nexport function criarApp({ modoTeste }) {\n  const app = express();\n  app.use(express.json());\n  return app;\n}\nEOF\nnpm test 2>&1 | grep -E \"^# |404|expected|actual\" | head",
+       "description": "Install Express, add bare server, rerun test"
+      },
+      "time": {
+       "start": 1790116504771,
+       "end": 1790116529920
+      },
+      "output": "  run `npm fund` for details\n\nfound 0 vulnerabilities\n  404 !== 204\n    actual: 404,\n    expected: 204,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 527,
+      "reasoning": 0,
+      "cache": {
+       "read": 56488,
+       "write": 4916
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116532485
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Red for the right reason: 404 instead of 204. Now the code: database, seed data, and the reset route.",
+     "time": {
+      "start": 1790116532487
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01M7whgXvBsSuW9xqkJiU9qV",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cat > src/banco.js <<'EOF'\nimport { mkdirSync } from 'node:fs';\nimport { dirname } from 'node:path';\nimport { fileURLToPath } from 'node:url';\nimport { DatabaseSync } from 'node:sqlite';\nimport { SALAS, USUARIOS } from './dados-iniciais.js';\n\nconst ARQUIVO_PADRAO = fileURLToPath(new URL('../dados/semana-academica.db', import.meta.url));\n\n// Ordem de criação; o reset apaga na ordem inversa por causa das chaves estrangeiras.\nconst TABELAS = ['usuarios', 'salas'];\n\nexport function abrirBanco(arquivo = process.env.ARQUIVO_BANCO || ARQUIVO_PADRAO) {\n  mkdirSync(dirname(arquivo), { recursive: true });\n  const db = new DatabaseSync(arquivo);\n  db.exec(`\n    PRAGMA foreign_keys = ON;\n    CREATE TABLE IF NOT EXISTS usuarios (\n      id    TEXT PRIMARY KEY,\n      nome  TEXT NOT NULL,\n      papel TEXT NOT NULL CHECK (papel IN ('organizacao', 'participante'))\n    );\n    CREATE TABLE IF NOT EXISTS salas (\n      id         TEXT PRIMARY KEY,\n      nome       TEXT NOT NULL,\n      capacidade INTEGER NOT NULL\n    );\n  `);\n  const vazio = db.prepare('SELECT COUNT(*) AS n FROM usuarios').get().n === 0;\n  if (vazio) carregarDadosIniciais(db);\n  return db;\n}\n\nexport function zerarBanco(db) {\n  db.exec('BEGIN');\n  try {\n    for (const tabela of [...TABELAS].reverse()) db.exec(`DELETE FROM ${tabela}`);\n    carregarDadosIniciais(db);\n    db.exec('COMMIT');\n  } catch (erro) {\n    db.exec('ROLLBACK');\n    throw erro;\n  }\n}\n\nfunction carregarDadosIniciais(db) {\n  const usuario = db.prepare('INSERT INTO usuarios (id, nome, papel) VALUES (?, ?, ?)');\n  for (const u of USUARIOS) usuario.run(u.id, u.nome, u.papel);\n  const sala = db.prepare('INSERT INTO salas (id, nome, capacidade) VALUES (?, ?, ?)');\n  for (const s of SALAS) sala.run(s.id, s.nome, s.capacidade);\n}\nEOF\ncat > src/dados-iniciais.js <<'EOF'\n// contrato-api.md, seção 4.\n\nexport const EVENTO = {\n  nome: 'Semana Acadêmica 2026',\n  inicio: '2026-10-19',\n  fim: '2026-10-23',\n  fuso: 'America/Sao_Paulo',\n};\n\nexport const USUARIOS = [\n  { id: 'org-ana', nome: 'Ana Beatriz Lima', papel: 'organizacao' },\n  { id: 'org-bruno', nome: 'Bruno Tavares', papel: 'organizacao' },\n  { id: 'p-carla', nome: 'Carla Mendes Souza', papel: 'participante' },\n  { id: 'p-diego', nome: 'Diego Alves', papel: 'participante' },\n  { id: 'p-elisa', nome: 'Elisa Fernandes da Rocha', papel: 'participante' },\n  { id: 'p-fabio', nome: 'Fábio Nogueira', papel: 'participante' },\n  { id: 'p-gabriela', nome: 'Gabriela Moura Castro', papel: 'participante' },\n  { id: 'p-heitor', nome: 'Heitor Campos', papel: 'participante' },\n  { id: 'p-isadora', nome: 'Isadora Ribeiro dos Santos', papel: 'participante' },\n  { id: 'p-joao', nome: 'João Pedro Martins', papel: 'participante' },\n];\n\nexport const SALAS = [\n  { id: 'auditorio', nome: 'Auditório Central', capacidade: 200 },\n  { id: 'sala-101', nome: 'Sala 101', capacidade: 40 },\n  { id: 'sala-102', nome: 'Sala 102', capacidade: 40 },\n  { id: 'lab-3', nome: 'Laboratório 3', capacidade: 20 },\n];\nEOF\nmkdir -p src/teste && cat > src/teste/rotas.js <<'EOF'\nimport { Router } from 'express';\nimport { zerarBanco } from '../banco.js';\n\n// Rotas /_teste/* do contrato, seção 3. Só são montadas com MODO_TESTE=1.\nexport function rotasDeTeste({ db }) {\n  const rotas = Router();\n\n  rotas.post('/reset', (req, res) => {\n    zerarBanco(db);\n    res.status(204).end();\n  });\n\n  return rotas;\n}\nEOF\ncat > src/app.js <<'EOF'\nimport express from 'express';\nimport { abrirBanco } from './banco.js';\nimport { rotasDeTeste } from './teste/rotas.js';\n\nexport function criarApp({ modoTeste }) {\n  const db = abrirBanco();\n  const app = express();\n  app.use(express.json());\n  if (modoTeste) app.use('/_teste', rotasDeTeste({ db }));\n  return app;\n}\nEOF\nnpm test 2>&1 | grep -E \"^# |not ok|ok \"",
+       "description": "Add database, seed data and reset route; run tests"
+      },
+      "time": {
+       "start": 1790116545342,
+       "end": 1790116547518
+      },
+      "output": "(Bash completed with no output)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2197,
+      "reasoning": 0,
+      "cache": {
+       "read": 61404,
+       "write": 602
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116549184
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01QDvm3386nETfPsuDsL493e",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm test 2>&1 | tail -15",
+       "description": "Show test output tail"
+      },
+      "time": {
+       "start": 1790116549184,
+       "end": 1790116551280
+      },
+      "output": "> test\n> node --test\n\n✔ test\\apoio\\api.js (44.9464ms)\n▶ modo de teste (contrato, seção 3)\n  ✔ POST /_teste/reset responde 204 sem corpo (5.2143ms)\n✔ modo de teste (contrato, seção 3) (169.0818ms)\nℹ tests 2\nℹ suites 1\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 266.3237",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 118,
+      "reasoning": 0,
+      "cache": {
+       "read": 62006,
+       "write": 2236
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116556449
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01H7cTxVaE6kWDhQR8SDCV9Z",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && sed -i 's#\"test\": \"node --test\"#\"test\": \"node --test test/*.test.js\"#' package.json && cat > test/modo-teste.test.js <<'EOF'\nimport { after, before, describe, it } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { subirApi } from './apoio/api.js';\n\nconst INSTANTE_DO_RESET = Date.parse('2026-10-13T09:00:00-03:00');\n\ndescribe('modo de teste (contrato, seção 3)', () => {\n  let api;\n  before(async () => { api = await subirApi(); });\n  after(async () => { await api?.parar(); });\n\n  const reset = () => fetch(`${api.url}/_teste/reset`, { method: 'POST' });\n  const lerRelogio = () => fetch(`${api.url}/_teste/relogio`);\n\n  it('POST /_teste/reset responde 204 sem corpo', async () => {\n    const res = await reset();\n    assert.equal(res.status, 204);\n    assert.equal(await res.text(), '');\n  });\n\n  it('depois do reset o relógio marca 2026-10-13T09:00:00-03:00', async () => {\n    await reset();\n    const res = await lerRelogio();\n    assert.equal(res.status, 200);\n    const corpo = await res.json();\n    assert.deepEqual(Object.keys(corpo), ['agora']);\n    assert.equal(Date.parse(corpo.agora), INSTANTE_DO_RESET);\n  });\n});\nEOF\nnpm test 2>&1 | grep -E \"✔|✖|ℹ (pass|fail)|actual|expected\"",
+       "description": "Add clock-after-reset test and run"
+      },
+      "time": {
+       "start": 1790116559656,
+       "end": 1790116561795
+      },
+      "output": "  ✔ POST /_teste/reset responde 204 sem corpo (5.0366ms)\n  ✖ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (6.6656ms)\n✖ modo de teste (contrato, seção 3) (187.4675ms)\nℹ pass 1\nℹ fail 1\n✖ failing tests:\n✖ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (6.6656ms)\n    actual: 404,\n    expected: 200,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 994,
+      "reasoning": 0,
+      "cache": {
+       "read": 64242,
+       "write": 335
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116563756
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Red (404). Now the clock: stopped in test mode, real otherwise.",
+     "time": {
+      "start": 1790116563757
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01KVhwnHfuBuj4UhNRNCF1m2",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cat > src/relogio.js <<'EOF'\n// Toda regra que depende de tempo pergunta a hora aqui, nunca ao Date direto.\n// No modo de teste o relógio fica parado e só muda por PUT /_teste/relogio (contrato, seção 3).\n\nexport const INSTANTE_DO_RESET = new Date('2026-10-13T09:00:00-03:00');\n\nexport function criarRelogio({ modoTeste }) {\n  let parado = modoTeste ? new Date(INSTANTE_DO_RESET) : null;\n\n  return {\n    agora: () => (parado ? new Date(parado) : new Date()),\n    ajustar(instante) {\n      parado = new Date(instante);\n    },\n  };\n}\nEOF\ncat > src/teste/rotas.js <<'EOF'\nimport { Router } from 'express';\nimport { zerarBanco } from '../banco.js';\nimport { INSTANTE_DO_RESET } from '../relogio.js';\n\n// Rotas /_teste/* do contrato, seção 3. Só são montadas com MODO_TESTE=1.\nexport function rotasDeTeste({ db, relogio }) {\n  const rotas = Router();\n\n  rotas.post('/reset', (req, res) => {\n    zerarBanco(db);\n    relogio.ajustar(INSTANTE_DO_RESET);\n    res.status(204).end();\n  });\n\n  rotas.get('/relogio', (req, res) => {\n    res.json({ agora: relogio.agora().toISOString() });\n  });\n\n  return rotas;\n}\nEOF\ncat > src/app.js <<'EOF'\nimport express from 'express';\nimport { abrirBanco } from './banco.js';\nimport { criarRelogio } from './relogio.js';\nimport { rotasDeTeste } from './teste/rotas.js';\n\nexport function criarApp({ modoTeste }) {\n  const db = abrirBanco();\n  const relogio = criarRelogio({ modoTeste });\n  const app = express();\n  app.use(express.json());\n  if (modoTeste) app.use('/_teste', rotasDeTeste({ db, relogio }));\n  return app;\n}\nEOF\nnpm test 2>&1 | grep -E \"✔|✖|ℹ (pass|fail)|actual|expected\"",
+       "description": "Add clock module and GET relogio; run tests"
+      },
+      "time": {
+       "start": 1790116569051,
+       "end": 1790116571448
+      },
+      "output": "  ✔ POST /_teste/reset responde 204 sem corpo (7.554ms)\n  ✔ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (9.3832ms)\n✔ modo de teste (contrato, seção 3) (250.1075ms)\nℹ pass 2\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 940,
+      "reasoning": 0,
+      "cache": {
+       "read": 64577,
+       "write": 1209
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116572674
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Green. Next slice: `PUT /_teste/relogio` sets the clock, and it stays put.",
+     "time": {
+      "start": 1790116572674
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_013SiHSqu9oWSd1eqgdfkpu5",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "    assert.equal(Date.parse(corpo.agora), INSTANTE_DO_RESET);\n  });\n});",
+       "new_string": "    assert.equal(Date.parse(corpo.agora), INSTANTE_DO_RESET);\n  });\n\n  it('PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado', async () => {\n    await reset();\n    const res = await ajustarRelogio({ agora: '2026-10-19T19:05:00-03:00' });\n    assert.equal(res.status, 200);\n    const corpo = await res.json();\n    assert.deepEqual(Object.keys(corpo), ['agora']);\n    assert.equal(Date.parse(corpo.agora), Date.parse('2026-10-19T22:05:00Z'));\n\n    await new Promise((resolve) => setTimeout(resolve, 20));\n    const lido = await (await lerRelogio()).json();\n    assert.equal(Date.parse(lido.agora), Date.parse('2026-10-19T22:05:00Z'));\n  });\n});",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\modo-teste.test.js"
+      },
+      "time": {
+       "start": 1790116575748,
+       "end": 1790116579348
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\modo-teste.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01YKBmFH4t4XTDqE8iUXKC6g",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "  const lerRelogio = () => fetch(`${api.url}/_teste/relogio`);",
+       "new_string": "  const lerRelogio = () => fetch(`${api.url}/_teste/relogio`);\n  const ajustarRelogio = (corpo) => fetch(`${api.url}/_teste/relogio`, {\n    method: 'PUT',\n    headers: { 'Content-Type': 'application/json' },\n    body: typeof corpo === 'string' ? corpo : JSON.stringify(corpo),\n  });",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\modo-teste.test.js"
+      },
+      "time": {
+       "start": 1790116577481,
+       "end": 1790116579377
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\modo-teste.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_012VzaLox7WaHuLPUm4sRZNo",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm test 2>&1 | grep -E \"✔|✖|ℹ (pass|fail)|actual|expected\"",
+       "description": "Run tests"
+      },
+      "time": {
+       "start": 1790116578233,
+       "end": 1790116580534
+      },
+      "output": "  ✔ POST /_teste/reset responde 204 sem corpo (5.3195ms)\n  ✔ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (8.6111ms)\n  ✖ PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado (136.3413ms)\n✖ modo de teste (contrato, seção 3) (318.9171ms)\nℹ pass 2\nℹ fail 1\n✖ failing tests:\n✖ PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado (136.3413ms)\n    actual: 404,\n    expected: 200,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 949,
+      "reasoning": 0,
+      "cache": {
+       "read": 65786,
+       "write": 1088
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116582936
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01Xr2XpRdpPbbX4js38mxXc8",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "  return rotas;",
+       "new_string": "  rotas.put('/relogio', (req, res) => {\n    relogio.ajustar(req.body.agora);\n    res.json({ agora: relogio.agora().toISOString() });\n  });\n\n  return rotas;",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\teste\\rotas.js"
+      },
+      "time": {
+       "start": 1790116582936,
+       "end": 1790116584337
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\teste\\rotas.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01UPfJNDtJ7WMcWVt17nGzY5",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm test 2>&1 | grep -E \"✔|✖|ℹ (pass|fail)|actual|expected\"",
+       "description": "Run tests"
+      },
+      "time": {
+       "start": 1790116583429,
+       "end": 1790116585423
+      },
+      "output": "  ✔ POST /_teste/reset responde 204 sem corpo (7.3173ms)\n  ✔ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (7.7411ms)\n  ✔ PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado (40.5856ms)\n✔ modo de teste (contrato, seção 3) (229.6154ms)\nℹ pass 3\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 344,
+      "reasoning": 0,
+      "cache": {
+       "read": 66874,
+       "write": 1421
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116590542
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_0173MMmRed8QM7xfd2bDJfZt",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "    assert.equal(Date.parse(lido.agora), Date.parse('2026-10-19T22:05:00Z'));\n  });\n});",
+       "new_string": "    assert.equal(Date.parse(lido.agora), Date.parse('2026-10-19T22:05:00Z'));\n  });\n\n  it('POST /_teste/reset devolve o relógio a 2026-10-13T09:00:00-03:00 depois de um PUT', async () => {\n    await reset();\n    await ajustarRelogio({ agora: '2026-10-22T10:00:00-03:00' });\n    await reset();\n    const lido = await (await lerRelogio()).json();\n    assert.equal(Date.parse(lido.agora), INSTANTE_DO_RESET);\n  });\n\n  for (const [caso, corpo] of [\n    ['corpo que não é JSON', '{agora:'],\n    ['sem o campo agora', {}],\n    ['agora que não é texto', { agora: 1760000000000 }],\n    ['agora que não é uma data', { agora: 'amanhã cedo' }],\n  ]) {\n    it(`PUT /_teste/relogio com ${caso} responde 422 DADOS_INVALIDOS e não mexe no relógio`, async () => {\n      await reset();\n      const res = await ajustarRelogio(corpo);\n      assert.equal(res.status, 422);\n      const erro = await res.json();\n      assert.equal(erro.erro, 'DADOS_INVALIDOS');\n      assert.equal(typeof erro.mensagem, 'string');\n\n      const lido = await (await lerRelogio()).json();\n      assert.equal(Date.parse(lido.agora), INSTANTE_DO_RESET);\n    });\n  }\n});",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\modo-teste.test.js"
+      },
+      "time": {
+       "start": 1790116594290,
+       "end": 1790116596036
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\modo-teste.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01FJDweeQMLkLu8PTT2R6c4H",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm test 2>&1 | grep -E \"✔|✖|ℹ (pass|fail)|actual|expected\" | head -20",
+       "description": "Run tests"
+      },
+      "time": {
+       "start": 1790116595092,
+       "end": 1790116597146
+      },
+      "output": "  ✔ POST /_teste/reset responde 204 sem corpo (6.3123ms)\n  ✔ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (8.4446ms)\n  ✔ PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado (39.4915ms)\n  ✔ POST /_teste/reset devolve o relógio a 2026-10-13T09:00:00-03:00 depois de um PUT (8.8284ms)\n  ✖ PUT /_teste/relogio com corpo que não é JSON responde 422 DADOS_INVALIDOS e não mexe no relógio (5.2249ms)\n  ✖ PUT /_teste/relogio com sem o campo agora responde 422 DADOS_INVALIDOS e não mexe no relógio (4.7677ms)\n  ✖ PUT /_teste/relogio com agora que não é texto responde 422 DADOS_INVALIDOS e não mexe no relógio (4.24ms)\n  ✖ PUT /_teste/relogio com agora que não é uma data responde 422 DADOS_INVALIDOS e não mexe no relógio (4.5245ms)\n✖ modo de teste (contrato, seção 3) (253.1139ms)\nℹ pass 4\nℹ fail 4\n✖ failing tests:\n✖ PUT /_teste/relogio com corpo que não é JSON responde 422 DADOS_INVALIDOS e não mexe no relógio (5.2249ms)\n    actual: 400,\n    expected: 422,\n✖ PUT /_teste/relogio com sem o campo agora responde 422 DADOS_INVALIDOS e não mexe no relógio (4.7677ms)\n    actual: 500,\n    expected: 422,\n✖ PUT /_teste/relogio com agora que não é texto responde 422 DADOS_INVALIDOS e não mexe no relógio (4.24ms)\n    actual: 200,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1147,
+      "reasoning": 0,
+      "cache": {
+       "read": 68295,
+       "write": 655
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116602478
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01X4rBCiWPhgoSgNYMn8cz7A",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cat > src/erros.js <<'EOF'\n// Formato de erro do contrato, seção 1: {\"erro\": \"CODIGO\", \"mensagem\": \"texto livre\"}.\n\nexport class ErroDaApi extends Error {\n  constructor(status, erro, mensagem) {\n    super(mensagem);\n    this.status = status;\n    this.erro = erro;\n  }\n}\n\nexport const dadosInvalidos = (mensagem) => new ErroDaApi(422, 'DADOS_INVALIDOS', mensagem);\n\nconst ISO_COM_FUSO = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$/;\n\n// Datas chegam em ISO 8601 com fuso (seção 1); qualquer outra coisa é DADOS_INVALIDOS.\nexport function lerInstante(valor, campo) {\n  if (typeof valor !== 'string' || !ISO_COM_FUSO.test(valor) || Number.isNaN(Date.parse(valor))) {\n    throw dadosInvalidos(`${campo} precisa ser uma data ISO 8601 com fuso`);\n  }\n  return new Date(valor);\n}\n\nexport function rotaInexistente(req, res) {\n  res.status(404).json({ erro: 'NAO_ENCONTRADO', mensagem: `${req.method} ${req.path} não existe` });\n}\n\n// eslint-disable-next-line no-unused-vars\nexport function tratarErros(erro, req, res, next) {\n  if (erro instanceof ErroDaApi) {\n    return res.status(erro.status).json({ erro: erro.erro, mensagem: erro.message });\n  }\n  if (erro.type === 'entity.parse.failed') {\n    return res.status(422).json({ erro: 'DADOS_INVALIDOS', mensagem: 'o corpo não é um JSON válido' });\n  }\n  console.error(erro);\n  res.status(500).json({ erro: 'ERRO_INTERNO', mensagem: 'erro inesperado no servidor' });\n}\nEOF\ncat > src/app.js <<'EOF'\nimport express from 'express';\nimport { abrirBanco } from './banco.js';\nimport { rotaInexistente, tratarErros } from './erros.js';\nimport { criarRelogio } from './relogio.js';\nimport { rotasDeTeste } from './teste/rotas.js';\n\nexport function criarApp({ modoTeste }) {\n  const db = abrirBanco();\n  const relogio = criarRelogio({ modoTeste });\n  const app = express();\n  app.use(express.json());\n  if (modoTeste) app.use('/_teste', rotasDeTeste({ db, relogio }));\n  app.use(rotaInexistente);\n  app.use(tratarErros);\n  return app;\n}\nEOF\npython - 2>/dev/null; node -e \"\nconst fs=require('fs');const p='src/teste/rotas.js';let s=fs.readFileSync(p,'utf8');\ns=s.replace(\\\"import { zerarBanco } from '../banco.js';\\\",\\\"import { zerarBanco } from '../banco.js';\\nimport { lerInstante } from '../erros.js';\\\");\ns=s.replace('relogio.ajustar(req.body.agora);','relogio.ajustar(lerInstante(req.body?.agora, \\'agora\\'));');\nfs.writeFileSync(p,s);\" && cat src/teste/rotas.js && npm test 2>&1 | grep -E \"✔|✖|ℹ (pass|fail)|actual|expected\" | head -20",
+       "description": "Add error module, validate clock body; run tests"
+      },
+      "time": {
+       "start": 1790116610811,
+       "end": 1790116731898
+      },
+      "output": "Command did not complete within its 120s timeout and was moved to the background (ID: bhtyld8j5). Output is being written to: C:\\Users\\caiot\\AppData\\Local\\Temp\\claude\\C--dev-Atividade-Final-IA-projeto-semanaacademica\\b42172cd-7bb9-4106-b2a0-56a7e7374043\\tasks\\bhtyld8j5.output. You will be notified when it completes. To check interim output, use Read on that file path.\nSession cwd remains C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api; directory changes made by the backgrounded command do not apply to subsequent commands.",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1767,
+      "reasoning": 0,
+      "cache": {
+       "read": 68950,
+       "write": 1974
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116733868
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "A stray `python -` in that command is stuck waiting on stdin. I'll stop it and check the files.",
+     "time": {
+      "start": 1790116733870
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "toolsearch",
+     "callID": "toolu_01JUjy9qbcimgXcczqaTq29W",
+     "state": {
+      "status": "completed",
+      "input": {
+       "query": "select:TaskStop",
+       "max_results": 1
+      },
+      "time": {
+       "start": 1790116734206,
+       "end": 1790116734216
+      },
+      "output": ""
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 150,
+      "reasoning": 0,
+      "cache": {
+       "read": 70924,
+       "write": 2015
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116735784
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "taskstop",
+     "callID": "toolu_01B1dFnL1qoVXpVo4HTv8vDH",
+     "state": {
+      "status": "completed",
+      "input": {
+       "task_id": "bhtyld8j5"
+      },
+      "time": {
+       "start": 1790116735784,
+       "end": 1790116735801
+      },
+      "output": "{\"message\":\"Successfully stopped task: bhtyld8j5 (cd \\\"/c/dev/Atividade Final IA/projeto-semanaacademica/api\\\" && cat > src/erros.js <<'EOF'\\n// Formato de erro do contrato, seção 1: {\\\"erro\\\": \\\"CODIGO\\\", \\\"mensagem\\\": \\\"texto livre\\\"}.\\n\\nexport class ErroDaApi extends Error {\\n  constructor(status, erro, mensagem) {\\n    super(mensagem);\\n    this.status = status;\\n    this.erro = erro;\\n  }\\n}\\n\\nexport const dadosInvalidos = (mensagem) => new ErroDaApi(422, 'DADOS_INVALIDOS', mensagem);\\n\\nconst ISO_COM_FUSO = /^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}(:\\\\d{2}(\\\\.\\\\d+)?)?(Z|[+-]\\\\d{2}:\\\\d{2})$/;\\n\\n// Datas chegam em ISO 8601 com fuso (seção 1); qualquer outra coisa é DADOS_INVALIDOS.\\nexport function lerInstante(valor, campo) {\\n  if (typeof valor !== 'string' || !ISO_COM_FUSO.test(valor) || Number.isNaN(Date.parse(valor))) {\\n    throw dadosInvalidos(`${campo} precisa ser uma data ISO 8601 com fuso`);\\n  }\\n  return new Date(valor);\\n}\\n\\nexport function rotaInexistente(req, res) {\\n  res.status(404).json({ erro: 'NAO_ENCONTRADO', mensagem: `${req.method} ${req.path} não existe` });\\n}\\n\\n// eslint-disable-next-line no-unused-vars\\nexport function tratarErros(erro, req, res, next) {\\n  if (erro instanceof ErroDaApi) {\\n    return res.status(erro.status).json({ erro: erro.erro, mensagem: erro.message });\\n  }\\n  if (erro.type === 'entity.parse.failed') {\\n    return res.status(422).json({ erro: 'DADOS_INVALIDOS', mensagem: 'o corpo não é um JSON válido' });\\n  }\\n  console.error(erro);\\n  res.status(500).json({ erro: 'ERRO_INTERNO', mensagem: 'erro inesperado no servidor' });\\n}\\nEOF\\ncat > src/app.js <<'EOF'\\nimport express from 'express';\\nimport { abrirBanco } from './banco.js';\\nimport { rotaInexistente, tratarErros } from './erros.js';\\nimport { criarRelogio } from './relogio.js';\\nimport { rotasDeTeste } from './teste/rotas.js';\\n\\nexport function criarApp({ modoTeste }) {\\n  const db = abrirBanco();\\n  const relogio = criarRelogio({ modoTeste });\\n  const app = express();\\n  app.use(express.json());\\n  if (modoTeste) app.use('/_teste', rotasDeTeste({ db, relogio }));\\n  app.use(rotaInexistente);\\n  app.use(tratarErros);\\n  return app;\\n}\\nEOF\\npython - 2>/dev/null; node -e \\\"\\nconst fs=require('fs');const p='src/teste/rotas.js';let s=fs.readFileSync(p,'utf8');\\ns=s.replace(\\\\\\\"import { zerarBanco } from '../banco.js';\\\\\\\",\\\\\\\"import { zerarBanco } from '../banco.js';\\\\nimport { lerInstante } from '../erros.js';\\\\\\\");\\ns=s.replace('relogio.ajustar(req.body.agora);','relogio.ajustar(lerInstante(req.body?.agora, \\\\'agora\\\\'));');\\nfs.writeFileSync(p,s);\\\" && cat src/teste/rotas.js && npm test 2>&1 | grep -E \\\"✔|✖|ℹ (pass|fail)|actual|expected\\\" | head -20)\",\"task_id\":\"bhtyld8j5\",\"task_type\":\"local_bash\",\"command\":\"cd \\\"/c/dev/Atividade Final IA/projeto-semanaacademica/api\\\" && cat > src/erros.js <<'EOF'\\n// Formato de erro do contrato, seção 1: {\\\"erro\\\": \\\"CODIGO\\\", \\\"mensagem\\\": \\\"texto livre\\\"}.\\n\\nexport class ErroDaApi extends Error {\\n  constructor(status, erro, mensagem) {\\n    super(mensagem);\\n    this.status = status;\\n    this.erro = erro;\\n  }\\n}\\n\\nexport const dadosInvalidos = (mensagem) => new ErroDaApi(422, 'DADOS_INVALIDOS', mensagem);\\n\\nconst ISO_COM_FUSO = /^\\\\d{4}-\\\\d{2}-\\\\d{2}T\\\\d{2}:\\\\d{2}(:\\\\d{2}(\\\\.\\\\d+)?)?(Z|[+-]\\\\d{2}:\\\\d{2})$/;\\n\\n// Datas chegam em ISO 8601 com fuso (seção 1); qualquer outra coisa é DADOS_INVALIDOS.\\nexport function lerInstante(valor, campo) {\\n  if (typeof valor !== 'string' || !ISO_COM_FUSO.test(valor) || Number.isNaN(Date.parse(valor))) {\\n    throw dadosInvalidos(`${campo} precisa ser uma data ISO 8601 com fuso`);\\n  }\\n  return new Date(valor);\\n}\\n\\nexport function rotaInexistente(req, res) {\\n  res.status(404).json({ erro: 'NAO_ENCONTRADO', mensagem: `${req.method} ${req.path} não existe` });\\n}\\n\\n// eslint-disable-next-line no-unused-vars\\nexport function tratarErros(erro, req, res, next) {\\n  if (erro instanceof ErroDaApi) {\\n    return res.status(erro.status).json({ erro: erro.erro, mensagem: erro.message });\\n  }\\n  if (erro.type === 'entity.parse.failed') {\\n    return res.status(422).json({ erro: 'DADOS_INVALIDOS', mensagem: 'o corpo não é um JSON válido' });\\n  }\\n  console.error(erro);\\n  res.status(500).json({ erro: 'ERRO_INTERNO', mensagem: 'erro inesperado no servidor' });\\n}\\nEOF\\ncat > src/app.js <<'EOF'\\nimport express from 'express';\\nimport { abrirBanco } from './banco.js';\\nimport { rotaInexistente, tratarErros } from './erros.js';\\nimport { criarRelogio } from './relogio.js';\\nimport { rotasDeTeste } from './teste/rotas.js';\\n\\nexport function criarApp({ modoTeste }) {\\n  const db = abrirBanco();\\n  const relogio = criarRelogio({ modoTeste });\\n  const app = express();\\n  app.use(express.json());\\n  if (modoTeste) app.use('/_teste', rotasDeTeste({ db, relogio }));\\n  app.use(rotaInexistente);\\n  app.use(tratarErros);\\n  return app;\\n}\\nEOF\\npython - 2>/dev/null; node -e \\\"\\nconst fs=require('fs');const p='src/teste/rotas.js';let s=fs.readFileSync(p,'utf8');\\ns=s.replace(\\\\\\\"import { zerarBanco } from '../banco.js';\\\\\\\",\\\\\\\"import { zerarBanco } from '../banco.js';\\\\nimport { lerInstante } from '../erros.js';\\\\\\\");\\ns=s.replace('relogio.ajustar(req.body.agora);','relogio.ajustar(lerInstante(req.body?.agora, \\\\'agora\\\\'));');\\nfs.writeFileSync(p,s);\\\" && cat src/teste/rotas.js && npm test 2>&1 | grep -E \\\"✔|✖|ℹ (pass|fail)|actual|expected\\\" | head -20\"}"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01YEGbiimAa7Gz78nEJSh4k5",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cat src/teste/rotas.js; ls src",
+       "description": "Check rotas file state"
+      },
+      "time": {
+       "start": 1790116736278,
+       "end": 1790116736443
+      },
+      "output": "import { Router } from 'express';\nimport { zerarBanco } from '../banco.js';\nimport { INSTANTE_DO_RESET } from '../relogio.js';\n\n// Rotas /_teste/* do contrato, seção 3. Só são montadas com MODO_TESTE=1.\nexport function rotasDeTeste({ db, relogio }) {\n  const rotas = Router();\n\n  rotas.post('/reset', (req, res) => {\n    zerarBanco(db);\n    relogio.ajustar(INSTANTE_DO_RESET);\n    res.status(204).end();\n  });\n\n  rotas.get('/relogio', (req, res) => {\n    res.json({ agora: relogio.agora().toISOString() });\n  });\n\n  rotas.put('/relogio', (req, res) => {\n    relogio.ajustar(req.body.agora);\n    res.json({ agora: relogio.agora().toISOString() });\n  });\n\n  return rotas;\n}\napp.js\nbanco.js\ndados-iniciais.js\nerros.js\nrelogio.js\nservidor.js\nteste",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 176,
+      "reasoning": 0,
+      "cache": {
+       "read": 72939,
+       "write": 502
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116738785
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01Gu9EY3EWWJ22fGa4QSmEKU",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\teste\\rotas.js"
+      },
+      "time": {
+       "start": 1790116738785,
+       "end": 1790116738803
+      },
+      "output": "[741 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 85,
+      "reasoning": 0,
+      "cache": {
+       "read": 73441,
+       "write": 3426
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116740867
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01SD5KaMu7iXNoG2uHh8jtPp",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "    relogio.ajustar(req.body.agora);",
+       "new_string": "    relogio.ajustar(lerInstante(req.body?.agora, 'agora'));",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\teste\\rotas.js"
+      },
+      "time": {
+       "start": 1790116740867,
+       "end": 1790116744192
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\teste\\rotas.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01KntjuM1n1dtD3tsHud4Wps",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "import { zerarBanco } from '../banco.js';",
+       "new_string": "import { zerarBanco } from '../banco.js';\nimport { lerInstante } from '../erros.js';",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\teste\\rotas.js"
+      },
+      "time": {
+       "start": 1790116741965,
+       "end": 1790116744224
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\teste\\rotas.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01SuBzLss86iuPweisFWbFSh",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm test 2>&1 | grep -E \"✔|✖|ℹ (pass|fail)|actual|expected\" | head -20",
+       "description": "Run tests",
+       "timeout": 60000
+      },
+      "time": {
+       "start": 1790116742847,
+       "end": 1790116745349
+      },
+      "output": "  ✔ POST /_teste/reset responde 204 sem corpo (6.1092ms)\n  ✔ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (6.7309ms)\n  ✔ PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado (48.187ms)\n  ✔ POST /_teste/reset devolve o relógio a 2026-10-13T09:00:00-03:00 depois de um PUT (9.4591ms)\n  ✔ PUT /_teste/relogio com corpo que não é JSON responde 422 DADOS_INVALIDOS e não mexe no relógio (5.334ms)\n  ✔ PUT /_teste/relogio com sem o campo agora responde 422 DADOS_INVALIDOS e não mexe no relógio (4.7428ms)\n  ✔ PUT /_teste/relogio com agora que não é texto responde 422 DADOS_INVALIDOS e não mexe no relógio (5.5301ms)\n  ✔ PUT /_teste/relogio com agora que não é uma data responde 422 DADOS_INVALIDOS e não mexe no relógio (4.9836ms)\n✔ modo de teste (contrato, seção 3) (258.2002ms)\nℹ pass 8\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 521,
+      "reasoning": 0,
+      "cache": {
+       "read": 76867,
+       "write": 633
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116748475
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Green, 8/8. Last slice: without `MODO_TESTE`, the `/_teste/*` routes return 404.",
+     "time": {
+      "start": 1790116748478
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01NSAdxQEMkhgHQrew8sJVnY",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cat >> test/modo-teste.test.js <<'EOF'\n\ndescribe('sem MODO_TESTE (contrato, seção 3)', () => {\n  let api;\n  before(async () => { api = await subirApi({ modoTeste: false }); });\n  after(async () => { await api?.parar(); });\n\n  for (const [metodo, rota] of [\n    ['POST', '/_teste/reset'],\n    ['GET', '/_teste/relogio'],\n    ['PUT', '/_teste/relogio'],\n  ]) {\n    it(`${metodo} ${rota} responde 404 NAO_ENCONTRADO`, async () => {\n      const res = await fetch(`${api.url}${rota}`, {\n        method: metodo,\n        headers: { 'Content-Type': 'application/json' },\n        body: metodo === 'PUT' ? JSON.stringify({ agora: '2026-10-19T19:00:00-03:00' }) : undefined,\n      });\n      assert.equal(res.status, 404);\n      assert.equal((await res.json()).erro, 'NAO_ENCONTRADO');\n    });\n  }\n});\nEOF\nnpm test 2>&1 | grep -E \"✔|✖|ℹ (tests|pass|fail)|actual|expected\" | head -20",
+       "description": "Add no-test-mode 404 tests and run",
+       "timeout": 60000
+      },
+      "time": {
+       "start": 1790116751816,
+       "end": 1790116754299
+      },
+      "output": "  ✔ POST /_teste/reset responde 204 sem corpo (7.2591ms)\n  ✔ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (7.175ms)\n  ✔ PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado (37.2708ms)\n  ✔ POST /_teste/reset devolve o relógio a 2026-10-13T09:00:00-03:00 depois de um PUT (10.0367ms)\n  ✔ PUT /_teste/relogio com corpo que não é JSON responde 422 DADOS_INVALIDOS e não mexe no relógio (7.3097ms)\n  ✔ PUT /_teste/relogio com sem o campo agora responde 422 DADOS_INVALIDOS e não mexe no relógio (5.475ms)\n  ✔ PUT /_teste/relogio com agora que não é texto responde 422 DADOS_INVALIDOS e não mexe no relógio (4.7028ms)\n  ✔ PUT /_teste/relogio com agora que não é uma data responde 422 DADOS_INVALIDOS e não mexe no relógio (4.7459ms)\n✔ modo de teste (contrato, seção 3) (261.2412ms)\n  ✔ POST /_teste/reset responde 404 NAO_ENCONTRADO (7.0351ms)\n  ✔ GET /_teste/relogio responde 404 NAO_ENCONTRADO (1.5583ms)\n  ✔ PUT /_teste/relogio responde 404 NAO_ENCONTRADO (2.086ms)\n✔ sem MODO_TESTE (contrato, seção 3) (221.0646ms)\nℹ tests 11\nℹ pass 11\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 755,
+      "reasoning": 0,
+      "cache": {
+       "read": 77500,
+       "write": 1215
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116757333
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01RNEvqEXC7hhD9RMp5TsVUM",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && sed -i \"s#if (modoTeste) app.use('/_teste'#if (true) app.use('/_teste'#\" src/app.js && npm test 2>&1 | grep -E \"ℹ (pass|fail)\"; sed -i \"s#if (true) app.use('/_teste'#if (modoTeste) app.use('/_teste'#\" src/app.js && grep -n \"_teste\" src/app.js",
+       "description": "Mutation check: mount test routes always, then revert",
+       "timeout": 60000
+      },
+      "time": {
+       "start": 1790116758168,
+       "end": 1790116760431
+      },
+      "output": "ℹ pass 8\nℹ fail 3\n12:  if (modoTeste) app.use('/_teste', rotasDeTeste({ db, relogio }));",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 393,
+      "reasoning": 0,
+      "cache": {
+       "read": 78715,
+       "write": 2064
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116762889
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "The mutation catches it (3 failures). Now `projeto.json`, `.gitignore`, and an `npm start` smoke test the way the judge runs it (env vars set in the process from Node, not on the command line):",
+     "time": {
+      "start": 1790116762894
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Wb1Db67FpGyePkhgq8nrZk",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && cat > projeto.json <<'EOF'\n{\n  \"stack\": \"Node 22.13+ + Express 5 + SQLite (node:sqlite, em arquivo); interface web em Vite + React\",\n  \"api\": {\n    \"pasta\": \"api\",\n    \"instalar\": \"npm install\",\n    \"iniciar\": \"npm start\"\n  },\n  \"testes\": [\"npm test\"]\n}\nEOF\ncat >> .gitignore <<'EOF'\n\n# banco da API (arquivo do node:sqlite)\napi/dados/\nEOF\ncd api && node -e \"\nconst {spawn}=require('child_process');\nconst p=spawn('npm',['start'],{shell:true,env:{...process.env,MODO_TESTE:'1',PORT:'3999'},stdio:['ignore','pipe','pipe']});\np.stdout.on('data',d=>process.stdout.write('[api] '+d));\nsetTimeout(async()=>{\n  const r=await fetch('http://localhost:3999/_teste/reset',{method:'POST'});console.log('reset',r.status);\n  const g=await fetch('http://localhost:3999/_teste/relogio');console.log('relogio',await g.text());\n  require('child_process').execSync(process.platform==='win32'?'taskkill /pid '+p.pid+' /T /F':'kill '+p.pid);\n},2500);\" ; ls dados; cd .. && git status --short",
+       "description": "Fill projeto.json, update gitignore, smoke-test npm start",
+       "timeout": 60000
+      },
+      "time": {
+       "start": 1790116766685,
+       "end": 1790116768345
+      },
+      "output": "/usr/bin/bash: line 41: /c/Program Files/nodejs/node: Permission denied\nls: cannot access 'dados': No such file or directory\n M .gitignore\n M projeto.json\n?? api/package-lock.json\n?? api/package.json\n?? api/src/\n?? api/test/",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 761,
+      "reasoning": 0,
+      "cache": {
+       "read": 80779,
+       "write": 477
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116770178
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "That `node -e` call was blocked in bash. I'll run the smoke test from a script in the scratchpad instead:",
+     "time": {
+      "start": 1790116770180
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01WnEUYhzPJ2nPCNyRWYkYhW",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "// Sobe a API com `npm start` como o juiz: MODO_TESTE e PORT no ambiente do processo.\nimport { spawn, execSync } from 'node:child_process';\n\nconst pasta = 'C:/dev/Atividade Final IA/projeto-semanaacademica/api';\nconst modoTeste = process.argv[2] !== 'real';\nconst env = { ...process.env, PORT: '3999' };\ndelete env.MODO_TESTE;\nif (modoTeste) env.MODO_TESTE = '1';\n\nconst p = spawn('npm', ['start'], { cwd: pasta, shell: true, env, stdio: ['ignore', 'pipe', 'pipe'] });\np.stdout.on('data', (d) => process.stdout.write('[api] ' + d));\np.stderr.on('data', (d) => process.stdout.write('[api:err] ' + d));\n\nsetTimeout(async () => {\n  try {\n    const r = await fetch('http://localhost:3999/_teste/reset', { method: 'POST' });\n    console.log('POST /_teste/reset', r.status);\n    const g = await fetch('http://localhost:3999/_teste/relogio');\n    console.log('GET /_teste/relogio', g.status, await g.text());\n  } finally {\n    execSync(process.platform === 'win32' ? `taskkill /pid ${p.pid} /T /F` : `kill ${p.pid}`);\n  }\n}, 3000);\n",
+       "filePath": "C:\\Users\\caiot\\AppData\\Local\\Temp\\claude\\C--dev-Atividade-Final-IA-projeto-semanaacademica\\b42172cd-7bb9-4106-b2a0-56a7e7374043\\scratchpad\\fumaca.mjs"
+      },
+      "time": {
+       "start": 1790116774759,
+       "end": 1790116774792
+      },
+      "output": "File created successfully at: C:\\Users\\caiot\\AppData\\Local\\Temp\\claude\\C--dev-Atividade-Final-IA-projeto-semanaacademica\\b42172cd-7bb9-4106-b2a0-56a7e7374043\\scratchpad\\fumaca.mjs (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01YMfv19H9reJVxN4znKVvFz",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "$s = \"C:\\Users\\caiot\\AppData\\Local\\Temp\\claude\\C--dev-Atividade-Final-IA-projeto-semanaacademica\\b42172cd-7bb9-4106-b2a0-56a7e7374043\\scratchpad\\fumaca.mjs\"; node $s; node $s real; Get-ChildItem api\\dados; git check-ignore -v api/dados/semana-academica.db",
+       "description": "Smoke-test npm start with and without test mode",
+       "timeout": 60000
+      },
+      "time": {
+       "start": 1790116776612,
+       "end": 1790116784737
+      },
+      "output": "(node:20340) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n[api] \n> start\n> node src/servidor.js\n\n[api] API da Semana Acadêmica na porta 3999 (modo de teste)\nPOST /_teste/reset 204\nGET /_teste/relogio 200 {\"agora\":\"2026-10-13T12:00:00.000Z\"}\n(node:22908) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n[api] \n> start\n> node src/servidor.js\n\n[api] API da Semana Acadêmica na porta 3999\nPOST /_teste/reset 404\nGET /_teste/relogio 404 {\"erro\":\"NAO_ENCONTRADO\",\"mensagem\":\"GET /_teste/relogio não existe\"}\n\r\n\r\n    Diretório: C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\dados\r\n\r\n\r\nMode                 LastWriteTime         Length Name                                                                 \r\n----                 -------------         ------ ----                                                                 \r\n-a----        22/09/2026     19:39          20480 semana-academica.db                                                  \r\n.gitignore:23:api/dados/\tapi/dados/semana-academica.db",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 965,
+      "reasoning": 0,
+      "cache": {
+       "read": 81256,
+       "write": 963
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116787557
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Both modes behave per the contract, and the database file is ignored by git. Final run of the full suite:",
+     "time": {
+      "start": 1790116787559
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_013FKKhQyPtt4odqyTQpRxuH",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd api; npm test 2>&1 | Select-String -Pattern \"^ℹ (tests|suites|pass|fail)\"",
+       "description": "Run full API test suite",
+       "timeout": 60000
+      },
+      "time": {
+       "start": 1790116788353,
+       "end": 1790116790584
+      },
+      "output": "ℹ tests 11\r\nℹ suites 2\r\nℹ pass 11\r\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 330,
+      "reasoning": 0,
+      "cache": {
+       "read": 82219,
+       "write": 1682
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116799888
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "O esqueleto da API e o modo de teste estão prontos: a suíte final (`npm test`) deu **11 testes, 11 passando, 0 falhas**. Não fiz commit.\n\n**Como foi o TDD (skill tdd)**\n- **Reset:** o primeiro teste de `POST /_teste/reset` falhou antes de qualquer código porque o servidor não existia. Subi um Express vazio e ele passou a falhar pelo motivo certo (404 em vez de 204). Aí escrevi o código e ficou verde.\n- **Relógio depois do reset:** vermelho (404), depois verde.\n- **`PUT /_teste/relogio`:** ajusta o relógio e ele fica parado. Vermelho, depois verde.\n- **Corpo inválido no PUT → `422 DADOS_INVALIDOS`:** 4 casos (JSON quebrado, sem `agora`, número, texto que não é data). Vermelho (400/500/200), depois verde. Essa regra vem da seção 1 do contrato.\n- **Testes que já passaram na primeira execução:**\n  - \"o reset devolve o relógio ao instante inicial depois de um PUT\": o reset já fazia isso desde a fatia do relógio.\n  - \"sem `MODO_TESTE`, `/_teste/*` responde 404\": as rotas já só eram montadas no modo de teste.\n\n  Para provar que esses testes de 404 conseguem falhar, montei as rotas sempre, vi 3 falhas e desfiz a mudança.\n\n**Estrutura**\n- `api/src/servidor.js` lê `PORT` (padrão 3000) e `MODO_TESTE`.\n- `api/src/app.js` monta a aplicação; `api/src/erros.js` tem o formato de erro `{erro, mensagem}` e o 404 `NAO_ENCONTRADO`.\n- `api/src/relogio.js`: no modo de teste o relógio começa em `2026-10-13T09:00:00-03:00` e só muda por PUT; fora dele, é a hora real.\n- `api/src/banco.js` usa `node:sqlite` em `api/dados/semana-academica.db`. Carrega os dados iniciais na primeira subida e a cada reset.\n- `api/src/dados-iniciais.js` tem os dados da seção 4: evento, 10 usuários e 4 salas.\n- `api/test/modo-teste.test.js` são os testes. O auxiliar `api/test/apoio/api.js` sobe `src/servidor.js` num processo filho e passa `MODO_TESTE=1`, `PORT` livre e um banco temporário pelo `env` desse processo. Nenhuma variável vai na linha de comando e o banco de desenvolvimento não é tocado.\n\n**Os comandos funcionam no Linux e no Windows**\n- `npm start` é `node src/servidor.js`.\n- `npm test` é `node --test test/*.test.js`. O próprio Node expande esse padrão, então funciona igual nos dois sistemas. O padrão também evita que `node --test` rode o arquivo auxiliar como se fosse teste.\n- `package.json` exige Node >=22.13 (versão em que `node:sqlite` deixou de exigir flag).\n\n**`projeto.json` e `.gitignore`**\n- O `projeto.json` está preenchido conforme a seção 2, com `\"testes\": [\"npm test\"]`. Quando a interface existir, falta acrescentar `npx vitest run`.\n- No `.gitignore`, o `*.db` que já existia cobria o arquivo; mesmo assim acrescentei `api/dados/` de forma explícita. Conferi com `git check-ignore`.\n\n**Rodei `npm start` como o juiz roda:**\n- **Com `MODO_TESTE=1`:** reset deu 204 e o relógio `2026-10-13T12:00:00.000Z` (o mesmo instante).\n- **Sem `MODO_TESTE`:** as rotas `/_teste/*` deram 404.\n\n**O que ainda não tem teste**\n- **Dados iniciais:** estão implementados, mas nenhum teste confirma que foram carregados. Pela API só daria para ver isso por `GET /salas` ou pelo 401 com `X-Usuario`, e as duas coisas pertencem aos módulos, que ficaram de fora como pedido. O primeiro teste de M1 deve conferir as 4 salas depois do reset.\n- **Relógio real fora do modo de teste:** também não tem teste, pelo mesmo motivo (nenhuma rota fora de `/_teste` mostra a hora).",
+     "time": {
+      "start": 1790116805732
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1606,
+      "reasoning": 0,
+      "cache": {
+       "read": 83901,
+       "write": 465
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

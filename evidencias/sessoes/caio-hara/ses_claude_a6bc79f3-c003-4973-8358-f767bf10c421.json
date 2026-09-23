@@ -1,0 +1,273 @@
+{
+ "info": {
+  "id": "ses_claude_a6bc79f3-c003-4973-8358-f767bf10c421",
+  "title": "Claude Code agent adaptation",
+  "directory": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica",
+  "time": {
+   "created": 1790116190607,
+   "updated": 1790116238057
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790116190599
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "/clear",
+     "time": {
+      "start": 1790116190599
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790116198616
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"f6ee\">\nAdapte .claude/skills/novo-subagente/SKILL.md para o Claude Code: o subagente\né criado em .claude/agents/<nome>.md com frontmatter name, description e tools\n(lista do Claude Code: Read, Grep, Glob, Bash, Write, Edit...), e uma cópia\nequivalente no formato OpenCode em .opencode/agent/<nome>.md para a entrega.\nPara revisor só-leitura, tools: Read, Grep, Glob (Bash só se precisar rodar algo).\nNão mexa em .opencode/skills/.\n</pasted_content id=\"f6ee\">\n",
+     "time": {
+      "start": 1790116198616
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116202430
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Kd23LVaxeuFWWsX8eyH444",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/dev/Atividade Final IA/projeto-semanaacademica\" && cat .claude/skills/novo-subagente/SKILL.md; echo ----; ls -R .claude .opencode 2>/dev/null | head -50",
+       "description": "Read skill file and list config dirs"
+      },
+      "time": {
+       "start": 1790116203487,
+       "end": 1790116203668
+      },
+      "output": "---\r\nname: novo-subagente\r\ndescription: Cria um subagente do OpenCode em .opencode/agent/<nome>.md — frontmatter, ferramentas permitidas e prompt. Use quando pedirem para criar um agente, um subagente, um revisor, um auditor, ou \"um agente que faz X\".\r\n---\r\n\r\n# Subagente novo\r\n\r\nUm subagente é um markdown. Frontmatter em cima, prompt embaixo. Não tem mais nada.\r\n\r\nEle existe para fazer **uma** coisa que o agente principal não deveria fazer sozinho —\r\nnormalmente porque quem escreveu o código não é quem deve assinar o aceite dele.\r\n\r\n## Onde mora\r\n\r\n```\r\n.opencode/agent/<nome>.md\r\n```\r\n\r\nO nome do arquivo é como você chama: `@<nome>` no chat.\r\n\r\n## As cinco regras\r\n\r\n**1. `mode: subagent`.**\r\n\r\n```yaml\r\nmode: subagent\r\n```\r\n\r\n`primary` é agente principal (aparece no seletor). `subagent` só roda quando alguém\r\nchama. Para um revisor, é sempre `subagent`.\r\n\r\n**2. O contexto dele é vazio.**\r\n\r\nO subagente **não vê a conversa** que você teve com o agente principal. Ele recebe só o\r\npedido que foi mandado para ele, mais o que ele mesmo ler do disco.\r\n\r\nIsso é a vantagem — ele não herda as justificativas de quem escreveu o código — e é a\r\nobrigação: o prompt precisa dizer **onde achar** o que ele precisa ler. Não escreva\r\n\"analise o que discutimos\". Ele não estava lá.\r\n\r\n**3. `tools:` é o contrato de poder, e é o campo mais importante.**\r\n\r\n```yaml\r\ntools:\r\n  write: false     # não cria arquivo\r\n  edit: false      # não altera arquivo\r\n  task: false      # não abre outro subagente\r\n  bash: true       # mas roda a suíte\r\n  read: true\r\n  grep: true\r\n  glob: true\r\n```\r\n\r\nUm auditor com `write: true` conserta o que encontrou, e você perde o achado — o\r\nrelatório vira \"estava tudo bem depois que eu ajustei\". Tire a ferramenta, não peça\r\neducadamente no prompt.\r\n\r\n`task: false` também importa aqui: sem isso, um subagente pode abrir outros e estourar\r\no limite de requisições por minuto da conta.\r\n\r\n**4. `description` é o gatilho.**\r\n\r\nTerceira pessoa, dizendo **o que faz** e **quando usar**, com as palavras que a pessoa\r\nrealmente vai digitar. É por essa frase que o agente principal decide chamar.\r\n\r\nRuim: `description: Um agente auditor.`\r\nBom: `description: Audita uma entrega contra a spec e aponta regra sem teste. Use quando o agente principal declarar que terminou.`\r\n\r\n**5. Campo com nome errado não dá erro.**\r\n\r\nFrontmatter aceito: `name, model, description, mode, hidden, color, temperature, top_p,\r\npermission, tools, steps, options, disable`. Qualquer outro é **silenciosamente\r\nignorado** — some dentro de `options` e o agente roda como se você não tivesse escrito\r\nnada. Escreveu `tool:` no lugar de `tools:`? O agente ganha permissão de escrita e você\r\nsó descobre quando ele reescrever seu código.\r\n\r\nPor isso a conferência da regra 6 não é opcional.\r\n\r\n**6. Confira sem gastar token.**\r\n\r\n```\r\nopencode debug agent <nome>\r\n```\r\n\r\nMostra a configuração já resolvida: o `mode`, o `temperature` e a lista de `tools` com\r\n`true`/`false`. Se `write` aparece `true` no que você quis bloquear, o frontmatter está\r\nerrado.\r\n\r\nConfig só é lida na inicialização: **saia e reabra o opencode** depois de criar o\r\narquivo, senão o agente não existe.\r\n\r\n## O corpo é o prompt\r\n\r\nQuatro seções, nesta ordem:\r\n\r\n```\r\n1. Quem ele é e por que não é você     (uma frase, não um cargo inventado)\r\n2. Entrada                              onde achar o que ele precisa ler,\r\n                                        e o que fazer se não achar\r\n3. Procedimento                         passos numerados, verbo no imperativo\r\n4. Formato da saída                     o desenho exato do relatório\r\n5. O que ele não faz                    a lista de proibições\r\n```\r\n\r\nA seção 5 é a que mais economiza tempo depois. \"Não elogie\", \"não conserte\", \"não\r\npresuma\", \"cite `arquivo:linha`\". Sem ela, a saída vem cheia de \"excelente\r\nimplementação!\" e nenhum achado.\r\n\r\n## Checklist\r\n\r\n```\r\n1. .opencode/agent/<nome>.md, nome do arquivo = como vai ser chamado\r\n2. mode: subagent\r\n3. tools: só o que ele precisa; write e edit false para quem opina\r\n4. task: false\r\n5. description em terceira pessoa, com o quando\r\n6. prompt não cita a conversa — diz onde ler\r\n7. opencode debug agent <nome> mostra as ferramentas como você quis\r\n8. opencode reiniciado\r\n```\r\n----\n.claude:\nagents\nskills\n\n.claude/agents:\nauditor.md\n\n.claude/skills:\ngrilling\nnovo-subagente\ntdd\nto-spec\n\n.claude/skills/grilling:\nSKILL.md\n\n.claude/skills/novo-subagente:\nSKILL.md\n\n.claude/skills/tdd:\nSKILL.md\n\n.claude/skills/to-spec:\nSKILL.md\n\n.opencode:\nagent\nskills\n\n.opencode/agent:\nauditor.md\n\n.opencode/skills:\ngrilling\nnovo-subagente\ntdd\nto-spec\n\n.opencode/skills/grilling:\nSKILL.md\n\n.opencode/skills/novo-subagente:\nSKILL.md\n\n.opencode/skills/tdd:\nSKILL.md\n\n.opencode/skills/to-spec:\nSKILL.md",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 378,
+      "reasoning": 0,
+      "cache": {
+       "read": 31242,
+       "write": 14278
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116205934
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vou ver o auditor existente nos dois formatos para manter o padrão.",
+     "time": {
+      "start": 1790116205934
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_016Sgo7sJ5j6yebcLUgEVXq7",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/dev/Atividade Final IA/projeto-semanaacademica\" && head -20 .claude/agents/auditor.md; echo ----; head -20 .opencode/agent/auditor.md",
+       "description": "Show frontmatter of existing auditor agents"
+      },
+      "time": {
+       "start": 1790116206824,
+       "end": 1790116206977
+      },
+      "output": "---\nname: auditor\ndescription: Audita um módulo da Semana Acadêmica contra a spec — para cada regra, confere se ela nasceu de uma pergunta da entrevista e se existe um teste que a comprove, e aponta o que ficou sem prova ou sem origem. Não conserta nada. Use quando pedirem para auditar um módulo ou quando a implementação de uma fatia estiver verde.\ntools: Read, Grep, Glob, Bash\n---\n\n# Auditor de módulo\n\nVocê audita o trabalho de outro agente. Você **não escreveu** este código, não participou da entrevista e não vai consertar nada. Seu único produto é um parecer.\n\nQuem escreveu não pode assinar o próprio aceite. É para isso que você existe.\n\n## Entrada\n\nVocê recebe um módulo (M1 a M5) ou o caminho de uma spec. A partir da raiz do repositório, leia:\n\n- a spec do módulo, em `specs/Mx-*.md`;\n- a entrevista do módulo, em `entrevistas/Mx-*.md` — a tabela `# | Pergunta | Resposta | Fonte`;\n- o `projeto.json`: a pasta da API em `api.pasta` e os comandos de teste em `testes`;\n- os testes do projeto, na stack que o grupo escolheu.\n----\n---\r\ndescription: Audita um módulo da Semana Acadêmica contra a spec — para cada regra, confere se ela nasceu de uma pergunta da entrevista e se existe um teste que a comprove, e aponta o que ficou sem prova ou sem origem. Não conserta nada. Use quando pedirem para auditar um módulo ou quando a implementação de uma fatia estiver verde.\r\nmode: subagent\r\ntemperature: 0.1\r\ntools:\r\n  write: false\r\n  edit: false\r\n  patch: false\r\n  task: false\r\n  bash: true\r\n  read: true\r\n  grep: true\r\n  glob: true\r\n---\r\n\r\n# Auditor de módulo\r\n\r\nVocê audita o trabalho de outro agente. Você **não escreveu** este código, não participou da entrevista e não vai consertar nada. Seu único produto é um parecer.\r\n\r\nQuem escreveu não pode assinar o próprio aceite. É para isso que você existe.",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 177,
+      "reasoning": 0,
+      "cache": {
+       "read": 45520,
+       "write": 2363
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116227636
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01JeZDhbnoX5CDTKZcTeJKZ8",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "---\nname: novo-subagente\ndescription: Cria um subagente do Claude Code em .claude/agents/<nome>.md — frontmatter, ferramentas permitidas e prompt — e a cópia equivalente no formato OpenCode em .opencode/agent/<nome>.md para a entrega. Use quando pedirem para criar um agente, um subagente, um revisor, um auditor, ou \"um agente que faz X\".\n---\n\n# Subagente novo\n\nUm subagente é um markdown. Frontmatter em cima, prompt embaixo. Não tem mais nada.\n\nEle existe para fazer **uma** coisa que o agente principal não deveria fazer sozinho —\nnormalmente porque quem escreveu o código não é quem deve assinar o aceite dele.\n\n## Onde mora\n\nSão **dois arquivos** com o mesmo nome e o mesmo prompt:\n\n```\n.claude/agents/<nome>.md      ← o que o Claude Code usa\n.opencode/agent/<nome>.md     ← cópia equivalente, exigida na entrega\n```\n\nO `name` do frontmatter é como você chama no Claude Code: \"use o subagente `<nome>`\"\n(ou `@<nome>`). No OpenCode, o nome do arquivo é o nome do agente: `@<nome>`.\n\nO corpo (o prompt) é **idêntico** nos dois. Só o frontmatter muda de formato.\nMudou um, mude o outro no mesmo commit.\n\n## As seis regras\n\n**1. O contexto dele é vazio.**\n\nO subagente **não vê a conversa** que você teve com o agente principal. Ele recebe só o\npedido que foi mandado para ele, mais o que ele mesmo ler do disco.\n\nIsso é a vantagem — ele não herda as justificativas de quem escreveu o código — e é a\nobrigação: o prompt precisa dizer **onde achar** o que ele precisa ler. Não escreva\n\"analise o que discutimos\". Ele não estava lá.\n\n**2. `tools:` é o contrato de poder, e é o campo mais importante.**\n\nNo Claude Code, `tools` é uma lista separada por vírgula com os nomes das ferramentas\n(`Read, Grep, Glob, Bash, Write, Edit, ...`). Só o que está listado fica disponível.\n\nRevisor/auditor só-leitura:\n\n```yaml\ntools: Read, Grep, Glob\n```\n\nSe ele precisa rodar a suíte de testes, acrescente `Bash` — e só nesse caso:\n\n```yaml\ntools: Read, Grep, Glob, Bash\n```\n\nUm auditor com `Write` ou `Edit` conserta o que encontrou, e você perde o achado — o\nrelatório vira \"estava tudo bem depois que eu ajustei\". Tire a ferramenta, não peça\neducadamente no prompt.\n\n**Omitir `tools:` não é \"nenhuma ferramenta\" — é herdar todas**, inclusive `Write`,\n`Edit` e `Agent`. Sempre escreva a lista.\n\nNão inclua `Agent`: sem ele, o subagente não abre outros subagentes e não estoura o\nlimite de requisições por minuto da conta.\n\n**3. `description` é o gatilho.**\n\nTerceira pessoa, dizendo **o que faz** e **quando usar**, com as palavras que a pessoa\nrealmente vai digitar. É por essa frase que o agente principal decide chamar.\n\nRuim: `description: Um agente auditor.`\nBom: `description: Audita uma entrega contra a spec e aponta regra sem teste. Use quando o agente principal declarar que terminou.`\n\nA mesma `description`, palavra por palavra, vai nos dois arquivos.\n\n**4. Campo com nome errado não dá erro.**\n\nFrontmatter do Claude Code: `name` e `description` são obrigatórios; `tools` e `model`\nsão opcionais. Qualquer outro campo é ignorado sem aviso. Escreveu `tool:` no lugar de\n`tools:`? O campo some, o agente herda todas as ferramentas e você só descobre quando\nele reescrever seu código.\n\nNome de ferramenta também é exato e com maiúscula: `Read`, não `read`.\n\n**5. Confira sem gastar token.**\n\nRode `/agents` no Claude Code: lista os subagentes carregados e as ferramentas de cada\num. Se `Write` ou `Edit` aparece no que você quis bloquear, o frontmatter está errado.\n\nArquivo criado com a sessão aberta pode não ser visto até reiniciar: se o agente não\naparece em `/agents`, **saia e reabra o Claude Code**.\n\n**6. A cópia OpenCode é tradução, não reinvenção.**\n\nMesmo corpo, mesma `description`, frontmatter no formato do OpenCode:\n\n```yaml\n---\ndescription: <a mesma do .claude/agents/<nome>.md>\nmode: subagent\ntemperature: 0.1\ntools:\n  write: false\n  edit: false\n  patch: false\n  task: false\n  bash: false     # true só se no Claude Code tiver Bash\n  read: true\n  grep: true\n  glob: true\n---\n```\n\nTradução das ferramentas:\n\n| Claude Code (`tools:` lista) | OpenCode (`tools:` mapa) |\n|---|---|\n| `Read` | `read: true` |\n| `Grep` | `grep: true` |\n| `Glob` | `glob: true` |\n| `Bash` | `bash: true` |\n| `Write` | `write: true` |\n| `Edit` | `edit: true`, `patch: true` |\n| `Agent` | `task: true` |\n\nO que **não** está na lista do Claude Code vira `false` explícito no OpenCode — no\nOpenCode, ferramenta não mencionada fica liberada. `mode: subagent` sempre.\n\nNo OpenCode não existe campo `name`: o nome vem do arquivo.\n\n## O corpo é o prompt\n\nCinco seções, nesta ordem:\n\n```\n1. Quem ele é e por que não é você     (uma frase, não um cargo inventado)\n2. Entrada                              onde achar o que ele precisa ler,\n                                        e o que fazer se não achar\n3. Procedimento                         passos numerados, verbo no imperativo\n4. Formato da saída                     o desenho exato do relatório\n5. O que ele não faz                    a lista de proibições\n```\n\nA seção 5 é a que mais economiza tempo depois. \"Não elogie\", \"não conserte\", \"não\npresuma\", \"cite `arquivo:linha`\". Sem ela, a saída vem cheia de \"excelente\nimplementação!\" e nenhum achado.\n\n## Checklist\n\n```\n1. .claude/agents/<nome>.md com name = <nome>\n2. tools: lista explícita; para quem opina, sem Write, Edit nem Agent\n   (Read, Grep, Glob; + Bash só se precisar rodar algo)\n3. description em terceira pessoa, com o quando\n4. prompt não cita a conversa — diz onde ler\n5. .opencode/agent/<nome>.md com o mesmo corpo e a mesma description,\n   mode: subagent, tools traduzidas pela tabela, o resto false\n6. /agents mostra o agente com as ferramentas que você quis\n7. Claude Code reiniciado se o agente não apareceu\n```\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.claude\\skills\\novo-subagente\\SKILL.md"
+      },
+      "time": {
+       "start": 1790116227636,
+       "end": 1790116228571
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.claude\\skills\\novo-subagente\\SKILL.md has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2599,
+      "reasoning": 0,
+      "cache": {
+       "read": 47883,
+       "write": 952
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116230005
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_014DECuiUiz6MXadpUDuU5Xq",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:/dev/Atividade Final IA/projeto-semanaacademica\" && git status --short",
+       "description": "Confirm only the intended file changed"
+      },
+      "time": {
+       "start": 1790116230282,
+       "end": 1790116230597
+      },
+      "output": "?? .claude/",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 138,
+      "reasoning": 0,
+      "cache": {
+       "read": 48835,
+       "write": 2701
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790116238044
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Atualizei `.claude/skills/novo-subagente/SKILL.md`. Não mexi em `.opencode/skills/`: o `git status` não mostra nenhuma mudança em `.opencode/`.\n\n**O que mudou:**\n- **Os dois arquivos:** a skill agora cria `.claude/agents/<nome>.md` (frontmatter com `name`, `description` e `tools`) e, junto, `.opencode/agent/<nome>.md` com o mesmo prompt e a mesma `description`.\n- **`tools:` no formato do Claude Code:** virou uma lista separada por vírgula. Para um revisor só-leitura, fica `Read, Grep, Glob`, e o `Bash` só entra se ele precisar rodar a suíte de testes. Acrescentei alguns avisos:\n  - Se `tools:` for omitido, o agente recebe todas as ferramentas.\n  - Os nomes das ferramentas precisam ter maiúscula exata (`Read`, não `read`).\n  - Não coloque `Agent`, que corresponde ao `task` do OpenCode.\n- **Tabela de tradução:** mostra o nome de cada ferramenta nos dois formatos (`Edit` vira `edit` + `patch`, `Agent` vira `task`, e assim por diante). Toda ferramenta que não estiver na lista do Claude Code vira `false` explícito no OpenCode, sempre com `mode: subagent`. Usei o `auditor.md` que já existe como modelo.\n- **Conferência:** o `opencode debug agent` foi trocado por `/agents` no Claude Code.\n- **Checklist:** foi reescrito para cobrir os dois arquivos.\n\nAproveitei para corrigir o texto \"Quatro seções\" para \"Cinco seções\", porque a lista abaixo dele sempre teve cinco itens.\n\nTodo o `.claude/` ainda está fora do controle de versão (untracked), então essa mudança não entrou em nenhum commit.",
+     "time": {
+      "start": 1790116238057
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 710,
+      "reasoning": 0,
+      "cache": {
+       "read": 51536,
+       "write": 173
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

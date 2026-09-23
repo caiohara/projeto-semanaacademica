@@ -1,0 +1,1802 @@
+{
+ "info": {
+  "id": "ses_claude_3df60618-0d8c-4a18-81b7-9479ac023128",
+  "title": "M3-presenca fatia 1",
+  "directory": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica",
+  "time": {
+   "created": 1790122638518,
+   "updated": 1790122917096
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790122638518
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"faf4\">\nUse a skill tdd. Implemente só a fatia 1 de specs/M3-presenca.md (código do\nencontro: R1, R2, R3, R6, R7, R8, R9, R12, R27). Critérios 1–7.\nEsta fatia depende só do M1 (encontros já existem no banco).\nUm teste por vez: escreva o teste, mostre ele falhando, e só então o código.\nArquivo de teste: api/test/m3-presenca.test.js.\nCada commit tem o número da regra: \"M3-R7: código gerado por HMAC\".\nO relógio é sempre PUT /_teste/relogio, nunca Date.now().\n\nLembretes da spec:\n- R6: código de 6 caracteres, só maiúsculas e dígitos, sem 0 O 1 I L.\n- R7: HMAC do encontroId + índice da janela, contado a partir do epoch Unix\n  em janelas de 60 segundos. Não é gravado no banco.\n- R8: trocaEm = fim da janela atual; validoAte = fim da janela seguinte.\n- R9: segredo vem de SEGREDO_CODIGO; se ausente, usa valor fixo. Reset não\n  troca o segredo.\n- R12: atividade cancelada → ATIVIDADE_CANCELADA.\n- R27: precedência ao obter código: 401 → 403 → 404 → ATIVIDADE_CANCELADA\n  → FORA_DA_JANELA.\n\nSó passe para a regra seguinte com todos os testes anteriores verdes.\n</pasted_content id=\"faf4\">\n",
+     "time": {
+      "start": 1790122638518
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122640741
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "skill",
+     "callID": "toolu_01KiNWnVsDoVZSXtUSKcS376",
+     "state": {
+      "status": "completed",
+      "input": {
+       "skill": "tdd",
+       "args": "Fatia 1 de specs/M3-presenca.md (R1, R2, R3, R6, R7, R8, R9, R12, R27), critérios 1–7. Teste em api/test/m3-presenca.test.js.",
+       "name": "tdd"
+      },
+      "time": {
+       "start": 1790122641574,
+       "end": 1790122641592
+      },
+      "output": "Launching skill: tdd"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 166,
+      "reasoning": 0,
+      "cache": {
+       "read": 31242,
+       "write": 14665
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122644654
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01LtouEyVA3j3PbJ3xFuTf1u",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && cat specs/M3-presenca.md && ls -R api/src api/test && cat api/package.json"
+      },
+      "time": {
+       "start": 1790122644654,
+       "end": 1790122645552
+      },
+      "output": "# Spec — M3 Presença por QR\n\n> Origem: `entrevistas/M3-presenca.md` (rodadas 1 e 2 e rodada de revisão da spec, 2026-09-22).\n> Cada regra cita a pergunta que a originou (**P-xx**) e, quando houver, a regra do documento de requisitos (**RN-xxx**).\n> Rotas, campos e códigos de erro vêm de `contrato-api.md` §5 e §6 e não mudam.\n\n## 1. Objetivo\n\nA organização projeta, durante um encontro, um código de 6 caracteres que troca a cada minuto; o participante inscrito lê o código e registra a própria presença, inclusive sem internet (a leitura fica guardada com o instante `lidoEm` e é enviada depois). Quando o QR não resolve, a organização registra a presença manualmente, com justificativa e dentro de um limite. A organização lista quem esteve presente em cada encontro.\n\n## 2. Fora de escopo\n\nFonte: P-12 (RN-504, Seção 7).\n\n- Apagar presença.\n- Corrigir presença já gravada.\n- Organização registrar presença por QR em nome de alguém.\n- Participante listar o próprio histórico de presenças.\n- Calcular frequência por encontro ou média da atividade — é do M5.\n- Presença de quem se inscreveu depois do encontro — ver R30 (sujeito à spec do M2).\n- Linhas de ausentes na lista de presenças (P-15).\n\n## 3. Modelo\n\n### Presenca (gravada)\n\n| Campo | Tipo | Origem |\n|---|---|---|\n| `id` | string `pre_` + 8 hex minúsculos | calculado (contrato §1) |\n| `encontroId` | string `enc_…` | rota (`:id`); o encontro vem do M1 |\n| `participanteId` | string | QR: quem chama (`X-Usuario`); manual: corpo |\n| `origem` | `\"qr\"` \\| `\"qr_offline\"` \\| `\"manual\"` | calculado (R16, R25) |\n| `lidoEm` | instante | calculado ou informado pelo cliente (R25) |\n| `registradaEm` | instante | calculado: relógio (R25) |\n| `justificativa` | string \\| `null` | informado pelo cliente; texto só quando `manual` |\n\n- Índice único (`encontroId`, `participanteId`) (P-23).\n- Instantes respondidos em `-03:00` (mesma decisão do M1 P-20).\n\n### CodigoDoEncontro (derivado, nunca gravado — P-17)\n\n| Campo | Tipo | Origem |\n|---|---|---|\n| `encontroId` | string | rota |\n| `codigo` | string, 6 caracteres | derivado (R6, R7) |\n| `trocaEm` | instante | derivado (R8) |\n| `validoAte` | instante | derivado (R8) |\n\n### Termos\n\n- **Janela de presença** do encontro: de `inicio − 15 min` até `fim + 30 min`, limites inclusivos (R2).\n- **Minuto** (índice da janela do código): intervalo de 1 minuto alinhado ao relógio, segundos 00–59, contado a partir do epoch Unix (R7).\n- **Instante de referência**: `lidoEm` quando enviado; senão, o relógio (R10, R16).\n- **Inscrito**: tem inscrição com status `confirmada` na atividade dona do encontro (R13).\n\n## 4. Endpoints\n\n| Método | Caminho | Quem | Corpo | Sucesso |\n|---|---|---|---|---|\n| GET | `/encontros/:id/codigo` | organização | — | 200 `CodigoDoEncontro` |\n| POST | `/encontros/:id/presencas` | participante | `{ \"codigo\": string, \"lidoEm\"?: instante }` | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\n| POST | `/encontros/:id/presencas/manual` | organização | `{ \"participanteId\": string, \"justificativa\": string }` | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\n| GET | `/encontros/:id/presencas` | organização | — | 200 `[Presenca]` |\n\nTodas: sem `X-Usuario` ou id desconhecido → 401 `USUARIO_DESCONHECIDO`; perfil errado → 403 `SOMENTE_ORGANIZACAO` / `SOMENTE_PARTICIPANTE`; encontro inexistente → 404 `NAO_ENCONTRADO` (contrato §1).\n\n## 5. Regras\n\n### Autoria\n\n- **R1** — Qualquer pessoa da organização obtém o código, registra presença manual e lista presenças de **qualquer** encontro, não só de atividades que criou. (P-18)\n\n### Janela de presença\n\n- **R2** — A janela de presença de um encontro vai de `inicio − 15 min` até `fim + 30 min`, com os dois limites inclusivos. (P-01; RN-301, RN-302)\n- **R3** — Obter código com o relógio fora da janela de presença (R2) → 422 `FORA_DA_JANELA`. (P-01; RN-302)\n- **R4** — Presença por QR sem `lidoEm` com o relógio fora da janela de presença (R2) → 422 `FORA_DA_JANELA`. (P-01)\n- **R5** — Presença manual é aceita com o relógio de `inicio − 15 min` até `fim + 2 h`, com os dois limites inclusivos: o instante exato `fim + 2 h` ainda é aceito, mesma regra da janela de presença. Fora disso → 422 `FORA_DA_JANELA`. (P-01; RN-310, RN-312, Regras Gerais Seção 5)\n\n### Código\n\n- **R6** — O código tem 6 caracteres, só letras maiúsculas e dígitos, sem `0`, `O`, `1`, `I`, `L`. (P-03)\n- **R7** — O código é derivado, não gravado: HMAC de `encontroId` + índice do minuto, com segredo, convertido para o alfabeto da R6. Minutos contados a partir do epoch Unix, alinhados ao relógio (segundos 00–59), não ao `inicio` do encontro. Duas chamadas no mesmo minuto devolvem o mesmo código. (P-02, P-17, P-25; RN-303)\n- **R8** — Para o código do minuto que começa em `M`: `trocaEm = M + 1 min` (fim do minuto do código) e `validoAte = M + 2 min` (primeiro instante em que deixa de ser aceito, já que o código do minuto anterior ainda vale — R10). (P-02; RN-303, RN-304; contrato §5)\n- **R9** — O segredo do HMAC vem da variável de ambiente `SEGREDO_CODIGO`; sem ela, usa um valor fixo no código. `POST /_teste/reset` não troca o segredo. (P-22)\n- **R10** — Um código é aceito se for igual ao código daquele encontro no minuto do instante de referência ou no minuto anterior. Qualquer outro — inexistente, de outro encontro, expirado ou de minuto futuro — → 422 `CODIGO_INVALIDO`. (P-02, P-04; RN-304)\n- **R11** — O código recebido só é convertido para maiúsculas antes da comparação. Tamanho ≠ 6, caractere fora do alfabeto da R6, espaço nas pontas, hífen ou qualquer outro desvio → 422 `CODIGO_INVALIDO` (não `DADOS_INVALIDOS`). (P-03, P-13, P-20)\n- **R12** — Obter código de encontro de atividade cancelada → 422 `ATIVIDADE_CANCELADA`. (P-10; RN-302)\n\n### Inscrição\n\n- **R13** — Só inscrição com status `confirmada` na atividade dona do encontro permite registrar presença, por QR ou manual. `convocada`, `em_espera`, `cancelada`, `expirada` ou nenhuma inscrição → 403 `NAO_INSCRITO`. (P-05; RN-306)\n- **R14** — Presença por QR ou manual em encontro de atividade cancelada → 403 `NAO_INSCRITO` (o cancelamento da atividade cancela as inscrições). (P-10; RN-217, RN-314)\n- **R15** — Presença manual com `participanteId` de alguém da organização → 403 `NAO_INSCRITO`. (P-14)\n\n### Leitura offline (`lidoEm`)\n\n- **R16** — Todo envio por QR com `lidoEm` grava `origem: \"qr_offline\"`, mesmo que `lidoEm` seja igual ao relógio. A janela de presença (R2) e o código (R10) são conferidos com `lidoEm`, não com o relógio; fora da janela → 422 `FORA_DA_JANELA`. (P-06; RN-308, RN-310)\n- **R17** — Envio com `lidoEm` é aceito com o relógio até `fim + 2 h` do encontro, limite inclusivo: o instante exato `fim + 2 h` ainda é aceito, mesma regra da janela de presença (P-01). Depois disso → 422 `SINCRONIZACAO_TARDIA`. (P-01, P-06; RN-310)\n- **R18** — `lidoEm` posterior ao relógio → 422 `DADOS_INVALIDOS`. (P-06, P-11)\n- **R19** — `lidoEm` é aceito e guardado com a precisão enviada (segundos, milissegundos); as comparações de prazo usam o instante completo. (P-21)\n\n### Corpo\n\n- **R20** — QR: `codigo` ausente ou não-string → 422 `DADOS_INVALIDOS`. `lidoEm` presente e não ISO 8601 com fuso → 422 `DADOS_INVALIDOS`. `lidoEm: null` → 422 `DADOS_INVALIDOS` (não equivale a ausente). Campo desconhecido no corpo → 422 `DADOS_INVALIDOS`. (P-13, P-19)\n- **R21** — Manual: `participanteId` ausente, não-string ou inexistente → 422 `DADOS_INVALIDOS`. `justificativa` presente e não-string → 422 `DADOS_INVALIDOS`. Campo desconhecido no corpo → 422 `DADOS_INVALIDOS`, mesmo comportamento do QR (R20). (P-14, P-26)\n- **R22** — Manual: `justificativa` precisa ter pelo menos 10 caracteres depois do trim. Ausente, vazia, só espaços ou com menos de 10 caracteres → 422 `JUSTIFICATIVA_OBRIGATORIA`. (P-09; RN-311, RN-314)\n\n### Limite de manuais\n\n- **R23** — Por encontro, o número de presenças `manual` não passa de `⌈10% × inscrições confirmadas da atividade⌉`. A manual que passaria desse número → 422 `LIMITE_DE_MANUAIS`. Repetir uma manual já gravada não gasta o limite (R24 vem antes). (P-08; RN-313, RN-314)\n\n### Presença repetida\n\n- **R24** — Há no máximo uma presença por (`encontroId`, `participanteId`). Registrar de novo — por qualquer rota e origem — devolve 200 com a presença já gravada, sem alteração: manual não substitui QR, QR não substitui manual, offline não substitui online nem o contrário. (P-07, P-23; RN-307, RN-314)\n\n### Saída\n\n- **R25** — Valores gravados: QR sem `lidoEm` → `origem: \"qr\"`, `lidoEm = registradaEm = relógio`, `justificativa: null`. QR com `lidoEm` → `origem: \"qr_offline\"`, `lidoEm` = o enviado, `registradaEm = relógio`, `justificativa: null`. Manual → `origem: \"manual\"`, `lidoEm = registradaEm = relógio`, `justificativa` = o texto exatamente como veio, sem trim; o trim serve só para validar o mínimo da R22 e não altera o valor guardado. (P-06, P-16, P-27)\n- **R26** — `GET /encontros/:id/presencas` lista só quem tem presença registrada no encontro, em ordem crescente de `lidoEm`; empate pelo `id`. Encontro existente sem presenças → 200 `[]`. (P-15)\n\n### Precedência\n\n- **R27** — Obter código: 401 → 403 → 404 → `ATIVIDADE_CANCELADA` (R12) → `FORA_DA_JANELA` (R3). (P-11a)\n- **R28** — QR: 401 → 403 → 404 → 422 `DADOS_INVALIDOS` (R18, R20) → presença existente, 200 (R24) → `NAO_INSCRITO` (R13, R14) → `SINCRONIZACAO_TARDIA` (R17) → `FORA_DA_JANELA` (R4, R16) → `CODIGO_INVALIDO` (R10, R11). Código malformado cai no último passo; repetir presença com `lidoEm` no futuro devolve 422, não 200. (P-07, P-11b, P-13; RN-302, RN-314)\n- **R29** — Manual: 401 → 403 → 404 → 422 `DADOS_INVALIDOS` (R21) → `JUSTIFICATIVA_OBRIGATORIA` (R22) → presença existente, 200 (R24) → `NAO_INSCRITO` (R13, R14, R15) → `FORA_DA_JANELA` (R5) → `LIMITE_DE_MANUAIS` (R23). (P-07, P-08, P-11c; RN-314)\n\n### Dependências do M2\n\n- **R30** — O M3 não trata presença de quem se inscreveu depois do encontro: o M2 não permite inscrição em atividade encerrada. Sujeito à spec do M2. (P-12)\n- **R31** — Os testes do M3 montam o cenário (atividades, encontros e inscrições) pelas rotas públicas do M1 e do M2, sem inserir direto no banco; a implementação segue a ordem M1 → M2 → M3. Sujeito à spec do M2. (P-24)\n\n## 6. Critérios de aceite\n\n**Cenário base** (montado pelas rotas públicas — R31, sujeito à spec do M2): relógio no reset; `org-ana` cria a atividade **A** com o encontro **E** de `2026-10-19T19:00:00-03:00` a `2026-10-19T22:00:00-03:00` e a atividade **B**, em outra sala, com o encontro **F** no mesmo horário. `p-carla`, `p-diego` e `p-elisa` têm inscrição `confirmada` em A; `p-fabio` tem inscrição em A com status diferente de `confirmada`; `p-gabriela` não tem inscrição em A. Janela de presença de E: 18:45:00 a 22:30:00; limite de manual e de sincronização: 2026-10-20T00:00:00-03:00. Limite de manuais de E: ⌈10% × 3⌉ = 1. \"Código de E às hh:mm\" = `codigo` devolvido por `GET /encontros/E/codigo` com o relógio nesse minuto.\n\nObter código\n\n1. (R3, R2) Relógio 18:44:59.999 → `GET /encontros/E/codigo` → 422 `FORA_DA_JANELA`; 18:45:00 → 200; 22:30:00 → 200; 22:30:00.001 → 422 `FORA_DA_JANELA`.\n2. (R6, R7, R8) Relógio 19:00:30 → 200; `codigo` casa `^[A-HJKMNP-Z2-9]{6}$`, `trocaEm` = 19:01:00, `validoAte` = 19:02:00, instantes em `-03:00`. Nova chamada às 19:00:59 → mesmo `codigo`. Às 19:01:00 → `trocaEm` = 19:02:00.\n3. (R7) Com o relógio às 19:00:30, os códigos de E e de F são diferentes.\n4. (R1) `org-bruno`, que não criou A, obtém o código de E → 200.\n5. (R12, R27) Atividade A cancelada (pelo M1) e relógio 19:00:30 → 422 `ATIVIDADE_CANCELADA`; relógio fora da janela, A cancelada → 422 `ATIVIDADE_CANCELADA`.\n6. (contrato §1) `p-carla` → 403 `SOMENTE_ORGANIZACAO`; `enc_00000000` → 404 `NAO_ENCONTRADO`.\n7. (R9) Teste da função de código: mesmo `encontroId`, índice e segredo → mesmo código; segredos diferentes → códigos diferentes; sem `SEGREDO_CODIGO` usa o valor fixo; `POST /_teste/reset` não altera o segredo.\n\nPresença por QR (online)\n\n8. (R10, R25) Relógio 19:00:30, `p-carla` envia o código de E às 19:00 → 201; `origem: \"qr\"`, `lidoEm = registradaEm` = 19:00:30, `justificativa: null`, `id` casa `^pre_[0-9a-f]{8}$`.\n9. (R10, R8) Código de E às 19:00; relógio 19:01:59.999 → `p-diego` → 201. Relógio 19:02:00 → `p-elisa` com o mesmo código → 422 `CODIGO_INVALIDO`.\n10. (R10) Relógio 19:00:30, `p-carla` envia o código de F às 19:00 → 422 `CODIGO_INVALIDO`; envia `\"ZZZZZZ\"` (diferente dos códigos de E às 19:00 e 18:59) → 422 `CODIGO_INVALIDO`.\n11. (R11) Relógio 19:00:30: código de E às 19:00 em minúsculas → 201; o mesmo com espaço nas pontas, com hífen no meio (`\"K7M-2QX\"`), com 5 ou 7 caracteres, ou com `O` → 422 `CODIGO_INVALIDO`.\n12. (R4, R2) Relógio 18:44:59, `p-carla` envia o código de E às 18:44 → 422 `FORA_DA_JANELA`; relógio 22:30:00 com o código de E às 22:30 → 201.\n13. (R13) Relógio 19:00:30 com código válido: `p-fabio` → 403 `NAO_INSCRITO`; `p-gabriela` → 403 `NAO_INSCRITO`.\n14. (R14) A cancelada; relógio 19:00:30; `p-carla` envia qualquer código → 403 `NAO_INSCRITO`.\n15. (R24) `p-carla` já tem presença QR às 19:00:30; relógio 19:10:00, envia código válido → 200 com a presença idêntica à gravada (mesmo `id`, `lidoEm`, `registradaEm`, `origem`).\n16. (R24, R28) `p-carla` já tem presença; relógio 23:00:00 envia `\"ZZZZZZ\"` → 200 com a presença gravada (repetição vem antes de `FORA_DA_JANELA` e `CODIGO_INVALIDO`).\n17. (R20) `{}` → 422 `DADOS_INVALIDOS`; `{\"codigo\": 123}` → 422; `{\"codigo\": \"…\", \"lidoEm\": null}` → 422; `{\"codigo\": \"…\", \"lidoEm\": \"2026-10-19T19:00:00\"}` (sem fuso) → 422; `{\"codigo\": \"…\", \"extra\": 1}` → 422.\n18. (R28) `p-gabriela` (não inscrita), relógio 23:00:00, código `\"ZZZZZZ\"` → 403 `NAO_INSCRITO`. `p-carla`, relógio 23:00:00, sem presença, `\"ZZZZZZ\"` → 422 `FORA_DA_JANELA`.\n19. (contrato §1) `org-ana` → 403 `SOMENTE_PARTICIPANTE`; encontro inexistente → 404.\n\nPresença por QR (offline)\n\n20. (R16, R25) Código de E às 19:00; relógio 21:00:00; `p-carla` envia com `lidoEm` 19:00:45 → 201, `origem: \"qr_offline\"`, `lidoEm` = 19:00:45, `registradaEm` = 21:00:00.\n21. (R16) Relógio 19:00:30; `p-diego` envia código válido com `lidoEm` = 19:00:30 → 201 `origem: \"qr_offline\"`.\n22. (R16, R10) Código de E às 19:05; relógio 19:05:30; `p-carla` envia com `lidoEm` 19:03:10 → 422 `CODIGO_INVALIDO` (minuto futuro em relação a `lidoEm`).\n23. (R16, R2) Código de E às 22:30; relógio 22:40:00; `p-carla` envia com `lidoEm` 22:30:00 → 201; `p-diego` com `lidoEm` 22:30:00.001 → 422 `FORA_DA_JANELA`.\n24. (R17) Relógio 2026-10-20T00:00:00-03:00, `lidoEm` válido de 19:00:45 → 201; relógio 2026-10-20T00:00:00.001-03:00 → 422 `SINCRONIZACAO_TARDIA`.\n25. (R17, R28) Relógio depois de `fim + 2 h`, `lidoEm` fora da janela e código inválido → 422 `SINCRONIZACAO_TARDIA`.\n26. (R18, R28) Relógio 19:00:30, `lidoEm` 19:00:31 → 422 `DADOS_INVALIDOS`; o mesmo com `p-carla` já presente → 422 (não 200).\n27. (R19) `lidoEm` `2026-10-19T19:00:45.123-03:00` → a presença devolve esse instante com os milissegundos; relógio 2026-10-20T00:00:00.000-03:00 aceita, 00:00:00.001 recusa (critério 24).\n\nPresença manual\n\n28. (R5, R25, R1) Relógio 19:30:00, `org-bruno` envia `{participanteId: \"p-carla\", justificativa: \"Celular sem bateria\"}` → 201, `origem: \"manual\"`, `lidoEm = registradaEm` = 19:30:00, `justificativa` = a enviada.\n29. (R5) Relógio 18:44:59.999 → 422 `FORA_DA_JANELA`; 2026-10-20T00:00:00-03:00 → 201; 2026-10-20T00:00:00.001-03:00 → 422 `FORA_DA_JANELA`.\n30. (R22) `justificativa` ausente, `\"\"`, `\"          \"`, `\"  curta  \"` (9 chars após trim) → 422 `JUSTIFICATIVA_OBRIGATORIA`; `\"  0123456789  \"` → 201.\n30a. (R25, R22) A presença do critério 30 devolve `justificativa: \"  0123456789  \"`, com os espaços, e a lista (R26) devolve o mesmo texto.\n31. (R21) `participanteId` ausente, `42`, `\"p-naoexiste\"` → 422 `DADOS_INVALIDOS`; `justificativa: 5` → 422 `DADOS_INVALIDOS`; corpo válido com `\"extra\": 1` → 422 `DADOS_INVALIDOS`.\n32. (R15) `participanteId: \"org-bruno\"` com justificativa válida → 403 `NAO_INSCRITO`.\n33. (R13, R14) `p-fabio` → 403 `NAO_INSCRITO`; A cancelada, `p-carla` → 403 `NAO_INSCRITO`.\n34. (R23) Relógio 19:30:00: manual de `p-carla` → 201; manual de `p-diego` → 422 `LIMITE_DE_MANUAIS`. Com 1 inscrição confirmada, limite ⌈0,1⌉ = 1: a primeira manual → 201.\n35. (R23, R24) Depois do critério 34, repetir a manual de `p-carla` → 200 com a presença gravada, não `LIMITE_DE_MANUAIS`.\n36. (R24) `p-carla` com presença QR; manual para `p-carla` → 200 com a presença QR inalterada (`origem: \"qr\"`, `justificativa: null`). `p-diego` com manual; `p-diego` envia QR válido → 200 com a manual inalterada.\n37. (R29, R22, R24) `p-carla` já presente; manual sem justificativa → 422 `JUSTIFICATIVA_OBRIGATORIA` (não 200).\n38. (R29) `p-carla` já presente; relógio fora da janela da R5, justificativa válida → 200.\n39. (R29) `p-fabio` fora da janela → 403 `NAO_INSCRITO`; `p-elisa` fora da janela e limite esgotado → 422 `FORA_DA_JANELA`.\n40. (contrato §1) `p-carla` chamando a rota manual → 403 `SOMENTE_ORGANIZACAO`.\n\nListagem\n\n41. (R26) E sem presenças → 200 `[]`.\n42. (R26) Presenças de `p-diego` (`lidoEm` 19:10:00), `p-carla` offline (`lidoEm` 19:00:45) e `p-elisa` manual (19:30:00) → lista `[p-carla, p-diego, p-elisa]`; `p-fabio` e `p-gabriela` não aparecem.\n43. (R26) Duas presenças com o mesmo `lidoEm` → vêm em ordem crescente de `id`.\n44. (R26, R1) `org-bruno` lista E → 200; `p-carla` → 403 `SOMENTE_ORGANIZACAO`; encontro inexistente → 404.\n\nDependências do M2\n\n45. (R30) Sujeito à spec do M2: com A encerrada, a inscrição de `p-gabriela` em A é recusada pelo M2, logo não há como ela ter presença em E.\n46. (R31) Sujeito à spec do M2: todos os critérios acima montam inscrições por `POST /atividades/:id/inscricoes` (e demais rotas do M2), nunca por escrita direta no banco.\n\n## 7. Como isto será verificado\n\nCostura principal: **HTTP contra a API de verdade**, subida por `subirApi()` (`api/test/apoio/api.js`) com `MODO_TESTE=1`, banco em arquivo temporário e o relógio controlado por `PUT /_teste/relogio`. É a mesma costura do juiz e já existe; todos os critérios, exceto o 7, passam por ela, com `node --test`.\n\nO código não é previsível de fora (HMAC com segredo), então os testes nunca fixam um valor de `codigo`: sempre obtêm o código por `GET /encontros/:id/codigo` no minuto desejado e depois movem o relógio.\n\nÚnico ponto de teste novo: a **função que deriva o código** (critério 7, R9), porque o segredo e a sobrevivência ao reset não são observáveis por HTTP — o reset apaga as atividades e os encontros ganham ids novos.\n\nO cenário depende do M1 (atividades e encontros) e do M2 (inscrições): R31, sujeito à spec do M2.\n\n## 8. Fatias de entrega\n\n1. **Código do encontro** — R1, R2, R3, R6, R7, R8, R9, R12, R27. Critérios 1–7. Só depende do M1.\n2. **Presença por QR online** — R4, R10, R11, R13, R14, R24, R25 (parte QR), R28 (sem offline). Critérios 8–16, 18–19. Depende do M2.\n3. **Corpo do QR** — R20. Critério 17.\n4. **Listagem** — R26. Critérios 41–44.\n5. **Leitura offline** — R16, R17, R18, R19, R28 completa. Critérios 20–27.\n6. **Presença manual** — R5, R15, R21, R22, R23, R29, R25 (parte manual). Critérios 28–40, incluindo 30a.\n7. **Dependências do M2** — R30, R31. Critérios 45–46, conferidos quando a spec do M2 existir.\napi/src:\napp.js\nautenticacao.js\nbanco.js\ndados-iniciais.js\nerros.js\nmodulos\nrelogio.js\nservidor.js\nteste\n\napi/src/modulos:\nm1-grade\n\napi/src/modulos/m1-grade:\nregras.js\nrotas.js\nvalidacao.js\n\napi/src/teste:\nrotas.js\n\napi/test:\napoio\nautenticacao.test.js\nm1-grade.test.js\nmodo-teste.test.js\n\napi/test/apoio:\napi.js\n{\n  \"name\": \"semana-academica-api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"engines\": {\n    \"node\": \">=22.13\"\n  },\n  \"scripts\": {\n    \"start\": \"node src/servidor.js\",\n    \"test\": \"node --test test/*.test.js\"\n  },\n  \"dependencies\": {\n    \"express\": \"^5.2.1\"\n  }\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 108,
+      "reasoning": 0,
+      "cache": {
+       "read": 45907,
+       "write": 1771
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122648020
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01NQvgBgqNYURdh2SeM6LXBu",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cat src/app.js src/autenticacao.js src/relogio.js src/erros.js src/teste/rotas.js test/apoio/api.js src/dados-iniciais.js && head -120 test/m1-grade.test.js && cat src/modulos/m1-grade/rotas.js"
+      },
+      "time": {
+       "start": 1790122648020,
+       "end": 1790122648266
+      },
+      "output": "import express from 'express';\nimport { identificar } from './autenticacao.js';\nimport { abrirBanco } from './banco.js';\nimport { rotaInexistente, tratarErros } from './erros.js';\nimport { rotasDaGrade } from './modulos/m1-grade/rotas.js';\nimport { criarRelogio } from './relogio.js';\nimport { rotasDeTeste } from './teste/rotas.js';\n\nexport function criarApp({ modoTeste }) {\n  const db = abrirBanco();\n  const relogio = criarRelogio({ modoTeste });\n  const app = express();\n  app.use(express.json());\n  if (modoTeste) app.use('/_teste', rotasDeTeste({ db, relogio }));\n  app.use(identificar({ db }));\n  app.use(rotasDaGrade({ db, relogio }));\n  app.use(rotaInexistente);\n  app.use(tratarErros);\n  return app;\n}\nimport { ErroDaApi } from './erros.js';\n\n// Identificação do contrato, seção 1: toda rota exige X-Usuario, menos /_teste/*.\n// Os usuários válidos são os dos dados iniciais (seção 4), gravados na tabela usuarios.\nexport function identificar({ db }) {\n  const buscar = db.prepare('SELECT id, nome, papel FROM usuarios WHERE id = ?');\n  return (req, res, next) => {\n    // Sem MODO_TESTE, /_teste/* não está montado e cai no 404 (seção 3), não no 401.\n    if (req.path.startsWith('/_teste/')) return next();\n    const id = req.get('X-Usuario');\n    const usuario = id ? buscar.get(id) : undefined;\n    if (!usuario) {\n      return next(new ErroDaApi(401, 'USUARIO_DESCONHECIDO', 'X-Usuario ausente ou desconhecido'));\n    }\n    req.usuario = usuario;\n    next();\n  };\n}\n\n// Rotas \"Quem: organização\" do contrato, seção 5. Roda depois de identificar e antes do corpo.\nexport function somenteOrganizacao(req, res, next) {\n  if (req.usuario.papel !== 'organizacao') {\n    return next(new ErroDaApi(403, 'SOMENTE_ORGANIZACAO', 'rota exclusiva da organização'));\n  }\n  next();\n}\n// Toda regra que depende de tempo pergunta a hora aqui, nunca ao Date direto.\n// No modo de teste o relógio fica parado e só muda por PUT /_teste/relogio (contrato, seção 3).\n\nexport const INSTANTE_DO_RESET = new Date('2026-10-13T09:00:00-03:00');\n\nexport function criarRelogio({ modoTeste }) {\n  let parado = modoTeste ? new Date(INSTANTE_DO_RESET) : null;\n\n  return {\n    agora: () => (parado ? new Date(parado) : new Date()),\n    ajustar(instante) {\n      parado = new Date(instante);\n    },\n  };\n}\n// Formato de erro do contrato, seção 1: {\"erro\": \"CODIGO\", \"mensagem\": \"texto livre\"}.\n\nexport class ErroDaApi extends Error {\n  constructor(status, erro, mensagem) {\n    super(mensagem);\n    this.status = status;\n    this.erro = erro;\n  }\n}\n\nexport const dadosInvalidos = (mensagem) => new ErroDaApi(422, 'DADOS_INVALIDOS', mensagem);\n\nconst ISO_COM_FUSO = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$/;\n\n// Datas chegam em ISO 8601 com fuso (seção 1); qualquer outra coisa é DADOS_INVALIDOS.\nexport function lerInstante(valor, campo) {\n  if (typeof valor !== 'string' || !ISO_COM_FUSO.test(valor) || Number.isNaN(Date.parse(valor))) {\n    throw dadosInvalidos(`${campo} precisa ser uma data ISO 8601 com fuso`);\n  }\n  return new Date(valor);\n}\n\nexport function rotaInexistente(req, res) {\n  res.status(404).json({ erro: 'NAO_ENCONTRADO', mensagem: `${req.method} ${req.path} não existe` });\n}\n\n// eslint-disable-next-line no-unused-vars\nexport function tratarErros(erro, req, res, next) {\n  if (erro instanceof ErroDaApi) {\n    return res.status(erro.status).json({ erro: erro.erro, mensagem: erro.message });\n  }\n  if (erro.type === 'entity.parse.failed') {\n    return res.status(422).json({ erro: 'DADOS_INVALIDOS', mensagem: 'o corpo não é um JSON válido' });\n  }\n  console.error(erro);\n  res.status(500).json({ erro: 'ERRO_INTERNO', mensagem: 'erro inesperado no servidor' });\n}\nimport { Router } from 'express';\nimport { zerarBanco } from '../banco.js';\nimport { lerInstante } from '../erros.js';\nimport { INSTANTE_DO_RESET } from '../relogio.js';\n\n// Rotas /_teste/* do contrato, seção 3. Só são montadas com MODO_TESTE=1.\nexport function rotasDeTeste({ db, relogio }) {\n  const rotas = Router();\n\n  rotas.post('/reset', (req, res) => {\n    zerarBanco(db);\n    relogio.ajustar(INSTANTE_DO_RESET);\n    res.status(204).end();\n  });\n\n  rotas.get('/relogio', (req, res) => {\n    res.json({ agora: relogio.agora().toISOString() });\n  });\n\n  rotas.put('/relogio', (req, res) => {\n    relogio.ajustar(lerInstante(req.body?.agora, 'agora'));\n    res.json({ agora: relogio.agora().toISOString() });\n  });\n\n  return rotas;\n}\n// Sobe a API de verdade num processo separado, como o juiz faz: MODO_TESTE e PORT\n// vão no ambiente do processo filho, e o banco é um arquivo temporário descartável.\nimport { spawn } from 'node:child_process';\nimport { once } from 'node:events';\nimport { mkdtempSync, rmSync } from 'node:fs';\nimport { createServer } from 'node:net';\nimport { tmpdir } from 'node:os';\nimport { join } from 'node:path';\nimport { fileURLToPath } from 'node:url';\n\nconst pastaApi = fileURLToPath(new URL('../..', import.meta.url));\n\nfunction portaLivre() {\n  return new Promise((resolve, reject) => {\n    const servidor = createServer();\n    servidor.on('error', reject);\n    servidor.listen(0, () => {\n      const { port } = servidor.address();\n      servidor.close(() => resolve(port));\n    });\n  });\n}\n\nconst esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\n\nexport async function subirApi({ modoTeste = true } = {}) {\n  const porta = await portaLivre();\n  const pastaBanco = mkdtempSync(join(tmpdir(), 'semana-api-'));\n  const env = { ...process.env, PORT: String(porta), ARQUIVO_BANCO: join(pastaBanco, 'teste.db') };\n  delete env.MODO_TESTE;\n  if (modoTeste) env.MODO_TESTE = '1';\n\n  const processo = spawn(process.execPath, ['src/servidor.js'], {\n    cwd: pastaApi,\n    env,\n    stdio: ['ignore', 'ignore', 'pipe'],\n  });\n  let saidaDeErro = '';\n  processo.stderr.on('data', (trecho) => { saidaDeErro += trecho; });\n\n  const url = `http://127.0.0.1:${porta}`;\n  for (let tentativa = 0; ; tentativa++) {\n    if (processo.exitCode !== null) throw new Error(`a API encerrou ao subir:\\n${saidaDeErro}`);\n    try {\n      await fetch(url);\n      break;\n    } catch {\n      if (tentativa >= 200) throw new Error(`a API não respondeu em ${url}:\\n${saidaDeErro}`);\n      await esperar(50);\n    }\n  }\n\n  return {\n    url,\n    async parar() {\n      if (processo.exitCode === null) {\n        processo.kill();\n        await once(processo, 'exit');\n      }\n      rmSync(pastaBanco, { recursive: true, force: true });\n    },\n  };\n}\n// contrato-api.md, seção 4.\n\nexport const EVENTO = {\n  nome: 'Semana Acadêmica 2026',\n  inicio: '2026-10-19',\n  fim: '2026-10-23',\n  fuso: 'America/Sao_Paulo',\n};\n\nexport const USUARIOS = [\n  { id: 'org-ana', nome: 'Ana Beatriz Lima', papel: 'organizacao' },\n  { id: 'org-bruno', nome: 'Bruno Tavares', papel: 'organizacao' },\n  { id: 'p-carla', nome: 'Carla Mendes Souza', papel: 'participante' },\n  { id: 'p-diego', nome: 'Diego Alves', papel: 'participante' },\n  { id: 'p-elisa', nome: 'Elisa Fernandes da Rocha', papel: 'participante' },\n  { id: 'p-fabio', nome: 'Fábio Nogueira', papel: 'participante' },\n  { id: 'p-gabriela', nome: 'Gabriela Moura Castro', papel: 'participante' },\n  { id: 'p-heitor', nome: 'Heitor Campos', papel: 'participante' },\n  { id: 'p-isadora', nome: 'Isadora Ribeiro dos Santos', papel: 'participante' },\n  { id: 'p-joao', nome: 'João Pedro Martins', papel: 'participante' },\n];\n\nexport const SALAS = [\n  { id: 'auditorio', nome: 'Auditório Central', capacidade: 200 },\n  { id: 'sala-101', nome: 'Sala 101', capacidade: 40 },\n  { id: 'sala-102', nome: 'Sala 102', capacidade: 40 },\n  { id: 'lab-3', nome: 'Laboratório 3', capacidade: 20 },\n];\n// M1 — Grade de atividades (specs/M1-grade.md). Tudo pela costura HTTP do contrato.\nimport { after, before, beforeEach, describe, it } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { subirApi } from './apoio/api.js';\n\ndescribe('M1 — grade de atividades', () => {\n  let api;\n  before(async () => { api = await subirApi(); });\n  after(async () => { await api?.parar(); });\n  beforeEach(async () => {\n    const res = await fetch(`${api.url}/_teste/reset`, { method: 'POST' });\n    assert.equal(res.status, 204);\n  });\n\n  const pedir = async (metodo, rota, { usuario = 'org-ana', corpo } = {}) => {\n    const headers = { 'X-Usuario': usuario };\n    if (corpo !== undefined) headers['Content-Type'] = 'application/json';\n    const res = await fetch(`${api.url}${rota}`, {\n      method: metodo,\n      headers,\n      body: corpo === undefined ? undefined : JSON.stringify(corpo),\n    });\n    const texto = await res.text();\n    return { status: res.status, corpo: texto ? JSON.parse(texto) : undefined };\n  };\n\n  it('R1: GET /salas devolve as salas na ordem dos dados iniciais', async () => {\n    const res = await pedir('GET', '/salas', { usuario: 'p-carla' });\n    assert.equal(res.status, 200);\n    assert.deepEqual(res.corpo, [\n      { id: 'auditorio', nome: 'Auditório Central', capacidade: 200 },\n      { id: 'sala-101', nome: 'Sala 101', capacidade: 40 },\n      { id: 'sala-102', nome: 'Sala 102', capacidade: 40 },\n      { id: 'lab-3', nome: 'Laboratório 3', capacidade: 20 },\n    ]);\n  });\n\n  it('R5: encontros enviados fora de ordem são aceitos e saem ordenados por inicio', async () => {\n    const res = await pedir('POST', '/atividades', {\n      corpo: {\n        titulo: 'Flutter do zero',\n        tipo: 'minicurso',\n        salaId: 'lab-3',\n        vagas: 20,\n        encontros: [\n          { inicio: '2026-10-20T19:00:00-03:00', fim: '2026-10-20T22:00:00-03:00' },\n          { inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' },\n        ],\n      },\n    });\n    assert.equal(res.status, 201);\n    assert.match(res.corpo.id, /^atv_[0-9a-f]{8}$/);\n    assert.equal(res.corpo.encontros.length, 2);\n    assert.equal(Date.parse(res.corpo.encontros[0].inicio), Date.parse('2026-10-19T19:00:00-03:00'));\n    assert.equal(Date.parse(res.corpo.encontros[0].fim), Date.parse('2026-10-19T22:00:00-03:00'));\n    assert.equal(Date.parse(res.corpo.encontros[1].inicio), Date.parse('2026-10-20T19:00:00-03:00'));\n    assert.equal(Date.parse(res.corpo.encontros[1].fim), Date.parse('2026-10-20T22:00:00-03:00'));\n    for (const encontro of res.corpo.encontros) assert.match(encontro.id, /^enc_[0-9a-f]{8}$/);\n    assert.notEqual(res.corpo.encontros[0].id, res.corpo.encontros[1].id);\n  });\n\n  it('R5: GET /atividades/:id devolve a atividade criada, encontros em ordem, contagens zeradas e prevista', async () => {\n    const criada = await pedir('POST', '/atividades', {\n      corpo: {\n        titulo: 'Flutter do zero',\n        tipo: 'minicurso',\n        salaId: 'lab-3',\n        vagas: 20,\n        encontros: [\n          { inicio: '2026-10-20T19:00:00-03:00', fim: '2026-10-20T22:00:00-03:00' },\n          { inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' },\n        ],\n      },\n    });\n    assert.equal(criada.status, 201);\n\n    const res = await pedir('GET', `/atividades/${criada.corpo.id}`, { usuario: 'p-carla' });\n    assert.equal(res.status, 200);\n    assert.deepEqual(res.corpo, criada.corpo);\n    assert.equal(res.corpo.titulo, 'Flutter do zero');\n    assert.equal(res.corpo.tipo, 'minicurso');\n    assert.equal(res.corpo.salaId, 'lab-3');\n    assert.equal(res.corpo.vagas, 20);\n    assert.equal(Date.parse(res.corpo.encontros[0].inicio), Date.parse('2026-10-19T19:00:00-03:00'));\n    assert.equal(Date.parse(res.corpo.encontros[1].inicio), Date.parse('2026-10-20T19:00:00-03:00'));\n    assert.equal(res.corpo.situacao, 'prevista');\n    assert.equal(res.corpo.ocupadas, 0);\n    assert.equal(res.corpo.emEspera, 0);\n    assert.equal(res.corpo.vagasRestantes, 20);\n  });\n\n  it('R6: cargaHorariaMinutos é a soma exata das durações dos encontros, sem arredondar', async () => {\n    const minicurso = await pedir('POST', '/atividades', {\n      corpo: {\n        titulo: 'Flutter do zero',\n        tipo: 'minicurso',\n        salaId: 'lab-3',\n        vagas: 20,\n        encontros: [\n          { inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' },\n          { inicio: '2026-10-20T19:00:00-03:00', fim: '2026-10-20T21:30:00-03:00' },\n        ],\n      },\n    });\n    assert.equal(minicurso.status, 201);\n    assert.equal(minicurso.corpo.cargaHorariaMinutos, 330);\n\n    const palestra = await pedir('POST', '/atividades', {\n      corpo: {\n        titulo: 'IA hoje',\n        tipo: 'palestra',\n        salaId: 'sala-101',\n        vagas: 40,\n        encontros: [{ inicio: '2026-10-19T19:00:30-03:00', fim: '2026-10-19T20:30:00-03:00' }],\n      },\n    });\n    assert.equal(palestra.status, 201);\n    assert.equal(palestra.corpo.cargaHorariaMinutos, 89.5);\n\n    const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`);\nimport { randomBytes } from 'node:crypto';\nimport { Router } from 'express';\nimport { somenteOrganizacao } from '../../autenticacao.js';\nimport { dadosInvalidos, ErroDaApi } from '../../erros.js';\nimport { validarAlteracao, validarCriacao } from './regras.js';\nimport { lerAlteracao, lerFiltros, lerNovaAtividade } from './validacao.js';\n\n// M1 — Grade de atividades (specs/M1-grade.md).\n\nconst novoId = (prefixo) => `${prefixo}_${randomBytes(4).toString('hex')}`;\n\n// R10: instantes saem no fuso de Brasília, -03:00 (sem horário de verão em 2026).\n// R11: a fração de segundo volta como veio; trocar de fuso não mexe nela.\nconst TRES_HORAS_MS = 3 * 60 * 60 * 1000;\nfunction emBrasilia(ms, original) {\n  const fracao = original.match(/:\\d{2}(\\.\\d+)/)?.[1] ?? '';\n  return `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 19)}${fracao}-03:00`;\n}\n\nexport function rotasDaGrade({ db, relogio }) {\n  const rotas = Router();\n\n  // R1: a ordem é a dos dados iniciais, que é a ordem de inserção.\n  rotas.get('/salas', (req, res) => {\n    res.json(db.prepare('SELECT id, nome, capacidade FROM salas ORDER BY rowid').all());\n  });\n\n  rotas.post('/atividades', somenteOrganizacao, (req, res) => {\n    const nova = lerNovaAtividade(req.body);\n    const { titulo, tipo, salaId, vagas, encontros } = nova;\n    // R14: sala inexistente é dado inválido do corpo, não 404.\n    const sala = db.prepare('SELECT capacidade FROM salas WHERE id = ?').get(salaId);\n    if (!sala) throw dadosInvalidos(`a sala ${salaId} não existe`);\n    // R22: atividade cancelada não ocupa a sala.\n    const ocupacaoDaSala = db.prepare(\n      'SELECT e.inicio_ms AS inicioMs, e.fim_ms AS fimMs FROM encontros e JOIN atividades a ON a.id = e.atividade_id WHERE a.sala_id = ? AND a.cancelada = 0',\n    ).all(salaId);\n    validarCriacao(nova, sala, ocupacaoDaSala);\n    const id = novoId('atv');\n    db.exec('BEGIN');\n    try {\n      db.prepare('INSERT INTO atividades (id, titulo, tipo, sala_id, vagas) VALUES (?, ?, ?, ?, ?)')\n        .run(id, titulo, tipo, salaId, vagas);\n      const encontro = db.prepare(\n        'INSERT INTO encontros (id, atividade_id, inicio, fim, inicio_ms, fim_ms) VALUES (?, ?, ?, ?, ?, ?)',\n      );\n      for (const e of encontros) {\n        encontro.run(novoId('enc'), id, e.inicio, e.fim, e.inicioMs, e.fimMs);\n      }\n      db.exec('COMMIT');\n    } catch (erro) {\n      db.exec('ROLLBACK');\n      throw erro;\n    }\n    res.status(201).json(lerAtividade(db, relogio, id));\n  });\n\n  // R2: ordem pelo inicio do 1º encontro; empate pelo id.\n  rotas.get('/atividades', (req, res) => {\n    const ids = db.prepare(\n      'SELECT a.id FROM atividades a JOIN encontros e ON e.atividade_id = a.id GROUP BY a.id ORDER BY MIN(e.inicio_ms), a.id',\n    ).all();\n    // R3: ?dia= (algum encontro nesse dia) e ?tipo=, combinados em E. O dia é o do\n    // calendário de Brasília: o inicio já sai em -03:00 (R10), então a data é o prefixo.\n    const { dia, tipo } = lerFiltros(req.query);\n    const atividades = ids.map(({ id }) => lerAtividade(db, relogio, id))\n      .filter((atv) => tipo === undefined || atv.tipo === tipo)\n      .filter((atv) => dia === undefined || atv.encontros.some((e) => e.inicio.slice(0, 10) === dia));\n    res.json(atividades);\n  });\n\n  rotas.get('/atividades/:id', (req, res) => {\n    res.json(lerAtividade(db, relogio, req.params.id));\n  });\n\n  // R24: só titulo e vagas são editáveis.\n  rotas.patch('/atividades/:id', somenteOrganizacao, (req, res) => {\n    const atividade = lerAtividade(db, relogio, req.params.id);\n    const alteracao = lerAlteracao(req.body);\n    const sala = db.prepare('SELECT capacidade FROM salas WHERE id = ?').get(atividade.salaId);\n    validarAlteracao(alteracao, atividade, sala);\n    const { titulo, vagas } = alteracao;\n    if (titulo !== undefined) db.prepare('UPDATE atividades SET titulo = ? WHERE id = ?').run(titulo, req.params.id);\n    if (vagas !== undefined) db.prepare('UPDATE atividades SET vagas = ? WHERE id = ?').run(vagas, req.params.id);\n    res.json(lerAtividade(db, relogio, req.params.id));\n  });\n\n  // R32: o corpo da requisição é ignorado.\n  rotas.post('/atividades/:id/cancelamento', somenteOrganizacao, (req, res) => {\n    const atividade = lerAtividade(db, relogio, req.params.id);\n    // R31: vem antes da R30, que também se aplicaria depois do início.\n    if (atividade.situacao === 'cancelada') {\n      throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade já está cancelada');\n    }\n    // R30: só antes do início do 1º encontro; no instante exato já é tarde.\n    if (relogio.agora().getTime() >= Date.parse(atividade.encontros[0].inicio)) {\n      throw new ErroDaApi(422, 'ATIVIDADE_JA_INICIADA', 'a atividade já começou e não pode ser cancelada');\n    }\n    db.prepare('UPDATE atividades SET cancelada = 1 WHERE id = ?').run(req.params.id);\n    res.json(lerAtividade(db, relogio, req.params.id));\n  });\n\n  return rotas;\n}\n\n// R7: calculada a cada leitura pelo relógio; as transições valem no instante exato\n// e cancelada prevalece sobre todas.\nfunction situacaoNoInstante(cancelada, encontros, agoraMs) {\n  if (cancelada) return 'cancelada';\n  if (agoraMs < encontros[0].inicio_ms) return 'prevista';\n  if (agoraMs < encontros[encontros.length - 1].fim_ms) return 'em_andamento';\n  return 'encerrada';\n}\n\nfunction lerAtividade(db, relogio, id) {\n  const a = db.prepare('SELECT id, titulo, tipo, sala_id, vagas, cancelada FROM atividades WHERE id = ?').get(id);\n  if (!a) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${id} não existe`);\n  // R5: encontros sempre em ordem de inicio.\n  const encontros = db.prepare(\n    'SELECT id, inicio, fim, inicio_ms, fim_ms FROM encontros WHERE atividade_id = ? ORDER BY inicio_ms, id',\n  ).all(id);\n  return {\n    id: a.id,\n    titulo: a.titulo,\n    tipo: a.tipo,\n    salaId: a.sala_id,\n    vagas: a.vagas,\n    encontros: encontros.map((e) => ({\n      id: e.id,\n      inicio: emBrasilia(e.inicio_ms, e.inicio),\n      fim: emBrasilia(e.fim_ms, e.fim),\n    })),\n    // R6: soma exata em minutos; pode ter fração quando os instantes têm segundos.\n    cargaHorariaMinutos: encontros.reduce((soma, e) => soma + (e.fim_ms - e.inicio_ms), 0) / 60000,\n    situacao: situacaoNoInstante(a.cancelada, encontros, relogio.agora().getTime()),\n    // Sem inscrições do M2 (R8), as contagens são zeradas.\n    ocupadas: 0,\n    vagasRestantes: a.vagas,\n    emEspera: 0,\n  };\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 173,
+      "reasoning": 0,
+      "cache": {
+       "read": 47678,
+       "write": 10299
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122651510
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_015oLV4EZPPM8rSKhKGmkfdj",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && grep -n -i -B2 -A12 \"codigo\" contrato-api.md | head -80; git log --oneline | wc -l"
+      },
+      "time": {
+       "start": 1790122651837,
+       "end": 1790122653777
+      },
+      "output": "10-\n11-- Entrada e saída em JSON UTF-8, exceto a planilha do M5.\n12:- **Identificação:** cabeçalho `X-Usuario: <id>` em toda rota, menos `GET /certificados/:codigo` e `/_teste/*`. Sem o cabeçalho, ou com um id que não existe → `401 USUARIO_DESCONHECIDO`.\n13-- **Datas:** ISO 8601 com fuso (`2026-10-19T19:00:00-03:00` ou `2026-10-19T22:00:00Z`). A API pode responder em qualquer fuso; o juiz compara o instante, não o texto.\n14-- **Identificadores gerados:** prefixo + 8 hexadecimais minúsculos — `atv_1a2b3c4d`, `enc_…`, `ins_…`, `pre_…`.\n15:- **Erro:** sempre `{\"erro\": \"CODIGO\", \"mensagem\": \"texto livre\"}`. O juiz confere o status e o `erro`; a mensagem é de vocês.\n16-- Corpo que não é JSON, campo obrigatório ausente ou de tipo errado → `422 DADOS_INVALIDOS`.\n17-- **Ordem das verificações:** identificação (401) → perfil (403 `SOMENTE_…`) → existência (404 `NAO_ENCONTRADO`) → corpo (422 `DADOS_INVALIDOS`) → regras do recurso. Quando mais de uma regra do recurso recusa a mesma operação, a ordem entre elas é regra de negócio.\n18-\n19-## 2. Como o juiz roda a API: `projeto.json`\n20-\n21-A stack é livre. Para o juiz rodar a API de todos os grupos do mesmo jeito, a raiz do repositório tem um `projeto.json`:\n22-\n23-```jsonc\n24-{\n25-  \"stack\": \"Node 22 + Express + SQLite; interface em Flutter web\",   // texto livre\n26-  \"api\": {\n27-    \"pasta\": \"api\",               // onde rodar os comandos, a partir da raiz\n--\n154-| Método | Rota | Quem | Sucesso |\n155-|---|---|---|---|\n156:| GET | `/encontros/:id/codigo` | organização | 200 `CodigoDoEncontro` |\n157-| POST | `/encontros/:id/presencas` | participante | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\n158-| POST | `/encontros/:id/presencas/manual` | organização | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\n159-| GET | `/encontros/:id/presencas` | organização | 200 `[Presenca]` |\n160-\n161-```jsonc\n162:// CodigoDoEncontro\n163-{\n164-  \"encontroId\": \"enc_5e6f7a8b\",\n165:  \"codigo\": \"K7M2QX\",           // 6 caracteres\n166-  \"trocaEm\": \"…\",               // quando a tela deve buscar o próximo código\n167-  \"validoAte\": \"…\"              // primeiro instante em que este código deixa de ser aceito\n168-}\n169-\n170-// POST /encontros/:id/presencas — entrada\n171:{ \"codigo\": \"K7M2QX\", \"lidoEm\": \"…\" }        // lidoEm é opcional: leitura feita sem internet\n172-\n173-// POST /encontros/:id/presencas/manual — entrada\n174-{ \"participanteId\": \"p-carla\", \"justificativa\": \"…\" }   // justificativa ausente também é JUSTIFICATIVA_OBRIGATORIA\n175-\n176-// Presenca\n177-{\n178-  \"id\": \"pre_3a4b5c6d\",\n179-  \"encontroId\": \"enc_5e6f7a8b\",\n180-  \"participanteId\": \"p-carla\",\n181-  \"origem\": \"qr\",               // \"qr\" | \"qr_offline\" | \"manual\"\n182-  \"lidoEm\": \"…\",                // o instante que valeu para as regras\n183-  \"registradaEm\": \"…\",\n--\n192-| POST | `/atividades/:id/certificado` | participante | 201 `Certificado` na primeira vez; 200 `Certificado` depois |\n193-| GET | `/certificados` | participante | 200 `[Certificado]` — os já emitidos |\n194:| GET | `/certificados/:codigo` | **público, sem `X-Usuario`** | 200 `Verificacao` |\n195-| GET | `/extrato` | participante | 200 `Extrato` |\n196-\n197-```jsonc\n198-// Certificado\n199-{\n200:  \"codigo\": \"SA26-7K2M-9QXA\",\n201-  \"atividadeId\": \"atv_1a2b3c4d\",\n202-  \"participanteId\": \"p-carla\",\n203-  \"cargaHorariaMinutos\": 360,\n204-  \"presencas\": 2,\n205-  \"encontros\": 2,\n206-  \"emitidoEm\": \"…\"\n207-}\n208-\n209-// Verificacao\n210-{\n211:  \"codigo\": \"SA26-7K2M-9QXA\",\n212-  \"participante\": \"Carla M. S.\",\n213-  \"atividade\": \"Flutter do zero\",\n214-  \"cargaHorariaMinutos\": 360,\n215-  \"emitidoEm\": \"…\"\n216-}\n217-\n218-// Extrato\n219-{\n220-  \"itens\": [\n221-    { \"atividadeId\": \"atv_1a2b3c4d\", \"titulo\": \"Flutter do zero\", \"tipo\": \"minicurso\",\n52",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 181,
+      "reasoning": 0,
+      "cache": {
+       "read": 57977,
+       "write": 9367
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122692329
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01TYUgCyvXtjQi5zCpiDt7U1",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "// M3 — Presença por QR (specs/M3-presenca.md). Tudo pela costura HTTP do contrato.\nimport { after, before, beforeEach, describe, it } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { subirApi } from './apoio/api.js';\n\ndescribe('M3 — presença', () => {\n  let api;\n  before(async () => { api = await subirApi(); });\n  after(async () => { await api?.parar(); });\n  beforeEach(async () => {\n    const res = await fetch(`${api.url}/_teste/reset`, { method: 'POST' });\n    assert.equal(res.status, 204);\n  });\n\n  const pedir = async (metodo, rota, { usuario = 'org-ana', corpo } = {}) => {\n    const headers = {};\n    if (usuario !== null) headers['X-Usuario'] = usuario;\n    if (corpo !== undefined) headers['Content-Type'] = 'application/json';\n    const res = await fetch(`${api.url}${rota}`, {\n      method: metodo,\n      headers,\n      body: corpo === undefined ? undefined : JSON.stringify(corpo),\n    });\n    const texto = await res.text();\n    return { status: res.status, corpo: texto ? JSON.parse(texto) : undefined };\n  };\n\n  const relogio = async (agora) => {\n    const res = await fetch(`${api.url}/_teste/relogio`, {\n      method: 'PUT',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ agora }),\n    });\n    assert.equal(res.status, 200);\n  };\n\n  // Cenário base da spec, seção 6 (parte do M1): A com o encontro E e B, em outra sala,\n  // com o encontro F no mesmo horário.\n  const montarCenario = async () => {\n    const criar = async (titulo, salaId) => {\n      const res = await pedir('POST', '/atividades', {\n        corpo: {\n          titulo,\n          tipo: 'palestra',\n          salaId,\n          vagas: 40,\n          encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' }],\n        },\n      });\n      assert.equal(res.status, 201);\n      return res.corpo;\n    };\n    const A = await criar('Atividade A', 'sala-101');\n    const B = await criar('Atividade B', 'sala-102');\n    return { A, E: A.encontros[0].id, B, F: B.encontros[0].id };\n  };\n\n  describe('obter código', () => {\n    it('R3/R2: fora da janela de presença (inicio − 15 min até fim + 30 min, inclusiva) → 422 FORA_DA_JANELA', async () => {\n      const { E } = await montarCenario();\n\n      await relogio('2026-10-19T18:44:59.999-03:00');\n      let res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 422);\n      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');\n\n      await relogio('2026-10-19T18:45:00-03:00');\n      res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 200);\n      assert.equal(res.corpo.encontroId, E);\n\n      await relogio('2026-10-19T22:30:00-03:00');\n      res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 200);\n      assert.equal(res.corpo.encontroId, E);\n\n      await relogio('2026-10-19T22:30:00.001-03:00');\n      res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 422);\n      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');\n    });\n  });\n});\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js"
+      },
+      "time": {
+       "start": 1790122695296,
+       "end": 1790122695332
+      },
+      "output": "File created successfully at: C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 4673,
+      "reasoning": 0,
+      "cache": {
+       "read": 67344,
+       "write": 2175
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122696896
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Escrevi o primeiro teste (R3/R2, critério 1). Agora vou rodá-lo para ver ele falhar.",
+     "time": {
+      "start": 1790122696896
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_015q1PYPeXHtaGBGyNuo473C",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^# (pass|fail)|not ok|expected|actual\" | head"
+      },
+      "time": {
+       "start": 1790122697644,
+       "end": 1790122699939
+      },
+      "output": "    actual: 404,\n    expected: 422,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 172,
+      "reasoning": 0,
+      "cache": {
+       "read": 69519,
+       "write": 4796
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122701728
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho: 404 (rota não existe). Código mínimo:",
+     "time": {
+      "start": 1790122701729
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01Qv86qnPfipK9KNRSkvWkHG",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "import { Router } from 'express';\nimport { ErroDaApi } from '../../erros.js';\n\n// M3 — Presença por QR (specs/M3-presenca.md).\n\nconst MINUTO_MS = 60 * 1000;\n\n// R2: de inicio − 15 min até fim + 30 min, os dois limites inclusivos.\nconst dentroDaJanela = (encontro, agoraMs) =>\n  agoraMs >= encontro.inicio_ms - 15 * MINUTO_MS && agoraMs <= encontro.fim_ms + 30 * MINUTO_MS;\n\nexport function rotasDaPresenca({ db, relogio }) {\n  const rotas = Router();\n\n  rotas.get('/encontros/:id/codigo', (req, res) => {\n    const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);\n    // R3\n    if (!dentroDaJanela(encontro, relogio.agora().getTime())) {\n      throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença do encontro');\n    }\n    res.json({ encontroId: encontro.id });\n  });\n\n  return rotas;\n}\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\modulos\\m3-presenca\\rotas.js"
+      },
+      "time": {
+       "start": 1790122704813,
+       "end": 1790122707451
+      },
+      "output": "File created successfully at: C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\modulos\\m3-presenca\\rotas.js (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01S7BE7BJJW297Qq9CzaJbU7",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && sed -i \"s#^import { rotasDaGrade } from './modulos/m1-grade/rotas.js';#&\\nimport { rotasDaPresenca } from './modulos/m3-presenca/rotas.js';#; s#^  app.use(rotasDaGrade({ db, relogio }));#&\\n  app.use(rotasDaPresenca({ db, relogio }));#\" src/app.js && cat src/app.js && npm test 2>&1 | grep -E \"^# (tests|pass|fail)\""
+      },
+      "time": {
+       "start": 1790122706267,
+       "end": 1790122709528
+      },
+      "output": "import express from 'express';\nimport { identificar } from './autenticacao.js';\nimport { abrirBanco } from './banco.js';\nimport { rotaInexistente, tratarErros } from './erros.js';\nimport { rotasDaGrade } from './modulos/m1-grade/rotas.js';\nimport { rotasDaPresenca } from './modulos/m3-presenca/rotas.js';\nimport { criarRelogio } from './relogio.js';\nimport { rotasDeTeste } from './teste/rotas.js';\n\nexport function criarApp({ modoTeste }) {\n  const db = abrirBanco();\n  const relogio = criarRelogio({ modoTeste });\n  const app = express();\n  app.use(express.json());\n  if (modoTeste) app.use('/_teste', rotasDeTeste({ db, relogio }));\n  app.use(identificar({ db }));\n  app.use(rotasDaGrade({ db, relogio }));\n  app.use(rotasDaPresenca({ db, relogio }));\n  app.use(rotaInexistente);\n  app.use(tratarErros);\n  return app;\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 823,
+      "reasoning": 0,
+      "cache": {
+       "read": 74315,
+       "write": 287
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122711172
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01RnoS3h8dfu4hCPcGXHEKin",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm test 2>&1 | grep -E \"^# (tests|pass|fail)|^not ok\""
+      },
+      "time": {
+       "start": 1790122711172,
+       "end": 1790122714432
+      },
+      "output": "(Bash completed with no output)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 111,
+      "reasoning": 0,
+      "cache": {
+       "read": 74602,
+       "write": 1337
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122716135
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01BhHjvA4NEDzkJQrU8vq5Uh",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm test 2>&1 | tail -15"
+      },
+      "time": {
+       "start": 1790122716135,
+       "end": 1790122719767
+      },
+      "output": "  ✔ PUT /_teste/relogio com agora que não é uma data responde 422 DADOS_INVALIDOS e não mexe no relógio (5.3301ms)\n✔ modo de teste (contrato, seção 3) (368.8504ms)\n▶ sem MODO_TESTE (contrato, seção 3)\n  ✔ POST /_teste/reset responde 404 NAO_ENCONTRADO (7.6759ms)\n  ✔ GET /_teste/relogio responde 404 NAO_ENCONTRADO (1.4506ms)\n  ✔ PUT /_teste/relogio responde 404 NAO_ENCONTRADO (2.0187ms)\n✔ sem MODO_TESTE (contrato, seção 3) (218.7784ms)\nℹ tests 89\nℹ suites 6\nℹ pass 89\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1008.8508",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 92,
+      "reasoning": 0,
+      "cache": {
+       "read": 75939,
+       "write": 150
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122721063
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde (89/89). Commit e próximo teste (R6).",
+     "time": {
+      "start": 1790122721063
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01P8eVWzN3wRzKPJkWTPGnH8",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && git add -A && git commit -q -m \"M3-R3: obter código fora da janela de presença responde FORA_DA_JANELA\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790122722007,
+       "end": 1790122723492
+      },
+      "output": "warning: in the working copy of 'api/src/app.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/src/modulos/m3-presenca/rotas.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\n9811ce5 M3-R3: obter código fora da janela de presença responde FORA_DA_JANELA",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 184,
+      "reasoning": 0,
+      "cache": {
+       "read": 76089,
+       "write": 468
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122726818
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01Vahv4sMyfYsmbytXiXdqKh",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');\n    });\n  });\n});",
+       "new_string": "      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');\n    });\n\n    it('R6: o código tem 6 caracteres, só maiúsculas e dígitos, sem 0 O 1 I L', async () => {\n      const { E } = await montarCenario();\n      await relogio('2026-10-19T19:00:30-03:00');\n      const res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 200);\n      assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);\n    });\n  });\n});",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js"
+      },
+      "time": {
+       "start": 1790122726818,
+       "end": 1790122728958
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01CyS5eMchR1xyjMtvWpTD4H",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|✖|actual|expected|TypeError\" | head"
+      },
+      "time": {
+       "start": 1790122727614,
+       "end": 1790122729678
+      },
+      "output": "    ✖ R6: o código tem 6 caracteres, só maiúsculas e dígitos, sem 0 O 1 I L (13.5554ms)\n  ✖ obter código (52.3008ms)\n✖ M3 — presença (237.2028ms)\nℹ pass 1\nℹ fail 1\n✖ failing tests:\n✖ R6: o código tem 6 caracteres, só maiúsculas e dígitos, sem 0 O 1 I L (13.5554ms)\n    actual: undefined,\n    expected: /^[A-HJKMNP-Z2-9]{6}$/,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 512,
+      "reasoning": 0,
+      "cache": {
+       "read": 76557,
+       "write": 460
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122732042
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho (`codigo` ausente). Mínimo que passa: um código fixo dentro do alfabeto — o HMAC fica para o teste da R7, que vai forçá-lo.",
+     "time": {
+      "start": 1790122732046
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01REfYnk7uCogTmAchbas3kc",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cat > src/modulos/m3-presenca/codigo.js <<'EOF'\n// Código do encontro (specs/M3-presenca.md, R6–R9).\n\n// R6: maiúsculas e dígitos, sem 0, O, 1, I, L.\nexport const ALFABETO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';\n\nexport function derivarCodigo() {\n  return 'K7M2QX';\n}\nEOF\nsed -i \"s#^import { ErroDaApi } from '../../erros.js';#&\\nimport { derivarCodigo } from './codigo.js';#; s#res.json({ encontroId: encontro.id });#res.json({ encontroId: encontro.id, codigo: derivarCodigo() });#\" src/modulos/m3-presenca/rotas.js && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\""
+      },
+      "time": {
+       "start": 1790122734263,
+       "end": 1790122737643
+      },
+      "output": "ℹ tests 90\nℹ pass 90\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 510,
+      "reasoning": 0,
+      "cache": {
+       "read": 77017,
+       "write": 933
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122738796
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde (90/90). Commit e próximo teste (R8).",
+     "time": {
+      "start": 1790122738796
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Njw8CnvnrWB635jDV1Dmpq",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && git add -A && git commit -q -m \"M3-R6: código de 6 caracteres no alfabeto sem 0 O 1 I L\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" 2>/dev/null && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790122740032,
+       "end": 1790122745829
+      },
+      "output": "warning: in the working copy of 'api/src/modulos/m3-presenca/rotas.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/src/modulos/m3-presenca/codigo.js', LF will be replaced by CRLF the next time Git touches it\n1f1d63a M3-R6: código de 6 caracteres no alfabeto sem 0 O 1 I L",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_011TtQdMGhXw9CXeHHwyuJaG",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "      assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);\n    });\n  });\n});",
+       "new_string": "      assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);\n    });\n\n    it('R8: trocaEm = fim do minuto do código e validoAte = fim do minuto seguinte, em -03:00', async () => {\n      const { E } = await montarCenario();\n\n      await relogio('2026-10-19T19:00:30-03:00');\n      let res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 200);\n      assert.equal(res.corpo.trocaEm, '2026-10-19T19:01:00-03:00');\n      assert.equal(res.corpo.validoAte, '2026-10-19T19:02:00-03:00');\n\n      await relogio('2026-10-19T19:01:00-03:00');\n      res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 200);\n      assert.equal(res.corpo.trocaEm, '2026-10-19T19:02:00-03:00');\n      assert.equal(res.corpo.validoAte, '2026-10-19T19:03:00-03:00');\n    });\n  });\n});",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js"
+      },
+      "time": {
+       "start": 1790122743376,
+       "end": 1790122745892
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01V37PxryJiSDGqYmDvVZQRw",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|^✖ R|actual|expected\" | head"
+      },
+      "time": {
+       "start": 1790122744107,
+       "end": 1790122746699
+      },
+      "output": "ℹ pass 2\nℹ fail 1\n✖ R8: trocaEm = fim do minuto do código e validoAte = fim do minuto seguinte, em -03:00 (12.9313ms)\n  + actual - expected\n    actual: undefined,\n    expected: '2026-10-19T19:01:00-03:00',",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 896,
+      "reasoning": 0,
+      "cache": {
+       "read": 77950,
+       "write": 1188
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122748610
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho (`trocaEm` ausente). Implementação:",
+     "time": {
+      "start": 1790122748614
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01FQGUEeQDkg97XqtCpjQrTd",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && python3 - <<'EOF' 2>/dev/null || node -e \"\nconst fs=require('fs');const f='src/modulos/m3-presenca/rotas.js';let s=fs.readFileSync(f,'utf8');\ns=s.replace(\\\"const MINUTO_MS = 60 * 1000;\\n\\\", \\\"const MINUTO_MS = 60 * 1000;\\n\\n// Instantes saem no fuso de Brasília, -03:00 (mesma decisão do M1 P-20). Os limites do\\n// código caem em minuto cheio, então não há fração de segundo a preservar.\\nconst TRES_HORAS_MS = 3 * 60 * 60 * 1000;\\nconst emBrasilia = (ms) => \\`\\${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 19)}-03:00\\`;\\n\\\");\ns=s.replace(\\\"    res.json({ encontroId: encontro.id, codigo: derivarCodigo() });\\\", \\\"    // R8: o código é o do minuto que começa em M; troca em M + 1 min e vale até M + 2 min.\\n    const inicioDoMinuto = Math.floor(agoraMs / MINUTO_MS) * MINUTO_MS;\\n    res.json({\\n      encontroId: encontro.id,\\n      codigo: derivarCodigo(),\\n      trocaEm: emBrasilia(inicioDoMinuto + MINUTO_MS),\\n      validoAte: emBrasilia(inicioDoMinuto + 2 * MINUTO_MS),\\n    });\\\");\ns=s.replace(\\\"    // R3\\n    if (!dentroDaJanela(encontro, relogio.agora().getTime())) {\\\", \\\"    const agoraMs = relogio.agora().getTime();\\n    // R3\\n    if (!dentroDaJanela(encontro, agoraMs)) {\\\");\nfs.writeFileSync(f,s);\"\nexit 0\nEOF\ncat src/modulos/m3-presenca/rotas.js | sed -n 5,40p"
+      },
+      "time": {
+       "start": 1790122753563,
+       "end": 1790122755423
+      },
+      "output": "// M3 — Presença por QR (specs/M3-presenca.md).\n\nconst MINUTO_MS = 60 * 1000;\n\n// Instantes saem no fuso de Brasília, -03:00 (mesma decisão do M1 P-20). Os limites do\n// código caem em minuto cheio, então não há fração de segundo a preservar.\nconst TRES_HORAS_MS = 3 * 60 * 60 * 1000;\nconst emBrasilia = (ms) => `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 19)}-03:00`;\n\n// R2: de inicio − 15 min até fim + 30 min, os dois limites inclusivos.\nconst dentroDaJanela = (encontro, agoraMs) =>\n  agoraMs >= encontro.inicio_ms - 15 * MINUTO_MS && agoraMs <= encontro.fim_ms + 30 * MINUTO_MS;\n\nexport function rotasDaPresenca({ db, relogio }) {\n  const rotas = Router();\n\n  rotas.get('/encontros/:id/codigo', (req, res) => {\n    const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);\n    const agoraMs = relogio.agora().getTime();\n    // R3\n    if (!dentroDaJanela(encontro, agoraMs)) {\n      throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença do encontro');\n    }\n    // R8: o código é o do minuto que começa em M; troca em M + 1 min e vale até M + 2 min.\n    const inicioDoMinuto = Math.floor(agoraMs / MINUTO_MS) * MINUTO_MS;\n    res.json({\n      encontroId: encontro.id,\n      codigo: derivarCodigo(),\n      trocaEm: emBrasilia(inicioDoMinuto + MINUTO_MS),\n      validoAte: emBrasilia(inicioDoMinuto + 2 * MINUTO_MS),\n    });\n  });\n\n  return rotas;\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 868,
+      "reasoning": 0,
+      "cache": {
+       "read": 79138,
+       "write": 1517
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122757387
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Bw3gF4sKsZZa4UifjA2BHQ",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\" && cd .. && git add -A && git commit -q -m \"M3-R8: trocaEm no fim do minuto do código e validoAte no fim do seguinte\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" 2>/dev/null && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790122758379,
+       "end": 1790122762146
+      },
+      "output": "ℹ tests 91\nℹ pass 91\nℹ fail 0\nwarning: in the working copy of 'api/src/modulos/m3-presenca/rotas.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\n6146096 M3-R8: trocaEm no fim do minuto do código e validoAte no fim do seguinte",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 249,
+      "reasoning": 0,
+      "cache": {
+       "read": 80655,
+       "write": 1631
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122765371
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde (91/91). Próximo: R7 (critérios 2 e 3) — com o código fixo atual, E e F dão o mesmo código, então ele tem que falhar.",
+     "time": {
+      "start": 1790122765373
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01Tmv11rdCNCA6Cmum7t6Zg6",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "      assert.equal(res.corpo.validoAte, '2026-10-19T19:03:00-03:00');\n    });\n  });\n});",
+       "new_string": "      assert.equal(res.corpo.validoAte, '2026-10-19T19:03:00-03:00');\n    });\n\n    it('R7: o código depende do encontro e do minuto do relógio (alinhado ao epoch), não do instante dentro do minuto', async () => {\n      const { E, F } = await montarCenario();\n      const codigo = async (encontro, agora) => {\n        await relogio(agora);\n        const res = await pedir('GET', `/encontros/${encontro}/codigo`);\n        assert.equal(res.status, 200);\n        return res.corpo.codigo;\n      };\n\n      const deE = await codigo(E, '2026-10-19T19:00:30-03:00');\n      const deF = await codigo(F, '2026-10-19T19:00:30-03:00');\n      assert.notEqual(deE, deF);\n\n      assert.equal(await codigo(E, '2026-10-19T19:00:59-03:00'), deE);\n      assert.equal(await codigo(E, '2026-10-19T19:00:00-03:00'), deE);\n      assert.notEqual(await codigo(E, '2026-10-19T19:01:00-03:00'), deE);\n    });\n  });\n});",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js"
+      },
+      "time": {
+       "start": 1790122769197,
+       "end": 1790122771258
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01CytCXSgZQyjnizQTyS7WVp",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|^✖ R|actual|expected|message\" | head"
+      },
+      "time": {
+       "start": 1790122769900,
+       "end": 1790122772134
+      },
+      "output": "ℹ pass 3\nℹ fail 1\n✖ R7: o código depende do encontro e do minuto do relógio (alinhado ao epoch), não do instante dentro do minuto (16.7834ms)\n  AssertionError [ERR_ASSERTION]: Expected \"actual\" to be strictly unequal to:\n    actual: 'K7M2QX',\n    expected: 'K7M2QX',",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 917,
+      "reasoning": 0,
+      "cache": {
+       "read": 82286,
+       "write": 513
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122773809
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho (E e F com o mesmo código). HMAC com segredo fixo — a leitura de `SEGREDO_CODIGO` fica para a R9:",
+     "time": {
+      "start": 1790122773809
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01BNyMFtHdJgvy15QLz7E8vm",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cat > src/modulos/m3-presenca/codigo.js <<'EOF'\nimport { createHmac } from 'node:crypto';\n\n// Código do encontro (specs/M3-presenca.md, R6–R9).\n\n// R6: maiúsculas e dígitos, sem 0, O, 1, I, L.\nexport const ALFABETO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';\n\nconst SEGREDO = 'semana-academica-2026-codigo-do-encontro';\n\n// R7: minutos contados a partir do epoch Unix, alinhados ao relógio (segundos 00–59).\nexport const indiceDoMinuto = (instanteMs) => Math.floor(instanteMs / 60000);\n\n// R7: HMAC de encontroId + índice do minuto, convertido para o alfabeto da R6.\n// Derivado a cada pedido, nunca gravado.\nexport function derivarCodigo(encontroId, indice) {\n  const hmac = createHmac('sha256', SEGREDO).update(`${encontroId}:${indice}`).digest();\n  let codigo = '';\n  for (let i = 0; i < 6; i++) codigo += ALFABETO[hmac[i] % ALFABETO.length];\n  return codigo;\n}\nEOF\nnode -e \"\nconst fs=require('fs');const f='src/modulos/m3-presenca/rotas.js';let s=fs.readFileSync(f,'utf8');\ns=s.replace(\\\"import { derivarCodigo } from './codigo.js';\\\",\\\"import { derivarCodigo, indiceDoMinuto } from './codigo.js';\\\");\ns=s.replace(\\\"    const inicioDoMinuto = Math.floor(agoraMs / MINUTO_MS) * MINUTO_MS;\\\",\\\"    const indice = indiceDoMinuto(agoraMs);\\n    const inicioDoMinuto = indice * MINUTO_MS;\\\");\ns=s.replace('codigo: derivarCodigo(),','codigo: derivarCodigo(encontro.id, indice),');\nfs.writeFileSync(f,s);\" && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\""
+      },
+      "time": {
+       "start": 1790122779128,
+       "end": 1790122782464
+      },
+      "output": "ℹ tests 92\nℹ pass 92\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 884,
+      "reasoning": 0,
+      "cache": {
+       "read": 82799,
+       "write": 1271
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122784552
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_016DaQbQ3Ktb9LNNep4WiKPa",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && git add -A && git commit -q -m \"M3-R7: código gerado por HMAC do encontro e do índice do minuto\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" 2>/dev/null && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790122784552,
+       "end": 1790122785998
+      },
+      "output": "warning: in the working copy of 'api/src/modulos/m3-presenca/codigo.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/src/modulos/m3-presenca/rotas.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\n4d6a8a7 M3-R7: código gerado por HMAC do encontro e do índice do minuto",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 167,
+      "reasoning": 0,
+      "cache": {
+       "read": 84070,
+       "write": 939
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122787639
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde (92/92). Próximo: R27, a parte 401 → 403 → 404 (critério 6).",
+     "time": {
+      "start": 1790122787639
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01SABMn2ge2zKNTQTNA2P3GL",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "      assert.notEqual(await codigo(E, '2026-10-19T19:01:00-03:00'), deE);\n    });\n  });\n});",
+       "new_string": "      assert.notEqual(await codigo(E, '2026-10-19T19:01:00-03:00'), deE);\n    });\n\n    it('R27: 401 USUARIO_DESCONHECIDO → 403 SOMENTE_ORGANIZACAO → 404 NAO_ENCONTRADO', async () => {\n      const { E } = await montarCenario();\n      await relogio('2026-10-19T19:00:30-03:00');\n\n      let res = await pedir('GET', '/encontros/enc_00000000/codigo', { usuario: null });\n      assert.equal(res.status, 401);\n      assert.equal(res.corpo.erro, 'USUARIO_DESCONHECIDO');\n\n      res = await pedir('GET', '/encontros/enc_00000000/codigo', { usuario: 'p-carla' });\n      assert.equal(res.status, 403);\n      assert.equal(res.corpo.erro, 'SOMENTE_ORGANIZACAO');\n\n      res = await pedir('GET', `/encontros/${E}/codigo`, { usuario: 'p-carla' });\n      assert.equal(res.status, 403);\n      assert.equal(res.corpo.erro, 'SOMENTE_ORGANIZACAO');\n\n      res = await pedir('GET', '/encontros/enc_00000000/codigo');\n      assert.equal(res.status, 404);\n      assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');\n    });\n  });\n});",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js"
+      },
+      "time": {
+       "start": 1790122791789,
+       "end": 1790122794101
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01KyfMEE2XPCY6FwLDKX6Xhu",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|^✖ R|actual|expected\" | head"
+      },
+      "time": {
+       "start": 1790122792492,
+       "end": 1790122794909
+      },
+      "output": "ℹ pass 4\nℹ fail 1\n✖ R27: 401 USUARIO_DESCONHECIDO → 403 SOMENTE_ORGANIZACAO → 404 NAO_ENCONTRADO (13.7145ms)\n    actual: 500,\n    expected: 403,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 844,
+      "reasoning": 0,
+      "cache": {
+       "read": 85009,
+       "write": 455
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122796458
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho (500 — participante chega na rota e o encontro não existe). Adiciono o perfil e o 404:",
+     "time": {
+      "start": 1790122796458
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Nyxvm2LmfJaX3zZM64ee8D",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node -e \"\nconst fs=require('fs');const f='src/modulos/m3-presenca/rotas.js';let s=fs.readFileSync(f,'utf8');\ns=s.replace(\\\"import { ErroDaApi } from '../../erros.js';\\\",\\\"import { somenteOrganizacao } from '../../autenticacao.js';\\nimport { ErroDaApi } from '../../erros.js';\\\");\ns=s.replace(\\\"rotas.get('/encontros/:id/codigo', (req, res) => {\\\",\\\"// R27: 401 (identificar) → 403 (somenteOrganizacao) → 404 → R12 → R3.\\n  rotas.get('/encontros/:id/codigo', somenteOrganizacao, (req, res) => {\\\");\ns=s.replace(\\\".get(req.params.id);\\n\\\",\\\".get(req.params.id);\\n    if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', \\`encontro \\${req.params.id} não existe\\`);\\n\\\");\nfs.writeFileSync(f,s);\" && sed -n 20,30p src/modulos/m3-presenca/rotas.js && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\""
+      },
+      "time": {
+       "start": 1790122799468,
+       "end": 1790122803090
+      },
+      "output": "  const rotas = Router();\n\n  // R27: 401 (identificar) → 403 (somenteOrganizacao) → 404 → R12 → R3.\n  rotas.get('/encontros/:id/codigo', somenteOrganizacao, (req, res) => {\n    const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);\n    if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);\n    const agoraMs = relogio.agora().getTime();\n    // R3\n    if (!dentroDaJanela(encontro, agoraMs)) {\n      throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença do encontro');\n    }\nℹ tests 93\nℹ pass 93\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 541,
+      "reasoning": 0,
+      "cache": {
+       "read": 85464,
+       "write": 1164
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122805412
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01YYnKqbqBZazTnh3uGYRPJ9",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && git add -A && git commit -q -m \"M3-R27: obter código responde 401, depois 403 SOMENTE_ORGANIZACAO, depois 404\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" 2>/dev/null && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790122805412,
+       "end": 1790122807444
+      },
+      "output": "warning: in the working copy of 'api/src/modulos/m3-presenca/rotas.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\n6c3a977 M3-R27: obter código responde 401, depois 403 SOMENTE_ORGANIZACAO, depois 404",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 180,
+      "reasoning": 0,
+      "cache": {
+       "read": 86628,
+       "write": 890
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122808958
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde (93/93). Próximo: R12 + R27 com atividade cancelada (critério 5). O cancelamento é feito pelo M1, com o relógio ainda no reset (antes do início).",
+     "time": {
+      "start": 1790122808958
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01AssCmuE331dStZCLuZHdGy",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "      assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');\n    });\n  });\n});",
+       "new_string": "      assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');\n    });\n\n    it('R12/R27: atividade cancelada → 422 ATIVIDADE_CANCELADA, antes de FORA_DA_JANELA', async () => {\n      const { A, E } = await montarCenario();\n      const cancelada = await pedir('POST', `/atividades/${A.id}/cancelamento`);\n      assert.equal(cancelada.status, 200);\n\n      await relogio('2026-10-19T19:00:30-03:00');\n      let res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 422);\n      assert.equal(res.corpo.erro, 'ATIVIDADE_CANCELADA');\n\n      await relogio('2026-10-19T23:00:00-03:00');\n      res = await pedir('GET', `/encontros/${E}/codigo`);\n      assert.equal(res.status, 422);\n      assert.equal(res.corpo.erro, 'ATIVIDADE_CANCELADA');\n    });\n  });\n});",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js"
+      },
+      "time": {
+       "start": 1790122812199,
+       "end": 1790122814346
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01MxxAjitanqNDMhUy6tGRsz",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|^✖ R|actual|expected\" | head"
+      },
+      "time": {
+       "start": 1790122812902,
+       "end": 1790122815252
+      },
+      "output": "ℹ pass 5\nℹ fail 1\n✖ R12/R27: atividade cancelada → 422 ATIVIDADE_CANCELADA, antes de FORA_DA_JANELA (16.1773ms)\n    actual: 200,\n    expected: 422,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 737,
+      "reasoning": 0,
+      "cache": {
+       "read": 87518,
+       "write": 426
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122816485
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho (200 com a atividade cancelada). Código:",
+     "time": {
+      "start": 1790122816485
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01LtqypP8mvJM358UvmqYmDP",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node -e \"\nconst fs=require('fs');const f='src/modulos/m3-presenca/rotas.js';let s=fs.readFileSync(f,'utf8');\ns=s.replace(\\\"db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?')\\\",\\\"db.prepare(\\n      'SELECT e.id, e.inicio_ms, e.fim_ms, a.cancelada FROM encontros e JOIN atividades a ON a.id = e.atividade_id WHERE e.id = ?',\\n    )\\\");\ns=s.replace(\\\"    const agoraMs = relogio.agora().getTime();\\n    // R3\\\",\\\"    // R12\\n    if (encontro.cancelada) throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade do encontro foi cancelada');\\n    const agoraMs = relogio.agora().getTime();\\n    // R3\\\");\nfs.writeFileSync(f,s);\" && sed -n 22,36p src/modulos/m3-presenca/rotas.js && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\""
+      },
+      "time": {
+       "start": 1790122819276,
+       "end": 1790122822753
+      },
+      "output": "  // R27: 401 (identificar) → 403 (somenteOrganizacao) → 404 → R12 → R3.\n  rotas.get('/encontros/:id/codigo', somenteOrganizacao, (req, res) => {\n    const encontro = db.prepare(\n      'SELECT e.id, e.inicio_ms, e.fim_ms, a.cancelada FROM encontros e JOIN atividades a ON a.id = e.atividade_id WHERE e.id = ?',\n    ).get(req.params.id);\n    if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);\n    // R12\n    if (encontro.cancelada) throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade do encontro foi cancelada');\n    const agoraMs = relogio.agora().getTime();\n    // R3\n    if (!dentroDaJanela(encontro, agoraMs)) {\n      throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença do encontro');\n    }\n    // R8: o código é o do minuto que começa em M; troca em M + 1 min e vale até M + 2 min.\n    const indice = indiceDoMinuto(agoraMs);\nℹ tests 94\nℹ pass 94\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 504,
+      "reasoning": 0,
+      "cache": {
+       "read": 87944,
+       "write": 1047
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122825255
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Pe9ViFNMFUjRCLm5G6kFWb",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && git add -A && git commit -q -m \"M3-R12: obter código de atividade cancelada responde ATIVIDADE_CANCELADA\n\nVem antes de FORA_DA_JANELA (R27).\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" 2>/dev/null && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790122825255,
+       "end": 1790122826754
+      },
+      "output": "warning: in the working copy of 'api/src/modulos/m3-presenca/rotas.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\nb25d408 M3-R12: obter código de atividade cancelada responde ATIVIDADE_CANCELADA",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 196,
+      "reasoning": 0,
+      "cache": {
+       "read": 88991,
+       "write": 1015
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122828732
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde (94/94). Próximo: R1 (critério 4). Já aviso: este **deve passar sem código novo**, porque a rota nunca restringiu por autoria. Vou rodar e confirmar que o motivo é esse.",
+     "time": {
+      "start": 1790122828732
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01UconpttRTMu4GbQUjQGN8G",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "      assert.equal(res.corpo.erro, 'ATIVIDADE_CANCELADA');\n    });\n  });\n});",
+       "new_string": "      assert.equal(res.corpo.erro, 'ATIVIDADE_CANCELADA');\n    });\n\n    it('R1: qualquer pessoa da organização obtém o código, não só quem criou a atividade', async () => {\n      const { E } = await montarCenario(); // criado por org-ana\n      await relogio('2026-10-19T19:00:30-03:00');\n      const res = await pedir('GET', `/encontros/${E}/codigo`, { usuario: 'org-bruno' });\n      assert.equal(res.status, 200);\n      assert.equal(res.corpo.encontroId, E);\n      assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);\n    });\n  });\n});",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js"
+      },
+      "time": {
+       "start": 1790122831318,
+       "end": 1790122833764
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01DeNw3jUX9gbjswDgAGR24D",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|R1:\" | head"
+      },
+      "time": {
+       "start": 1790122831984,
+       "end": 1790122834586
+      },
+      "output": "    ✔ R1: qualquer pessoa da organização obtém o código, não só quem criou a atividade (11.539ms)\nℹ pass 7\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 624,
+      "reasoning": 0,
+      "cache": {
+       "read": 90006,
+       "write": 435
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122839366
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01LqbLaprwjkNNeB5aJnc2bF",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cp src/modulos/m3-presenca/rotas.js /tmp/r.js 2>/dev/null || cp src/modulos/m3-presenca/rotas.js \"$TEMP/r.js\"; sed -i \"s#    // R12\\$#    if (req.usuario.id !== 'org-ana') throw new ErroDaApi(403, 'SOMENTE_ORGANIZACAO', 'x');\\n    // R12#\" src/modulos/m3-presenca/rotas.js && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|^✖ R1|actual|expected\"; git checkout -q src/modulos/m3-presenca/rotas.js && git status --short && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\""
+      },
+      "time": {
+       "start": 1790122840194,
+       "end": 1790122844188
+      },
+      "output": "ℹ pass 6\nℹ fail 1\n✖ R1: qualquer pessoa da organização obtém o código, não só quem criou a atividade (11.9017ms)\n    actual: 403,\n    expected: 200,\n M test/m3-presenca.test.js\nℹ tests 95\nℹ pass 95\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 515,
+      "reasoning": 0,
+      "cache": {
+       "read": 90441,
+       "write": 902
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122845703
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Confirmado: o teste pega uma restrição por autoria. Código restaurado, 95/95.",
+     "time": {
+      "start": 1790122845703
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01ELvVewwgg2V8L5P6piFiWV",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && git add -A && git commit -q -m \"M3-R1: qualquer pessoa da organização obtém o código de qualquer encontro\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" 2>/dev/null && git log --oneline -1"
+      },
+      "time": {
+       "start": 1790122847045,
+       "end": 1790122849156
+      },
+      "output": "warning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\ne7e23f8 M3-R1: qualquer pessoa da organização obtém o código de qualquer encontro",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 204,
+      "reasoning": 0,
+      "cache": {
+       "read": 91343,
+       "write": 661
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122861764
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01AjMyThN4GnAhskygTrErvn",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node -e \"\nconst fs=require('fs');const f='test/apoio/api.js';let s=fs.readFileSync(f,'utf8');\ns=s.replace(\\\"export async function subirApi({ modoTeste = true } = {}) {\\\",\\\"// ambiente: variáveis a mais para o processo; valor undefined remove a variável herdada.\\nexport async function subirApi({ modoTeste = true, ambiente = {} } = {}) {\\\");\ns=s.replace(\\\"  if (modoTeste) env.MODO_TESTE = '1';\\n\\\",\\\"  if (modoTeste) env.MODO_TESTE = '1';\\n  for (const [nome, valor] of Object.entries(ambiente)) {\\n    if (valor === undefined) delete env[nome];\\n    else env[nome] = valor;\\n  }\\n\\\");\nfs.writeFileSync(f,s);\" && git diff test/apoio/api.js"
+      },
+      "time": {
+       "start": 1790122861952,
+       "end": 1790122863965
+      },
+      "output": "warning: in the working copy of 'api/test/apoio/api.js', LF will be replaced by CRLF the next time Git touches it\ndiff --git a/api/test/apoio/api.js b/api/test/apoio/api.js\nindex 88582e4..db940ce 100644\n--- a/api/test/apoio/api.js\n+++ b/api/test/apoio/api.js\n@@ -23,12 +23,17 @@ function portaLivre() {\n \n const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\n \n-export async function subirApi({ modoTeste = true } = {}) {\n+// ambiente: variáveis a mais para o processo; valor undefined remove a variável herdada.\n+export async function subirApi({ modoTeste = true, ambiente = {} } = {}) {\n   const porta = await portaLivre();\n   const pastaBanco = mkdtempSync(join(tmpdir(), 'semana-api-'));\n   const env = { ...process.env, PORT: String(porta), ARQUIVO_BANCO: join(pastaBanco, 'teste.db') };\n   delete env.MODO_TESTE;\n   if (modoTeste) env.MODO_TESTE = '1';\n+  for (const [nome, valor] of Object.entries(ambiente)) {\n+    if (valor === undefined) delete env[nome];\n+    else env[nome] = valor;\n+  }\n \n   const processo = spawn(process.execPath, ['src/servidor.js'], {\n     cwd: pastaApi,",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1344,
+      "reasoning": 0,
+      "cache": {
+       "read": 92004,
+       "write": 388
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122865502
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Agora o teste da R9, num `describe` próprio (cada caso sobe a sua API):",
+     "time": {
+      "start": 1790122865502
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01F9osAJCsZUxGRCauPP3ZGx",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node -e \"\nconst fs=require('fs');const f='test/m3-presenca.test.js';let s=fs.readFileSync(f,'utf8');\ns=s.replace(\\\"import { subirApi } from './apoio/api.js';\\\",\\\"import { subirApi } from './apoio/api.js';\\n// Único ponto de teste fora do HTTP (spec, seção 7, critério 7): o segredo não é observável de fora.\\nimport { derivarCodigo, SEGREDO_PADRAO } from '../src/modulos/m3-presenca/codigo.js';\\\");\nfs.writeFileSync(f,s);\" && cat >> test/m3-presenca.test.js <<'EOF'\n\ndescribe('M3 — segredo do código (R9)', () => {\n  // Minuto de 19:00 do dia 19, contado a partir do epoch Unix (R7).\n  const MINUTO_DAS_19H = Date.parse('2026-10-19T19:00:00-03:00') / 60000;\n\n  const pedir = async (api, metodo, rota, corpo) => {\n    const res = await fetch(`${api.url}${rota}`, {\n      method: metodo,\n      headers: { 'X-Usuario': 'org-ana', 'Content-Type': 'application/json' },\n      body: corpo === undefined ? undefined : JSON.stringify(corpo),\n    });\n    const texto = await res.text();\n    return { status: res.status, corpo: texto ? JSON.parse(texto) : undefined };\n  };\n\n  // Reset, cria um encontro às 19:00 e devolve { encontroId, codigo } com o relógio às 19:00:30.\n  const codigoDeUmEncontroNovo = async (api) => {\n    assert.equal((await pedir(api, 'POST', '/_teste/reset')).status, 204);\n    const atividade = await pedir(api, 'POST', '/atividades', {\n      titulo: 'Atividade A',\n      tipo: 'palestra',\n      salaId: 'sala-101',\n      vagas: 40,\n      encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' }],\n    });\n    assert.equal(atividade.status, 201);\n    assert.equal((await pedir(api, 'PUT', '/_teste/relogio', { agora: '2026-10-19T19:00:30-03:00' })).status, 200);\n    const res = await pedir(api, 'GET', `/encontros/${atividade.corpo.encontros[0].id}/codigo`);\n    assert.equal(res.status, 200);\n    return res.corpo;\n  };\n\n  it('R9: mesmo encontroId, índice e segredo dão o mesmo código; segredos diferentes, códigos diferentes', () => {\n    const um = derivarCodigo('enc_1a2b3c4d', MINUTO_DAS_19H, 'segredo-um');\n    assert.match(um, /^[A-HJKMNP-Z2-9]{6}$/);\n    assert.equal(derivarCodigo('enc_1a2b3c4d', MINUTO_DAS_19H, 'segredo-um'), um);\n    assert.notEqual(derivarCodigo('enc_1a2b3c4d', MINUTO_DAS_19H, 'segredo-dois'), um);\n  });\n\n  it('R9: sem SEGREDO_CODIGO a API usa o valor fixo', async () => {\n    const api = await subirApi({ ambiente: { SEGREDO_CODIGO: undefined } });\n    try {\n      const { encontroId, codigo } = await codigoDeUmEncontroNovo(api);\n      assert.equal(codigo, derivarCodigo(encontroId, MINUTO_DAS_19H, SEGREDO_PADRAO));\n    } finally {\n      await api.parar();\n    }\n  });\n\n  it('R9: com SEGREDO_CODIGO a API usa esse segredo, e POST /_teste/reset não o troca', async () => {\n    const segredo = 'segredo-do-teste-m3';\n    assert.notEqual(segredo, SEGREDO_PADRAO);\n    const api = await subirApi({ ambiente: { SEGREDO_CODIGO: segredo } });\n    try {\n      const antes = await codigoDeUmEncontroNovo(api);\n      assert.equal(antes.codigo, derivarCodigo(antes.encontroId, MINUTO_DAS_19H, segredo));\n      assert.notEqual(antes.codigo, derivarCodigo(antes.encontroId, MINUTO_DAS_19H, SEGREDO_PADRAO));\n\n      const depois = await codigoDeUmEncontroNovo(api); // faz outro reset\n      assert.equal(depois.codigo, derivarCodigo(depois.encontroId, MINUTO_DAS_19H, segredo));\n    } finally {\n      await api.parar();\n    }\n  });\n});\nEOF\nnode --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|^✖|SyntaxError|does not provide\" | head"
+      },
+      "time": {
+       "start": 1790122877167,
+       "end": 1790122879338
+      },
+      "output": "SyntaxError: The requested module '../src/modulos/m3-presenca/codigo.js' does not provide an export named 'SEGREDO_PADRAO'\n✖ test\\m3-presenca.test.js (52.8577ms)\nℹ pass 0\nℹ fail 1\n✖ failing tests:\n✖ test\\m3-presenca.test.js (52.8577ms)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1848,
+      "reasoning": 0,
+      "cache": {
+       "read": 92392,
+       "write": 1964
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122885035
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vermelho: `SEGREDO_PADRAO` não existe, e `derivarCodigo` ignora o segredo que recebe. Implementação — o segredo é lido uma vez, quando o processo sobe, e o reset nem chega a tocar nele:",
+     "time": {
+      "start": 1790122885038
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01T9WjMuX5amNTWiZhGew2uE",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && node -e \"\nconst fs=require('fs');const f='src/modulos/m3-presenca/codigo.js';let s=fs.readFileSync(f,'utf8');\ns=s.replace(\\\"const SEGREDO = 'semana-academica-2026-codigo-do-encontro';\\\",\\\"// R9: o segredo vem de SEGREDO_CODIGO; sem ela, este valor fixo. É lido uma vez, quando o\\n// processo sobe, então POST /_teste/reset não o troca.\\nexport const SEGREDO_PADRAO = 'semana-academica-2026-codigo-do-encontro';\\nconst SEGREDO = process.env.SEGREDO_CODIGO ?? SEGREDO_PADRAO;\\\");\ns=s.replace('export function derivarCodigo(encontroId, indice) {','export function derivarCodigo(encontroId, indice, segredo = SEGREDO) {');\ns=s.replace(\\\"createHmac('sha256', SEGREDO)\\\",\\\"createHmac('sha256', segredo)\\\");\nfs.writeFileSync(f,s);\" && cat src/modulos/m3-presenca/codigo.js && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)|^✖\""
+      },
+      "time": {
+       "start": 1790122888181,
+       "end": 1790122891198
+      },
+      "output": "import { createHmac } from 'node:crypto';\n\n// Código do encontro (specs/M3-presenca.md, R6–R9).\n\n// R6: maiúsculas e dígitos, sem 0, O, 1, I, L.\nexport const ALFABETO = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';\n\n// R9: o segredo vem de SEGREDO_CODIGO; sem ela, este valor fixo. É lido uma vez, quando o\n// processo sobe, então POST /_teste/reset não o troca.\nexport const SEGREDO_PADRAO = 'semana-academica-2026-codigo-do-encontro';\nconst SEGREDO = process.env.SEGREDO_CODIGO ?? SEGREDO_PADRAO;\n\n// R7: minutos contados a partir do epoch Unix, alinhados ao relógio (segundos 00–59).\nexport const indiceDoMinuto = (instanteMs) => Math.floor(instanteMs / 60000);\n\n// R7: HMAC de encontroId + índice do minuto, convertido para o alfabeto da R6.\n// Derivado a cada pedido, nunca gravado.\nexport function derivarCodigo(encontroId, indice, segredo = SEGREDO) {\n  const hmac = createHmac('sha256', segredo).update(`${encontroId}:${indice}`).digest();\n  let codigo = '';\n  for (let i = 0; i < 6; i++) codigo += ALFABETO[hmac[i] % ALFABETO.length];\n  return codigo;\n}\nℹ tests 98\nℹ pass 98\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 972,
+      "reasoning": 0,
+      "cache": {
+       "read": 94356,
+       "write": 5975
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122894158
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Verde (98/98). O vermelho anterior foi de importação, que derruba o arquivo inteiro. Por isso conferi também que o teste de `SEGREDO_CODIGO` falha sozinho quando a API ignora a variável:",
+     "time": {
+      "start": 1790122894161
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_019MiJG7kgViLBAjX4UwDdcj",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica/api\" && cp src/modulos/m3-presenca/codigo.js \"$TEMP/codigo.bak\" && sed -i \"s#^const SEGREDO = process.env.SEGREDO_CODIGO ?? SEGREDO_PADRAO;#const SEGREDO = SEGREDO_PADRAO;#\" src/modulos/m3-presenca/codigo.js && node --test test/m3-presenca.test.js 2>&1 | grep -E \"^ℹ (pass|fail)|^✖ R\"; cp \"$TEMP/codigo.bak\" src/modulos/m3-presenca/codigo.js && npm test 2>&1 | grep -E \"^ℹ (tests|pass|fail)\" && git diff --stat"
+      },
+      "time": {
+       "start": 1790122896299,
+       "end": 1790122900524
+      },
+      "output": "ℹ pass 9\nℹ fail 1\n✖ R9: com SEGREDO_CODIGO a API usa esse segredo, e POST /_teste/reset não o troca (217.117ms)\nℹ tests 98\nℹ pass 98\nℹ fail 0\nwarning: in the working copy of 'api/src/modulos/m3-presenca/codigo.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/apoio/api.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\n api/src/modulos/m3-presenca/codigo.js |  9 +++--\n api/test/apoio/api.js                 |  7 +++-\n api/test/m3-presenca.test.js          | 67 +++++++++++++++++++++++++++++++++++\n 3 files changed, 79 insertions(+), 4 deletions(-)",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 492,
+      "reasoning": 0,
+      "cache": {
+       "read": 100331,
+       "write": 1556
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122903303
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01F8LsbFuHJ8QLj1deusFZEo",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && git add -A && git commit -q -m \"M3-R9: segredo do código vem de SEGREDO_CODIGO, com valor fixo sem ela\n\nLido uma vez ao subir o processo; POST /_teste/reset não o troca.\nsubirApi aceita variáveis de ambiente para o teste da R9.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\" 2>/dev/null && git log --oneline -9 && cd api && npm test 2>&1 | grep -E \"^ℹ (tests|suites|pass|fail)\""
+      },
+      "time": {
+       "start": 1790122903303,
+       "end": 1790122906796
+      },
+      "output": "warning: in the working copy of 'api/src/modulos/m3-presenca/codigo.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/apoio/api.js', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'api/test/m3-presenca.test.js', LF will be replaced by CRLF the next time Git touches it\n2da53c3 M3-R9: segredo do código vem de SEGREDO_CODIGO, com valor fixo sem ela\ne7e23f8 M3-R1: qualquer pessoa da organização obtém o código de qualquer encontro\nb25d408 M3-R12: obter código de atividade cancelada responde ATIVIDADE_CANCELADA\n6c3a977 M3-R27: obter código responde 401, depois 403 SOMENTE_ORGANIZACAO, depois 404\n4d6a8a7 M3-R7: código gerado por HMAC do encontro e do índice do minuto\n6146096 M3-R8: trocaEm no fim do minuto do código e validoAte no fim do seguinte\n1f1d63a M3-R6: código de 6 caracteres no alfabeto sem 0 O 1 I L\n9811ce5 M3-R3: obter código fora da janela de presença responde FORA_DA_JANELA\n44bbd40 M1-R33: qualquer pessoa da organização altera atividade de outra\nℹ tests 98\nℹ suites 7\nℹ pass 98\nℹ fail 0",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 272,
+      "reasoning": 0,
+      "cache": {
+       "read": 101887,
+       "write": 876
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790122917096
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "A fatia 1 do M3 (o código do encontro) está pronta, com os critérios 1 a 7 cobertos. A suíte da API inteira, na última rodada de `npm test` (`node --test`), deu **98 testes, 98 passando, 0 falhando**. Nenhum teste existente foi alterado.\n\nCada regra teve o seu teste visto falhando antes do código, e cada uma virou um commit:\n\n| Commit | Regra | Critério | Por que o teste falhou antes do código |\n|---|---|---|---|\n| 9811ce5 | M3-R3 (+R2) | 1 | a rota não existia (404) |\n| 1f1d63a | M3-R6 | 2 | a resposta vinha sem `codigo` |\n| 6146096 | M3-R8 | 2 | a resposta vinha sem `trocaEm` e `validoAte` |\n| 4d6a8a7 | M3-R7 | 2, 3 | o código era fixo, então E e F davam o mesmo |\n| 6c3a977 | M3-R27 (401→403→404) | 6 | dava 500 em vez de 403 |\n| b25d408 | M3-R12 (+R27) | 5 | dava 200 com a atividade cancelada |\n| e7e23f8 | M3-R1 | 4 | **não falhou** (veja abaixo) |\n| 2da53c3 | M3-R9 | 7 | faltava `SEGREDO_PADRAO` e o segredo recebido era ignorado |\n\nTrês coisas que valem a pena saber:\n\n- **R1 passou antes de qualquer código novo.** A rota nunca verificou quem criou a atividade, então não havia nada a implementar. Para confirmar que o teste realmente pega o erro, coloquei de propósito uma regra que só deixava `org-ana` obter o código: o teste ficou vermelho (403). Depois desfiz essa mudança.\n- **R6 teve uma etapa com código fixo.** Para o teste do formato, o mínimo que passava era devolver sempre `K7M2QX`. O teste da R7 é que obrigou a trocar isso pelo HMAC.\n- **R9 é o único teste que usa uma função interna** (`derivarCodigo` e `SEGREDO_PADRAO` de `api/src/modulos/m3-presenca/codigo.js`), como a seção 7 da spec prevê. Ele sobe a API com e sem `SEGREDO_CODIGO` e compara o código devolvido por HTTP com a função usando o segredo esperado, antes e depois do reset. A primeira falha dele foi de importação, então conferi à parte que o caso \"com `SEGREDO_CODIGO`\" falha sozinho quando a API ignora a variável.\n\nPara o teste da R9, a função `subirApi` em `api/test/apoio/api.js` agora aceita uma opção `ambiente`. É um arquivo de apoio, não um teste. O segredo é lido uma única vez, quando o processo da API sobe.\n\nOs horários vêm sempre de `PUT /_teste/relogio`, e o módulo novo não usa `Date.now()`. Não precisei mexer em `autenticacao.js`, porque a rota nova exige `X-Usuario` normalmente.",
+     "time": {
+      "start": 1790122917096
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1102,
+      "reasoning": 0,
+      "cache": {
+       "read": 102763,
+       "write": 831
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

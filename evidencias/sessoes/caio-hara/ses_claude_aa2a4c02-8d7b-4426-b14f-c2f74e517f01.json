@@ -1,0 +1,641 @@
+{
+ "info": {
+  "id": "ses_claude_aa2a4c02-8d7b-4426-b14f-c2f74e517f01",
+  "title": "M1-grade skill specification",
+  "directory": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica",
+  "time": {
+   "created": 1790120067434,
+   "updated": 1790120413888
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790120067434
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"3198\">\nUse a skill to-spec. Escreva specs/M1-grade.md a partir de\nentrevistas/M1-grade.md. Cada regra cita a pergunta que a originou (P-xx)\ne, se houver, a regra do documento (RN-xxx). Siga as oito seções do modelo\nda skill. As regras são numeradas R1..Rn. Não invente nada que não esteja\nna entrevista.\n</pasted_content id=\"3198\">\n",
+     "time": {
+      "start": 1790120067434
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120070175
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "skill",
+     "callID": "toolu_012o85aRtxtyeu4vTxMpfmha",
+     "state": {
+      "status": "completed",
+      "input": {
+       "skill": "to-spec",
+       "args": "specs/M1-grade.md a partir de entrevistas/M1-grade.md",
+       "name": "to-spec"
+      },
+      "time": {
+       "start": 1790120070796,
+       "end": 1790120070814
+      },
+      "output": "Launching skill: to-spec"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 251,
+      "reasoning": 0,
+      "cache": {
+       "read": 31242,
+       "write": 14100
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120074002
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_011NLhahwe1kLduJioiFbdef",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && ls -R specs entrevistas 2>&1; cat entrevistas/M1-grade.md; ls; cat contrato-api.md",
+       "description": "List specs/interviews and read M1 interview and API contract"
+      },
+      "time": {
+       "start": 1790120074002,
+       "end": 1790120074990
+      },
+      "output": "<persisted-output>\nOutput too large (30.8KB). Full output saved to: C:\\Users\\caiot\\.claude\\projects\\C--dev-Atividade-Final-IA-projeto-semanaacademica\\aa2a4c02-8d7b-4426-b14f-c2f74e517f01\\tool-results\\bpz0hzjed.txt\n\nPreview (first 2KB):\nentrevistas:\nM1-grade.md\nM3-presenca.md\n\nspecs:\n# Entrevista — M1 Grade de atividades\n\n> Skill `grilling`. O agente pergunta; o grupo responde ou marca \"consultar requisitos\".\n> Pergunta marcada \"consultar requisitos\" fica **Pendente** e é respondida na consulta ao documento de requisitos.\n> Numeração **P-xx** contínua. O prefixo **RN** é reservado às regras do documento de requisitos e aparece só na coluna **Fonte**.\n\n## Fatos já resolvidos pelo repositório (não são perguntas)\n\n- Rotas, campos e códigos do M1: `contrato-api.md` §5 e §6. Não mudam.\n- Ordem geral: 401 → 403 `SOMENTE_ORGANIZACAO` → 404 `NAO_ENCONTRADO` → 422 `DADOS_INVALIDOS` → regras do recurso (§1). Logo, um erro de corpo (`DADOS_INVALIDOS`) sempre vence qualquer erro de regra. A ordem **entre** regras do recurso é regra de negócio.\n- Códigos de regra do M1 (§6): `QUANTIDADE_DE_ENCONTROS`, `ENCONTRO_INVALIDO`, `VAGAS_ACIMA_DA_CAPACIDADE`, `CONFLITO_DE_SALA` (criar); `CAMPO_NAO_EDITAVEL`, `VAGAS_ABAIXO_DOS_INSCRITOS`, `VAGAS_ACIMA_DA_CAPACIDADE`, `ATIVIDADE_CANCELADA` (alterar); `ATIVIDADE_JA_INICIADA`, `ATIVIDADE_CANCELADA` (cancelar).\n- `encontros` na saída vêm em ordem de início (§5).\n- Campo com `null` ou tipo errado (ex.: `\"vagas\": \"20\"`, `\"titulo\": null`) → 422 `DADOS_INVALIDOS` (§1).\n- Tempo vem do relógio do modo de teste (`api/src/relogio.js`, contrato §3), nunca da hora do sistema.\n- Datas de entrada: ISO 8601 com fuso (§1), validado por `lerInstante` em `api/src/erros.js`.\n- Ids: prefixo + 8 hex minúsculos, `atv_` e `enc_` (§1).\n- Evento: 19/10/2026 (seg) a 23/10/2026 (sex), horário de Brasília. Salas e capacidades: §4.\n\n---\n\n## Rodada 1\n\n### Regra de negócio\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-01 | Quantidade de encontros por tipo (`QUANTIDADE_DE_ENCONTROS`): quantos encontros uma palestra aceita? E um minicurso — qual o mínimo e o máximo? | Palestra: exatamente 1 encontro. Minicurso: mínimo 2 e máximo 5 encontros. | RN-102, RN-103. |\n...\n</persisted-output>",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 159,
+      "reasoning": 0,
+      "cache": {
+       "read": 45342,
+       "write": 1400
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120077289
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01TmyGqEzCUKzFux2u8UViJm",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\Users\\caiot\\.claude\\projects\\C--dev-Atividade-Final-IA-projeto-semanaacademica\\aa2a4c02-8d7b-4426-b14f-c2f74e517f01\\tool-results\\bpz0hzjed.txt"
+      },
+      "time": {
+       "start": 1790120077289,
+       "end": 1790120077563
+      },
+      "output": "[32235 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 136,
+      "reasoning": 0,
+      "cache": {
+       "read": 46742,
+       "write": 1408
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120079623
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_019KGkJp2yUoNhzdvSefMnsR",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && git ls-files api | grep -v node_modules; ls specs auditorias; sed -n 1,80p api/src/servidor.js 2>/dev/null || true; grep -rn \"criarServidor\" api/src | head",
+       "description": "Inspect API layout and test seam"
+      },
+      "time": {
+       "start": 1790120080624,
+       "end": 1790120082745
+      },
+      "output": "api/AGENTS.md\napi/CLAUDE.md\napi/package-lock.json\napi/package.json\napi/src/app.js\napi/src/banco.js\napi/src/dados-iniciais.js\napi/src/erros.js\napi/src/relogio.js\napi/src/servidor.js\napi/src/teste/rotas.js\napi/test/apoio/api.js\napi/test/modo-teste.test.js\nauditorias:\n\nspecs:\nimport { criarApp } from './app.js';\n\nconst porta = Number(process.env.PORT) || 3000;\nconst modoTeste = process.env.MODO_TESTE === '1';\n\ncriarApp({ modoTeste }).listen(porta, () => {\n  console.log(`API da Semana Acadêmica na porta ${porta}${modoTeste ? ' (modo de teste)' : ''}`);\n});",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 282,
+      "reasoning": 0,
+      "cache": {
+       "read": 48150,
+       "write": 16457
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120084829
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_018drq9ZcKSDyRzdwsdqnarQ",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && cat api/AGENTS.md api/test/apoio/api.js; sed -n 1,40p api/test/modo-teste.test.js; cat api/src/erros.js | head -60",
+       "description": "Read API agent notes and test helper"
+      },
+      "time": {
+       "start": 1790120084829,
+       "end": 1790120085139
+      },
+      "output": "# API\r\n- Tempo sempre pelo relógio do modo de teste, nunca Date.now() direto.\r\n- Testes em api/test/, um arquivo por módulo.// Sobe a API de verdade num processo separado, como o juiz faz: MODO_TESTE e PORT\n// vão no ambiente do processo filho, e o banco é um arquivo temporário descartável.\nimport { spawn } from 'node:child_process';\nimport { once } from 'node:events';\nimport { mkdtempSync, rmSync } from 'node:fs';\nimport { createServer } from 'node:net';\nimport { tmpdir } from 'node:os';\nimport { join } from 'node:path';\nimport { fileURLToPath } from 'node:url';\n\nconst pastaApi = fileURLToPath(new URL('../..', import.meta.url));\n\nfunction portaLivre() {\n  return new Promise((resolve, reject) => {\n    const servidor = createServer();\n    servidor.on('error', reject);\n    servidor.listen(0, () => {\n      const { port } = servidor.address();\n      servidor.close(() => resolve(port));\n    });\n  });\n}\n\nconst esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\n\nexport async function subirApi({ modoTeste = true } = {}) {\n  const porta = await portaLivre();\n  const pastaBanco = mkdtempSync(join(tmpdir(), 'semana-api-'));\n  const env = { ...process.env, PORT: String(porta), ARQUIVO_BANCO: join(pastaBanco, 'teste.db') };\n  delete env.MODO_TESTE;\n  if (modoTeste) env.MODO_TESTE = '1';\n\n  const processo = spawn(process.execPath, ['src/servidor.js'], {\n    cwd: pastaApi,\n    env,\n    stdio: ['ignore', 'ignore', 'pipe'],\n  });\n  let saidaDeErro = '';\n  processo.stderr.on('data', (trecho) => { saidaDeErro += trecho; });\n\n  const url = `http://127.0.0.1:${porta}`;\n  for (let tentativa = 0; ; tentativa++) {\n    if (processo.exitCode !== null) throw new Error(`a API encerrou ao subir:\\n${saidaDeErro}`);\n    try {\n      await fetch(url);\n      break;\n    } catch {\n      if (tentativa >= 200) throw new Error(`a API não respondeu em ${url}:\\n${saidaDeErro}`);\n      await esperar(50);\n    }\n  }\n\n  return {\n    url,\n    async parar() {\n      if (processo.exitCode === null) {\n        processo.kill();\n        await once(processo, 'exit');\n      }\n      rmSync(pastaBanco, { recursive: true, force: true });\n    },\n  };\n}\nimport { after, before, describe, it } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { subirApi } from './apoio/api.js';\n\nconst INSTANTE_DO_RESET = Date.parse('2026-10-13T09:00:00-03:00');\n\ndescribe('modo de teste (contrato, seção 3)', () => {\n  let api;\n  before(async () => { api = await subirApi(); });\n  after(async () => { await api?.parar(); });\n\n  const reset = () => fetch(`${api.url}/_teste/reset`, { method: 'POST' });\n  const lerRelogio = () => fetch(`${api.url}/_teste/relogio`);\n  const ajustarRelogio = (corpo) => fetch(`${api.url}/_teste/relogio`, {\n    method: 'PUT',\n    headers: { 'Content-Type': 'application/json' },\n    body: typeof corpo === 'string' ? corpo : JSON.stringify(corpo),\n  });\n\n  it('POST /_teste/reset responde 204 sem corpo', async () => {\n    const res = await reset();\n    assert.equal(res.status, 204);\n    assert.equal(await res.text(), '');\n  });\n\n  it('depois do reset o relógio marca 2026-10-13T09:00:00-03:00', async () => {\n    await reset();\n    const res = await lerRelogio();\n    assert.equal(res.status, 200);\n    const corpo = await res.json();\n    assert.deepEqual(Object.keys(corpo), ['agora']);\n    assert.equal(Date.parse(corpo.agora), INSTANTE_DO_RESET);\n  });\n\n  it('PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado', async () => {\n    await reset();\n    const res = await ajustarRelogio({ agora: '2026-10-19T19:05:00-03:00' });\n    assert.equal(res.status, 200);\n    const corpo = await res.json();\n    assert.deepEqual(Object.keys(corpo), ['agora']);\n// Formato de erro do contrato, seção 1: {\"erro\": \"CODIGO\", \"mensagem\": \"texto livre\"}.\n\nexport class ErroDaApi extends Error {\n  constructor(status, erro, mensagem) {\n    super(mensagem);\n    this.status = status;\n    this.erro = erro;\n  }\n}\n\nexport const dadosInvalidos = (mensagem) => new ErroDaApi(422, 'DADOS_INVALIDOS', mensagem);\n\nconst ISO_COM_FUSO = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:\\d{2})$/;\n\n// Datas chegam em ISO 8601 com fuso (seção 1); qualquer outra coisa é DADOS_INVALIDOS.\nexport function lerInstante(valor, campo) {\n  if (typeof valor !== 'string' || !ISO_COM_FUSO.test(valor) || Number.isNaN(Date.parse(valor))) {\n    throw dadosInvalidos(`${campo} precisa ser uma data ISO 8601 com fuso`);\n  }\n  return new Date(valor);\n}\n\nexport function rotaInexistente(req, res) {\n  res.status(404).json({ erro: 'NAO_ENCONTRADO', mensagem: `${req.method} ${req.path} não existe` });\n}\n\n// eslint-disable-next-line no-unused-vars\nexport function tratarErros(erro, req, res, next) {\n  if (erro instanceof ErroDaApi) {\n    return res.status(erro.status).json({ erro: erro.erro, mensagem: erro.message });\n  }\n  if (erro.type === 'entity.parse.failed') {\n    return res.status(422).json({ erro: 'DADOS_INVALIDOS', mensagem: 'o corpo não é um JSON válido' });\n  }\n  console.error(erro);\n  res.status(500).json({ erro: 'ERRO_INTERNO', mensagem: 'erro inesperado no servidor' });\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 167,
+      "reasoning": 0,
+      "cache": {
+       "read": 64607,
+       "write": 589
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120123075
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Li a entrevista e o contrato; agora vou escrever a spec.",
+     "time": {
+      "start": 1790120123077
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01AQ9mhshASJVQjZkEZ1oXj6",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "# Spec — M1 Grade de atividades\n\n> Origem: `entrevistas/M1-grade.md` (rodadas 1–3 e consulta ao documento de requisitos, 2026-09-22).\n> Cada regra cita a pergunta que a originou (**P-xx**) e, quando houver, a regra do documento de requisitos (**RN-xxx**).\n> Rotas, campos e códigos vêm de `contrato-api.md` §5 e §6 e não mudam.\n\n## 1. Objetivo\n\nA organização monta a grade da Semana Acadêmica (19 a 23/10/2026, horário de Brasília): cadastra palestras e minicursos, cada um com sala, vagas e encontros; ajusta título e vagas; e cancela atividades que ainda não começaram. Qualquer pessoa (organização ou participante) consulta as salas e a grade, com a situação de cada atividade e as contagens de vagas calculadas no momento da leitura.\n\n## 2. Fora de escopo\n\n- Excluir atividade (P-14, RN-113).\n- Reativar atividade cancelada (P-14, RN-113).\n- Criar sala; as salas são as dos dados iniciais (P-14, Seção 7; contrato §4).\n- Cadastrar palestrante ou descrição (P-14, Seção 7).\n- Limitar quantas atividades um organizador cria (P-14, Seção 7).\n- Cancelar as inscrições de uma atividade cancelada: é do M2 (P-12, RN-217).\n- Exigir que o encontro comece no futuro em relação ao relógio (P-02).\n- Faixa de horário permitida no dia (P-02).\n- Tamanho máximo de título e unicidade de título (P-23).\n- Restringir alteração/cancelamento a quem criou a atividade (P-29).\n\n## 3. Modelo\n\n### Sala (dados iniciais, contrato §4)\n\n| Campo | Tipo | Origem |\n|---|---|---|\n| `id` | string | dados iniciais (`auditorio`, `sala-101`, `sala-102`, `lab-3`) |\n| `nome` | string | dados iniciais |\n| `capacidade` | inteiro | dados iniciais (200, 40, 40, 20) |\n\n### Atividade\n\n| Campo | Tipo | Origem |\n|---|---|---|\n| `id` | string `atv_` + 8 hex minúsculos | gerado na criação |\n| `titulo` | string | informado; editável |\n| `tipo` | `\"palestra\"` \\| `\"minicurso\"` | informado; não editável |\n| `salaId` | string | informado; não editável |\n| `vagas` | inteiro ≥ 1 | informado; editável |\n| `encontros` | `[Encontro]`, em ordem de `inicio` | informado; não editável |\n| `cancelada` (interno, não sai na resposta) | booleano | gravado pelo cancelamento — o único estado gravado além da entrada (P-27) |\n| `cargaHorariaMinutos` | inteiro | derivado: soma das durações dos encontros |\n| `situacao` | `\"prevista\"` \\| `\"em_andamento\"` \\| `\"encerrada\"` \\| `\"cancelada\"` | derivado do relógio e de `cancelada` |\n| `ocupadas` | inteiro | derivado das inscrições do M2 |\n| `emEspera` | inteiro | derivado das inscrições do M2 |\n| `vagasRestantes` | inteiro | derivado: `vagas − ocupadas` |\n\n### Encontro\n\n| Campo | Tipo | Origem |\n|---|---|---|\n| `id` | string `enc_` + 8 hex minúsculos | gerado na criação |\n| `inicio` | instante ISO 8601 | informado |\n| `fim` | instante ISO 8601 | informado |\n\nCampos derivados não são gravados: são calculados a cada leitura (P-27).\n\n## 4. Endpoints\n\n| Método | Rota | Quem | Corpo | Sucesso |\n|---|---|---|---|---|\n| GET | `/salas` | todos | — | 200 `[Sala]` |\n| GET | `/atividades` | todos | — (filtros `?dia=AAAA-MM-DD`, `?tipo=palestra\\|minicurso`) | 200 `[Atividade]` |\n| GET | `/atividades/:id` | todos | — | 200 `Atividade` |\n| POST | `/atividades` | organização | `{titulo, tipo, salaId, vagas, encontros: [{inicio, fim}]}` | 201 `Atividade` |\n| PATCH | `/atividades/:id` | organização | subconjunto de `{titulo, vagas}` | 200 `Atividade` |\n| POST | `/atividades/:id/cancelamento` | organização | ignorado | 200 `Atividade` |\n\nHerdado do contrato (§1, §6), vale para todas as rotas acima e não é regra R: sem `X-Usuario` ou id desconhecido → 401 `USUARIO_DESCONHECIDO`; participante em rota de organização → 403 `SOMENTE_ORGANIZACAO`; `:id` inexistente → 404 `NAO_ENCONTRADO`; corpo que não é JSON, campo obrigatório ausente, `null` ou de tipo errado → 422 `DADOS_INVALIDOS`. Ordem: 401 → 403 → 404 → 422 `DADOS_INVALIDOS` → regras do recurso. Tempo sempre do relógio do modo de teste.\n\n## 5. Regras\n\n### Leitura\n\n- **R1** — `GET /salas` devolve as salas na ordem da tabela de dados iniciais: `auditorio`, `sala-101`, `sala-102`, `lab-3`. (P-28; contrato §4)\n- **R2** — `GET /atividades` ordena pelo `inicio` do primeiro encontro; empate pelo `id`. (P-17)\n- **R3** — `?dia=AAAA-MM-DD` devolve as atividades com algum encontro nesse dia pelo calendário de Brasília; `?tipo=` filtra por `palestra` ou `minicurso`; os dois combinam em E. Valor inválido em qualquer filtro → 422 `DADOS_INVALIDOS`. (P-18; RN-116)\n- **R4** — Atividades canceladas aparecem em `GET /atividades` e em `GET /atividades/:id`, para todos os perfis. (P-13; RN-115)\n- **R5** — `encontros` sai ordenado por `inicio`; encontros enviados fora de ordem são aceitos. (P-25; contrato §5)\n- **R6** — `cargaHorariaMinutos` é a soma exata das durações dos encontros em minutos, sem arredondamento. (P-11; RN-109)\n- **R7** — `situacao`: `prevista` até antes do `inicio` do 1º encontro; `em_andamento` a partir do instante exato do `inicio` do 1º encontro (inclusive entre encontros); `encerrada` a partir do instante exato do `fim` do último encontro; `cancelada` prevalece sobre todas. Muda com o relógio sem que nada seja gravado. (P-09, P-27; RN-114)\n- **R8** — `ocupadas` conta as inscrições `confirmada` e `convocada`; `emEspera` conta só `em_espera`; `vagasRestantes = vagas − ocupadas`. (P-10; RN-111, RN-205, Seção 5.2)\n- **R9** — Em atividade cancelada: `ocupadas: 0`, `emEspera: 0`, `vagasRestantes: vagas`. (P-10(d), P-27; RN-217)\n- **R10** — Instantes na resposta usam o fuso `-03:00`. (P-20; contrato §1)\n- **R11** — Instantes de encontro com segundos ou milissegundos são aceitos e guardados como vieram (o instante devolvido é o mesmo, com a mesma precisão). (P-30)\n\n### Criar (`POST /atividades`)\n\n- **R12** — 422 `DADOS_INVALIDOS` quando: `titulo` não é string ou fica vazio após trim; `tipo` fora de `palestra`/`minicurso`; `vagas` não é inteiro ≥ 1 (0, negativo ou decimal); `encontros` não é array de objetos com `inicio` e `fim` ISO 8601 com fuso; campo obrigatório ausente ou de tipo errado. (P-15; contrato §1, §5)\n- **R13** — Campo extra dentro de um encontro (ex.: `id`) → 422 `DADOS_INVALIDOS`. (P-26)\n- **R14** — `salaId` que não existe → 422 `DADOS_INVALIDOS` (não 404). (P-16)\n- **R15** — Título sem tamanho máximo; títulos repetidos são aceitos. (P-23)\n- **R16** — 422 `QUANTIDADE_DE_ENCONTROS` quando palestra não tem exatamente 1 encontro, ou minicurso tem menos de 2 ou mais de 5. `encontros: []` cai aqui, não em `DADOS_INVALIDOS`. (P-01, P-15; RN-102, RN-103)\n- **R17** — 422 `ENCONTRO_INVALIDO` quando a duração de um encontro é inferior a 60 minutos ou superior a 240 minutos (60 e 240 são aceitos; `fim` ≤ `inicio` cai aqui). (P-02; RN-104–RN-106)\n- **R18** — 422 `ENCONTRO_INVALIDO` quando um encontro não começa e termina no mesmo dia. (P-02; RN-104–RN-106)\n- **R19** — 422 `ENCONTRO_INVALIDO` quando um encontro fica fora do período 19/10/2026 a 23/10/2026 (horário de Brasília). (P-02; RN-104–RN-106)\n- **R20** — 422 `ENCONTRO_INVALIDO` quando dois encontros da mesma atividade se sobrepõem. (P-02; RN-104–RN-106)\n- **R21** — 422 `VAGAS_ACIMA_DA_CAPACIDADE` quando `vagas` ultrapassa a capacidade da sala; `vagas` igual à capacidade é aceito. Vale no POST e no PATCH. (P-03, P-21; RN-107)\n- **R22** — 409 `CONFLITO_DE_SALA` quando um encontro, na mesma sala, fica a menos de 15 minutos de um encontro de outra atividade não cancelada (entre o fim de um e o início do outro). Encostar (`fim` = `inicio`) conflita; intervalo de exatamente 15 minutos é aceito. Atividade cancelada não ocupa a sala. (P-04; RN-108)\n- **R23** — Precedência no POST: `QUANTIDADE_DE_ENCONTROS` → `ENCONTRO_INVALIDO` → `VAGAS_ACIMA_DA_CAPACIDADE` → `CONFLITO_DE_SALA`. (P-05)\n\n### Alterar (`PATCH /atividades/:id`)\n\n- **R24** — Só `titulo` e `vagas` são editáveis. `tipo`, `salaId`, `encontros`, `id` e os campos calculados (`cargaHorariaMinutos`, `situacao`, `ocupadas`, `vagasRestantes`, `emEspera`) no corpo → 422 `CAMPO_NAO_EDITAVEL`, mesmo com o valor atual. (P-06, P-19, P-24; RN-110)\n- **R25** — Campo desconhecido no corpo → 422 `DADOS_INVALIDOS`. Corpo `{}` → 200 sem mudança. `titulo` e `vagas` enviados seguem a validação da R12. (P-19, P-15)\n- **R26** — 409 `VAGAS_ABAIXO_DOS_INSCRITOS` quando o novo `vagas` é menor que `ocupadas`; igual é aceito; a lista de espera não entra na conta. (P-07; RN-111)\n- **R27** — PATCH em atividade cancelada → 422 `ATIVIDADE_CANCELADA`. (P-21, P-22; RN-113, RN-114)\n- **R28** — O PATCH não é bloqueado pelo tempo: atividade `em_andamento` ou `encerrada` aceita alteração de `titulo` e `vagas`. (P-08; RN-110)\n- **R29** — Precedência no PATCH: `ATIVIDADE_CANCELADA` → `CAMPO_NAO_EDITAVEL` → `VAGAS_ACIMA_DA_CAPACIDADE` → `VAGAS_ABAIXO_DOS_INSCRITOS`. (P-21)\n\n### Cancelar (`POST /atividades/:id/cancelamento`)\n\n- **R30** — Cancelar só antes do início do 1º encontro, sem antecedência mínima. Com o relógio no instante exato do `inicio` do 1º encontro ou depois → 422 `ATIVIDADE_JA_INICIADA`. (P-08; RN-112, Seção 5)\n- **R31** — Atividade já cancelada → 422 `ATIVIDADE_CANCELADA`, que vence `ATIVIDADE_JA_INICIADA` quando as duas se aplicam. (P-22; RN-113, RN-114)\n- **R32** — Sucesso → 200 com a `Atividade` em `situacao: \"cancelada\"`; o corpo da requisição é ignorado. (P-31, P-27)\n\n### Autoria\n\n- **R33** — Qualquer pessoa da organização altera e cancela qualquer atividade, inclusive as criadas por outra. (P-29)\n\n## 6. Critérios de aceite\n\nTodos partem de `POST /_teste/reset` (relógio em `2026-10-13T09:00:00-03:00`) e usam `X-Usuario: org-ana` salvo indicação. \"Palestra válida\" = `{\"titulo\":\"IA hoje\",\"tipo\":\"palestra\",\"salaId\":\"sala-101\",\"vagas\":40,\"encontros\":[{\"inicio\":\"2026-10-19T19:00:00-03:00\",\"fim\":\"2026-10-19T21:00:00-03:00\"}]}`.\n\n1. (R1) `GET /salas` com `p-carla` → 200, ids na ordem `auditorio`, `sala-101`, `sala-102`, `lab-3`, capacidades 200, 40, 40, 20.\n2. (R2) Criar A com encontro em 20/10 19:00 e B em 19/10 19:00 → `GET /atividades` devolve B antes de A.\n3. (R2) Duas atividades com o mesmo `inicio` do 1º encontro (salas diferentes) → saem em ordem crescente de `id`.\n4. (R3) Palestra em 19/10 e minicurso em 20/10–21/10 → `?dia=2026-10-20` devolve só o minicurso; `?tipo=palestra` só a palestra; `?dia=2026-10-20&tipo=palestra` → `[]`.\n5. (R3) Encontro `2026-10-19T22:00:00-03:00`–`23:30-03:00` (01:00Z do dia 20) → aparece em `?dia=2026-10-19`, não em `?dia=2026-10-20`.\n6. (R3) `?dia=19-10-2026` → 422 `DADOS_INVALIDOS`; `?tipo=oficina` → 422 `DADOS_INVALIDOS`.\n7. (R4, R32) Cancelar a palestra válida → 200, `situacao: \"cancelada\"`; `GET /atividades` e `GET /atividades/:id` com `p-carla` a incluem com `situacao: \"cancelada\"`.\n8. (R5) Minicurso com encontros enviados 20/10 antes de 19/10 → 201, `encontros[0].inicio` é o de 19/10; cada encontro tem `id` `enc_` + 8 hex.\n9. (R6) Minicurso com encontros de 3 h e 2 h 30 → `cargaHorariaMinutos: 330`.\n10. (R6, R11) Palestra de `19:00:30-03:00` a `20:30:00-03:00` → 201, `cargaHorariaMinutos` = 89,5 (soma exata, sem arredondar), `inicio` devolvido é o mesmo instante com os segundos.\n11. (R7) Palestra válida: relógio 19/10 18:59:59 → `prevista`; 19:00:00 → `em_andamento`; 21:00:00 → `encerrada`.\n12. (R7) Minicurso 19/10 19–22 h e 20/10 19–22 h, relógio 20/10 10:00 → `em_andamento`.\n13. (R7, R9) Palestra cancelada com o relógio depois avançado para 19/10 22:00 → `situacao: \"cancelada\"`, `ocupadas: 0`, `emEspera: 0`, `vagasRestantes: 40`.\n14. (R8) *(depende do M2)* Atividade com 2 inscrições `confirmada`, 1 `convocada` e 3 `em_espera`, `vagas` 40 → `ocupadas: 3`, `emEspera: 3`, `vagasRestantes: 37`.\n15. (R10) Encontro enviado como `2026-10-19T22:00:00Z` → resposta com `inicio` terminando em `-03:00` e igual a `2026-10-19T19:00:00-03:00`.\n16. (R12) POST com `titulo: \"   \"`, com `tipo: \"oficina\"`, com `vagas: 0`, `vagas: -1`, `vagas: 2.5`, `vagas: \"20\"`, `titulo: null`, sem `salaId`, com `encontros: [{\"inicio\":\"2026-10-19T19:00:00\"}]` (sem fuso e sem `fim`) → cada um 422 `DADOS_INVALIDOS`.\n17. (R12, R16) Palestra válida com `vagas: 0` **e** `encontros: []` → 422 `DADOS_INVALIDOS` (corpo vence regra).\n18. (R13) Encontro com `\"id\":\"enc_00000000\"` → 422 `DADOS_INVALIDOS`.\n19. (R14) `salaId: \"sala-999\"` → 422 `DADOS_INVALIDOS`.\n20. (R15) Duas palestras válidas com o mesmo título (horários sem conflito) → as duas 201; título com 1000 caracteres → 201.\n21. (R16) Palestra com 2 encontros → 422 `QUANTIDADE_DE_ENCONTROS`; minicurso com 1 → 422; minicurso com 6 → 422; minicurso com 5 → 201; palestra com `encontros: []` → 422 `QUANTIDADE_DE_ENCONTROS`.\n22. (R17) Encontro de 59 min → 422 `ENCONTRO_INVALIDO`; de 60 min → 201; de 240 min → 201; de 241 min → 422; `fim` igual a `inicio` → 422 `ENCONTRO_INVALIDO`.\n23. (R18) Encontro de `2026-10-19T22:00:00-03:00` a `2026-10-20T01:00:00-03:00` → 422 `ENCONTRO_INVALIDO`.\n24. (R19) Encontro em 18/10/2026 19–21 h → 422 `ENCONTRO_INVALIDO`; em 24/10/2026 → 422; em 23/10/2026 19–21 h → 201.\n25. (R20) Minicurso com encontros 19/10 19–21 h e 19/10 20–22 h → 422 `ENCONTRO_INVALIDO`.\n26. (R21) `lab-3` com `vagas: 20` → 201; com `vagas: 21` → 422 `VAGAS_ACIMA_DA_CAPACIDADE`.\n27. (R22) Existe palestra na `sala-101` 19/10 19–21 h. Nova na mesma sala 21:00–22:00 → 409 `CONFLITO_DE_SALA`; 21:14–22:14 → 409; 21:15–22:15 → 201; 17:45–18:45 → 201; 18:00–19:00 → 409. Mesmo horário em `sala-102` → 201.\n28. (R22) Cancelar a palestra existente e criar outra na `sala-101` 19/10 19–21 h → 201.\n29. (R23) Palestra com 2 encontros inválidos e `vagas` acima da capacidade → `QUANTIDADE_DE_ENCONTROS`; palestra com 1 encontro de 30 min, `vagas` acima da capacidade e conflito de sala → `ENCONTRO_INVALIDO`; encontro válido, `vagas` acima e conflito → `VAGAS_ACIMA_DA_CAPACIDADE`.\n30. (R24) PATCH com `{\"tipo\":\"minicurso\"}`, `{\"salaId\":\"sala-101\"}` (valor atual), `{\"encontros\":[...]}`, `{\"id\":\"atv_00000000\"}`, `{\"situacao\":\"encerrada\"}`, `{\"ocupadas\":0}` → cada um 422 `CAMPO_NAO_EDITAVEL`.\n31. (R24, R25) PATCH `{\"titulo\":\"Novo\"}` → 200, `titulo: \"Novo\"`; `{\"vagas\":30}` → 200, `vagas: 30`, `vagasRestantes: 30`.\n32. (R25) PATCH `{}` → 200 com a atividade igual; `{\"descricao\":\"x\"}` → 422 `DADOS_INVALIDOS`; `{\"vagas\":0}` → 422 `DADOS_INVALIDOS`; `{\"titulo\":\"\"}` → 422 `DADOS_INVALIDOS`.\n33. (R21) PATCH `{\"vagas\":41}` na `sala-101` → 422 `VAGAS_ACIMA_DA_CAPACIDADE`; `{\"vagas\":40}` → 200.\n34. (R26) *(depende do M2)* Atividade com `ocupadas: 3` e 2 em espera → PATCH `{\"vagas\":2}` → 409 `VAGAS_ABAIXO_DOS_INSCRITOS`; `{\"vagas\":3}` → 200.\n35. (R27) PATCH `{\"titulo\":\"x\"}` em atividade cancelada → 422 `ATIVIDADE_CANCELADA`.\n36. (R28) Relógio em 19/10 20:00 (em andamento) → PATCH `{\"titulo\":\"x\"}` → 200; relógio em 19/10 22:00 (encerrada) → PATCH `{\"vagas\":35}` → 200.\n37. (R29) Cancelada + `{\"tipo\":\"minicurso\",\"vagas\":999}` → `ATIVIDADE_CANCELADA`; não cancelada + `{\"tipo\":\"minicurso\",\"vagas\":999}` → `CAMPO_NAO_EDITAVEL`. *(depende do M2)* `ocupadas: 3` + `{\"vagas\":999}` → `VAGAS_ACIMA_DA_CAPACIDADE`.\n38. (R30) Relógio em 19/10 18:59:59 → cancelar → 200; em outra palestra, relógio em 19/10 19:00:00 → 422 `ATIVIDADE_JA_INICIADA`; relógio em 19/10 22:00 → 422 `ATIVIDADE_JA_INICIADA`.\n39. (R31) Cancelar duas vezes → a 2ª é 422 `ATIVIDADE_CANCELADA`; cancelada e com relógio depois do início → 422 `ATIVIDADE_CANCELADA`.\n40. (R32) Cancelamento com corpo `{\"motivo\":\"x\"}` → 200, `situacao: \"cancelada\"`.\n41. (R33) Atividade criada por `org-ana`; `org-bruno` faz PATCH `{\"titulo\":\"x\"}` → 200 e cancela → 200.\n\n## 7. Como isto será verificado\n\nPela costura HTTP, a mais externa que o repositório já tem: `api/test/apoio/api.js` (`subirApi`) sobe a API num processo separado com `MODO_TESTE=1` e banco temporário, como o juiz faz. Os testes ficam em `api/test/m1-grade.test.js` (um arquivo por módulo), usam `fetch`, `POST /_teste/reset` antes de cada cenário e `PUT /_teste/relogio` para mover o tempo. Nenhum ponto de teste novo: as regras são todas observáveis nas rotas do contrato.\n\nOs critérios 14, 34 e a última parte do 37 precisam de inscrições com status `confirmada`, `convocada` e `em_espera`, que só existem pelo M2 (`POST /atividades/:id/inscricoes` e o fluxo de convocação). Eles entram na última fatia e só rodam quando o M2 existir.\n\n## 8. Fatias de entrega\n\n1. **Salas e palestra mínima** — R1, R5, R6, R10, R11, R12, R13, R14, R15, R32 não; `GET /salas`, `POST /atividades` feliz, `GET /atividades/:id` com contagens zeradas (`ocupadas: 0`, `emEspera: 0`, `vagasRestantes: vagas`) e `situacao: \"prevista\"`. Critérios 1, 8–10, 15–20.\n2. **Regras de criação** — R16, R17, R18, R19, R20, R21 (POST), R22 (sem cancelamento), R23. Critérios 21–27, 29.\n3. **Listagem** — R2, R3. Critérios 2–6.\n4. **Tempo e cancelamento** — R7, R9, R30, R31, R32, R4, R22 (cancelada libera a sala), R33 (cancelar). Critérios 7, 11–13, 28, 38–40, 41 (parte do cancelamento).\n5. **Alteração** — R24, R25, R21 (PATCH), R27, R28, R29 (sem inscrições), R33 (PATCH). Critérios 30–33, 35–37 (sem a parte do M2), 41.\n6. **Contagens com inscrições** *(depende do M2)* — R8, R26, R29 completa. Critérios 14, 34, 37 (parte do M2).\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\specs\\M1-grade.md"
+      },
+      "time": {
+       "start": 1790120188685,
+       "end": 1790120188717
+      },
+      "output": "File created successfully at: C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\specs\\M1-grade.md (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 13067,
+      "reasoning": 0,
+      "cache": {
+       "read": 65196,
+       "write": 2565
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120191486
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01XDp9gsLNW3icWM2CvFKa8D",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && sed -i 's/R1, R5, R6, R10, R11, R12, R13, R14, R15, R32 não; /R1, R5, R6, R10, R11, R12, R13, R14, R15; /; s/| `cargaHorariaMinutos` | inteiro | derivado: soma das durações dos encontros |/| `cargaHorariaMinutos` | número (minutos) | derivado: soma exata das durações dos encontros (pode ter fração, P-11 + P-30) |/' specs/M1-grade.md && grep -n \"Salas e palestra\\|cargaHorariaMinutos\\` |\" specs/M1-grade.md",
+       "description": "Fix slice-1 line and carga horária type"
+      },
+      "time": {
+       "start": 1790120193782,
+       "end": 1790120195449
+      },
+      "output": "45:| `cargaHorariaMinutos` | número (minutos) | derivado: soma exata das durações dos encontros (pode ter fração, P-11 + P-30) |\n178:1. **Salas e palestra mínima** — R1, R5, R6, R10, R11, R12, R13, R14, R15; `GET /salas`, `POST /atividades` feliz, `GET /atividades/:id` com contagens zeradas (`ocupadas: 0`, `emEspera: 0`, `vagasRestantes: vagas`) e `situacao: \"prevista\"`. Critérios 1, 8–10, 15–20.",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 478,
+      "reasoning": 0,
+      "cache": {
+       "read": 67761,
+       "write": 13156
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120203695
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Escrevi `specs/M1-grade.md` com as oito seções do modelo, 33 regras e 41 critérios de aceite. Cada regra cita a pergunta que a originou (P-xx) e, quando houver, a regra do documento (RN-xxx). Uma ressalva: a skill manda gravar em `spec-<recurso>.md` na raiz, mas segui o caminho que você pediu.\n\n**Regras**\n\n- R1 — `GET /salas` na ordem dos dados iniciais (P-28)\n- R2 — `GET /atividades` ordenado pelo início do 1º encontro; empate pelo `id` (P-17)\n- R3 — Filtros `?dia=` (calendário de Brasília) e `?tipo=` combinam em E; valor inválido → 422 `DADOS_INVALIDOS` (P-18, RN-116)\n- R4 — Canceladas aparecem na lista e no detalhe, para todos os perfis (P-13, RN-115)\n- R5 — Encontros enviados fora de ordem são aceitos; saem ordenados por `inicio` (P-25)\n- R6 — `cargaHorariaMinutos` é a soma exata das durações, sem arredondar (P-11, RN-109)\n- R7 — Transições de `situacao` no instante exato; `cancelada` prevalece; calculada na leitura (P-09, P-27, RN-114)\n- R8 — `ocupadas` = `confirmada` + `convocada`; `emEspera` = `em_espera`; `vagasRestantes` = `vagas − ocupadas` (P-10)\n- R9 — Atividade cancelada → contagens 0 / 0 / `vagas` (P-10, RN-217)\n- R10 — Instantes na resposta em `-03:00` (P-20)\n- R11 — Segundos e milissegundos são aceitos e guardados como vieram (P-30)\n- R12 — Validação do corpo → 422 `DADOS_INVALIDOS` (P-15)\n- R13 — Campo extra dentro de um encontro → `DADOS_INVALIDOS` (P-26)\n- R14 — `salaId` inexistente → 422 `DADOS_INVALIDOS` (P-16)\n- R15 — Título sem tamanho máximo; títulos repetidos são aceitos (P-23)\n- R16 — Palestra tem 1 encontro; minicurso tem de 2 a 5; `[]` → `QUANTIDADE_DE_ENCONTROS` (P-01, RN-102/103)\n- R17 — Duração menor que 60 ou maior que 240 min → `ENCONTRO_INVALIDO` (P-02)\n- R18 — Encontro que não começa e termina no mesmo dia → `ENCONTRO_INVALIDO` (P-02)\n- R19 — Encontro fora de 19 a 23/10/2026 → `ENCONTRO_INVALIDO` (P-02)\n- R20 — Encontros da mesma atividade que se sobrepõem → `ENCONTRO_INVALIDO` (P-02)\n- R21 — `vagas` acima da capacidade → `VAGAS_ACIMA_DA_CAPACIDADE`; igual é aceito; vale no POST e no PATCH (P-03, RN-107)\n- R22 — Intervalo menor que 15 min na mesma sala → 409 `CONFLITO_DE_SALA`; encostar conflita; cancelada não ocupa a sala (P-04, RN-108)\n- R23 — Precedência no POST (P-05)\n- R24 — Só `titulo` e `vagas` são editáveis; os demais campos → `CAMPO_NAO_EDITAVEL`, mesmo com o valor atual (P-06, P-19, P-24)\n- R25 — PATCH com `{}` → 200; campo desconhecido → `DADOS_INVALIDOS` (P-19)\n- R26 — `vagas` menor que `ocupadas` → 409 `VAGAS_ABAIXO_DOS_INSCRITOS`; igual é aceito (P-07, RN-111)\n- R27 — PATCH em atividade cancelada → `ATIVIDADE_CANCELADA` (P-21, P-22)\n- R28 — PATCH não é bloqueado pelo tempo (P-08)\n- R29 — Precedência no PATCH (P-21)\n- R30 — Cancelar a partir do instante do início → `ATIVIDADE_JA_INICIADA` (P-08, RN-112)\n- R31 — Cancelar de novo → `ATIVIDADE_CANCELADA`, que vence `ATIVIDADE_JA_INICIADA` (P-22)\n- R32 — Cancelamento → 200 com `cancelada`; o corpo é ignorado (P-31)\n- R33 — Qualquer pessoa da organização altera e cancela qualquer atividade (P-29)\n\n**Pontos que a entrevista não fecha.** Não inventei regra para eles; preciso que vocês decidam:\n\n1. **Campo desconhecido ou `id` no corpo do POST.** A P-19 só trata do PATCH e a P-26 só de campos dentro do encontro.\n2. **Encontros da mesma atividade que se encostam** (`fim` de um = `inicio` do outro): isso conta como sobreposição na R20? A regra de encostar da P-04 é só para a sala.\n3. **\"Mesmo dia\" da R18:** considerei o calendário de Brasília, porque o evento é definido nesse horário. Confirmam?\n4. **Fração em `cargaHorariaMinutos`:** a P-11 (sem arredondamento) e a P-30 (aceita segundos) juntas permitem valores como 89,5. O contrato só mostra inteiros no exemplo. Escrevi um critério com 89,5 (critério 10); confirmam?\n\nOs critérios 14, 34 e parte do 37 precisam de inscrições, que só existem pelo M2. Por isso ficaram na última fatia de entrega.\n\nFalta alguma regra?",
+     "time": {
+      "start": 1790120211462
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2098,
+      "reasoning": 0,
+      "cache": {
+       "read": 80917,
+       "write": 4956
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790120289140
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"3198\">\nRespostas aos quatro pontos em aberto:\n\n1. Campo desconhecido ou id no corpo do POST: mesmo comportamento do PATCH\n   (P-19). Campo desconhecido → DADOS_INVALIDOS. Campo id no corpo → ignorado,\n   porque o id é gerado pelo servidor e não faz parte da entrada. Acrescente\n   uma regra nova para cobrir o POST. Fonte: decisão do grupo, mesma regra\n   do PATCH (P-19).\n\n2. Encontros da mesma atividade que se encostam (fim de um = inicio do outro):\n   NÃO conta como sobreposição. A R20 cobre sobreposição de intervalo aberto\n   — dois encontros que apenas se tocam num instante são aceitos. A R22\n   (intervalo de 15 min) é só para a mesma sala, não para encontros da mesma\n   atividade. Acrescente uma nota na R20 deixando isso explícito. Fonte:\n   decisão do grupo.\n\n3. \"Mesmo dia\" da R18: confirmado, usa o calendário de Brasília (-03:00).\n   Acrescente isso na R18. Fonte: decisão do grupo, coerente com P-20.\n\n4. Fração em cargaHorariaMinutos: confirmado, pode ter fração. O contrato\n   mostra inteiros nos exemplos mas não proíbe fração, e a P-11 diz soma\n   exata. Mantenha o critério 10 com 89,5. Fonte: P-11, P-30.\n\nDepois de ajustar, mostre a lista final de fatias e confirme que não há mais\npontos em aberto.\n</pasted_content id=\"3198\">\n",
+     "time": {
+      "start": 1790120289140
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120303708
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vou registrar as quatro respostas na entrevista como rodada 4 (P-32 a P-35). A regra do repositório diz que uma spec só pode vir da entrevista, então as regras precisam de um P-xx para citar. Depois ajusto a spec.",
+     "time": {
+      "start": 1790120304469
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01XEJnawfKVEC7aPdmZkN4sN",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && python - <<'EOF'\np='entrevistas/M1-grade.md'\ns=open(p,encoding='utf-8').read()\nnovo='''## Rodada 4 (fechamento dos pontos abertos pela spec)\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-32 | Campo desconhecido ou `id` no corpo do `POST /atividades`: o que acontece? | Mesmo comportamento do PATCH (P-19): campo desconhecido → `DADOS_INVALIDOS`. `id` no corpo → ignorado, porque o id é gerado pelo servidor e não faz parte da entrada. | Decisão do grupo (rodada 4), mesma regra do PATCH (P-19). |\n| P-33 | Encontros da mesma atividade que se encostam (`fim` de um = `inicio` do outro) contam como sobreposição para `ENCONTRO_INVALIDO`? | Não. A sobreposição é de intervalo aberto: dois encontros que só se tocam num instante são aceitos. O intervalo de 15 min (P-04) é só para a mesma sala, não para encontros da mesma atividade. | Decisão do grupo (rodada 4). |\n| P-34 | \"Começa e termina no mesmo dia\" (P-02) usa qual calendário? | Calendário de Brasília (`-03:00`). | Decisão do grupo (rodada 4), coerente com P-20. |\n| P-35 | `cargaHorariaMinutos` pode ter fração (encontros com segundos, P-30)? | Sim. O contrato mostra inteiros nos exemplos mas não proíbe fração, e a P-11 diz soma exata. | P-11, P-30; decisão do grupo (rodada 4). |\n\n---\n\n## Encerramento'''\nassert s.count('## Encerramento')==1\ns=s.replace('## Encerramento',novo,1)\ns=s.replace('''| P-31 | Corpo do `POST /atividades/:id/cancelamento` é ignorado | Decisão do grupo |''','''| P-31 | Corpo do `POST /atividades/:id/cancelamento` é ignorado | Decisão do grupo |\n| P-32 | POST: campo desconhecido → `DADOS_INVALIDOS`; `id` no corpo é ignorado | Decisão do grupo (regra da P-19) |\n| P-33 | Encontros da mesma atividade que só se encostam não se sobrepõem | Decisão do grupo |\n| P-34 | \"Mesmo dia\" pelo calendário de Brasília | Decisão do grupo; coerente com P-20 |\n| P-35 | `cargaHorariaMinutos` pode ter fração | P-11, P-30; decisão do grupo |''')\nopen(p,'w',encoding='utf-8').write(s)\nEOF\ngrep -n \"P-3[2-5]\" entrevistas/M1-grade.md | cut -c1-80; sed -n 150,200p specs/M1-grade.md",
+       "description": "Add round 4 to interview and view spec tail"
+      },
+      "time": {
+       "start": 1790120312174,
+       "end": 1790120314013
+      },
+      "output": "98:| P-32 | Campo desconhecido ou `id` no corpo do `POST /atividades`: o que aco\n99:| P-33 | Encontros da mesma atividade que se encostam (`fim` de um = `inicio`\n100:| P-34 | \"Começa e termina no mesmo dia\" (P-02) usa qual calendário? | Cal\n101:| P-35 | `cargaHorariaMinutos` pode ter fração (encontros com segundos, P-\n127:| P-32 | POST: campo desconhecido → `DADOS_INVALIDOS`; `id` no corpo é ig\n128:| P-33 | Encontros da mesma atividade que só se encostam não se sobrepõem\n129:| P-34 | \"Mesmo dia\" pelo calendário de Brasília | Decisão do grupo; coer\n130:| P-35 | `cargaHorariaMinutos` pode ter fração | P-11, P-30; decisão do g\n23. (R18) Encontro de `2026-10-19T22:00:00-03:00` a `2026-10-20T01:00:00-03:00` → 422 `ENCONTRO_INVALIDO`.\n24. (R19) Encontro em 18/10/2026 19–21 h → 422 `ENCONTRO_INVALIDO`; em 24/10/2026 → 422; em 23/10/2026 19–21 h → 201.\n25. (R20) Minicurso com encontros 19/10 19–21 h e 19/10 20–22 h → 422 `ENCONTRO_INVALIDO`.\n26. (R21) `lab-3` com `vagas: 20` → 201; com `vagas: 21` → 422 `VAGAS_ACIMA_DA_CAPACIDADE`.\n27. (R22) Existe palestra na `sala-101` 19/10 19–21 h. Nova na mesma sala 21:00–22:00 → 409 `CONFLITO_DE_SALA`; 21:14–22:14 → 409; 21:15–22:15 → 201; 17:45–18:45 → 201; 18:00–19:00 → 409. Mesmo horário em `sala-102` → 201.\n28. (R22) Cancelar a palestra existente e criar outra na `sala-101` 19/10 19–21 h → 201.\n29. (R23) Palestra com 2 encontros inválidos e `vagas` acima da capacidade → `QUANTIDADE_DE_ENCONTROS`; palestra com 1 encontro de 30 min, `vagas` acima da capacidade e conflito de sala → `ENCONTRO_INVALIDO`; encontro válido, `vagas` acima e conflito → `VAGAS_ACIMA_DA_CAPACIDADE`.\n30. (R24) PATCH com `{\"tipo\":\"minicurso\"}`, `{\"salaId\":\"sala-101\"}` (valor atual), `{\"encontros\":[...]}`, `{\"id\":\"atv_00000000\"}`, `{\"situacao\":\"encerrada\"}`, `{\"ocupadas\":0}` → cada um 422 `CAMPO_NAO_EDITAVEL`.\n31. (R24, R25) PATCH `{\"titulo\":\"Novo\"}` → 200, `titulo: \"Novo\"`; `{\"vagas\":30}` → 200, `vagas: 30`, `vagasRestantes: 30`.\n32. (R25) PATCH `{}` → 200 com a atividade igual; `{\"descricao\":\"x\"}` → 422 `DADOS_INVALIDOS`; `{\"vagas\":0}` → 422 `DADOS_INVALIDOS`; `{\"titulo\":\"\"}` → 422 `DADOS_INVALIDOS`.\n33. (R21) PATCH `{\"vagas\":41}` na `sala-101` → 422 `VAGAS_ACIMA_DA_CAPACIDADE`; `{\"vagas\":40}` → 200.\n34. (R26) *(depende do M2)* Atividade com `ocupadas: 3` e 2 em espera → PATCH `{\"vagas\":2}` → 409 `VAGAS_ABAIXO_DOS_INSCRITOS`; `{\"vagas\":3}` → 200.\n35. (R27) PATCH `{\"titulo\":\"x\"}` em atividade cancelada → 422 `ATIVIDADE_CANCELADA`.\n36. (R28) Relógio em 19/10 20:00 (em andamento) → PATCH `{\"titulo\":\"x\"}` → 200; relógio em 19/10 22:00 (encerrada) → PATCH `{\"vagas\":35}` → 200.\n37. (R29) Cancelada + `{\"tipo\":\"minicurso\",\"vagas\":999}` → `ATIVIDADE_CANCELADA`; não cancelada + `{\"tipo\":\"minicurso\",\"vagas\":999}` → `CAMPO_NAO_EDITAVEL`. *(depende do M2)* `ocupadas: 3` + `{\"vagas\":999}` → `VAGAS_ACIMA_DA_CAPACIDADE`.\n38. (R30) Relógio em 19/10 18:59:59 → cancelar → 200; em outra palestra, relógio em 19/10 19:00:00 → 422 `ATIVIDADE_JA_INICIADA`; relógio em 19/10 22:00 → 422 `ATIVIDADE_JA_INICIADA`.\n39. (R31) Cancelar duas vezes → a 2ª é 422 `ATIVIDADE_CANCELADA`; cancelada e com relógio depois do início → 422 `ATIVIDADE_CANCELADA`.\n40. (R32) Cancelamento com corpo `{\"motivo\":\"x\"}` → 200, `situacao: \"cancelada\"`.\n41. (R33) Atividade criada por `org-ana`; `org-bruno` faz PATCH `{\"titulo\":\"x\"}` → 200 e cancela → 200.\n\n## 7. Como isto será verificado\n\nPela costura HTTP, a mais externa que o repositório já tem: `api/test/apoio/api.js` (`subirApi`) sobe a API num processo separado com `MODO_TESTE=1` e banco temporário, como o juiz faz. Os testes ficam em `api/test/m1-grade.test.js` (um arquivo por módulo), usam `fetch`, `POST /_teste/reset` antes de cada cenário e `PUT /_teste/relogio` para mover o tempo. Nenhum ponto de teste novo: as regras são todas observáveis nas rotas do contrato.\n\nOs critérios 14, 34 e a última parte do 37 precisam de inscrições com status `confirmada`, `convocada` e `em_espera`, que só existem pelo M2 (`POST /atividades/:id/inscricoes` e o fluxo de convocação). Eles entram na última fatia e só rodam quando o M2 existir.\n\n## 8. Fatias de entrega\n\n1. **Salas e palestra mínima** — R1, R5, R6, R10, R11, R12, R13, R14, R15; `GET /salas`, `POST /atividades` feliz, `GET /atividades/:id` com contagens zeradas (`ocupadas: 0`, `emEspera: 0`, `vagasRestantes: vagas`) e `situacao: \"prevista\"`. Critérios 1, 8–10, 15–20.\n2. **Regras de criação** — R16, R17, R18, R19, R20, R21 (POST), R22 (sem cancelamento), R23. Critérios 21–27, 29.\n3. **Listagem** — R2, R3. Critérios 2–6.\n4. **Tempo e cancelamento** — R7, R9, R30, R31, R32, R4, R22 (cancelada libera a sala), R33 (cancelar). Critérios 7, 11–13, 28, 38–40, 41 (parte do cancelamento).\n5. **Alteração** — R24, R25, R21 (PATCH), R27, R28, R29 (sem inscrições), R33 (PATCH). Critérios 30–33, 35–37 (sem a parte do M2), 41.\n6. **Contagens com inscrições** *(depende do M2)* — R8, R26, R29 completa. Critérios 14, 34, 37 (parte do M2).",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2593,
+      "reasoning": 0,
+      "cache": {
+       "read": 87971,
+       "write": 612
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120316590
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01EbRCR1tp1ujsJnb4DmWGsS",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && python - <<'EOF'\np='specs/M1-grade.md'\ns=open(p,encoding='utf-8').read()\ndef rep(a,b):\n    global s\n    assert s.count(a)==1,a\n    s=s.replace(a,b)\nrep(\"> Origem: `entrevistas/M1-grade.md` (rodadas 1–3 e consulta\",\"> Origem: `entrevistas/M1-grade.md` (rodadas 1–4 e consulta\")\nrep(\"| `cargaHorariaMinutos` | número (minutos) | derivado: soma exata das durações dos encontros (pode ter fração, P-11 + P-30) |\",\n    \"| `cargaHorariaMinutos` | número (minutos) | derivado: soma exata das durações dos encontros; pode ter fração (P-11, P-30, P-35) |\")\nrep(\"- **R6** — `cargaHorariaMinutos` é a soma exata das durações dos encontros em minutos, sem arredondamento. (P-11; RN-109)\",\n    \"- **R6** — `cargaHorariaMinutos` é a soma exata das durações dos encontros em minutos, sem arredondamento; pode ter fração quando os instantes têm segundos. (P-11, P-35; RN-109)\")\nrep(\"- **R13** — Campo extra dentro de um encontro (ex.: `id`) → 422 `DADOS_INVALIDOS`. (P-26)\",\n    \"- **R13** — Campo extra dentro de um encontro (ex.: `id`) → 422 `DADOS_INVALIDOS`. (P-26)\\n- **R34** — Campo desconhecido no corpo do POST → 422 `DADOS_INVALIDOS`. `id` no corpo do POST é ignorado: a atividade recebe o `id` gerado pelo servidor. (P-32, P-19)\")\nrep(\"- **R18** — 422 `ENCONTRO_INVALIDO` quando um encontro não começa e termina no mesmo dia. (P-02; RN-104–RN-106)\",\n    \"- **R18** — 422 `ENCONTRO_INVALIDO` quando um encontro não começa e termina no mesmo dia pelo calendário de Brasília (`-03:00`), qualquer que seja o fuso enviado. (P-02, P-34; RN-104–RN-106)\")\nrep(\"- **R20** — 422 `ENCONTRO_INVALIDO` quando dois encontros da mesma atividade se sobrepõem. (P-02; RN-104–RN-106)\",\n    \"- **R20** — 422 `ENCONTRO_INVALIDO` quando dois encontros da mesma atividade se sobrepõem. A sobreposição é de intervalo aberto: encontros que só se encostam (`fim` de um = `inicio` do outro) são aceitos. O intervalo de 15 min da R22 vale só entre atividades na mesma sala, não entre encontros da mesma atividade. (P-02, P-33; RN-104–RN-106)\")\nrep(\"10. (R6, R11) Palestra\",\"10. (R6, R11, P-35) Palestra\")\nrep(\"41. (R33) Atividade criada por `org-ana`; `org-bruno` faz PATCH `{\\\"titulo\\\":\\\"x\\\"}` → 200 e cancela → 200.\",\n\"\"\"41. (R33) Atividade criada por `org-ana`; `org-bruno` faz PATCH `{\"titulo\":\"x\"}` → 200 e cancela → 200.\n42. (R34) Palestra válida com `\"descricao\":\"x\"` → 422 `DADOS_INVALIDOS`; palestra válida com `\"id\":\"atv_00000000\"` → 201, `id` diferente de `atv_00000000` e no formato `atv_` + 8 hex.\n43. (R20) Minicurso na `lab-3` com encontros 19/10 19:00–21:00 e 19/10 21:00–23:00 → 201 (encostar não é sobreposição nem conflito de sala consigo mesma).\n44. (R18) Encontro de `2026-10-19T20:00:00Z` a `2026-10-20T00:30:00Z` (19/10 17:00–21:30 em Brasília) → 201; encontro de `2026-10-20T02:00:00Z` a `2026-10-20T04:00:00Z` (19/10 23:00 a 20/10 01:00 em Brasília) → 422 `ENCONTRO_INVALIDO`.\"\"\")\nrep(\"R1, R5, R6, R10, R11, R12, R13, R14, R15; \",\"R1, R5, R6, R10, R11, R12, R13, R14, R15, R34; \")\nrep(\"Critérios 1, 8–10, 15–20.\",\"Critérios 1, 8–10, 15–20, 42.\")\nrep(\"Critérios 21–27, 29.\",\"Critérios 21–27, 29, 43, 44.\")\nopen(p,'w',encoding='utf-8').write(s)\nEOF\ngrep -c \"^- \\*\\*R\" specs/M1-grade.md; for i in $(seq 1 34); do grep -q \"(R$i[,)]\\|, R$i[,)]\" specs/M1-grade.md || echo \"R$i sem critério\"; done",
+       "description": "Apply four decisions to spec and check coverage"
+      },
+      "time": {
+       "start": 1790120328673,
+       "end": 1790120330897
+      },
+      "output": "34",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1986,
+      "reasoning": 0,
+      "cache": {
+       "read": 88583,
+       "write": 5441
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120340608
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Os quatro pontos estão aplicados. Antes, registrei as respostas em `entrevistas/M1-grade.md` como **rodada 4 (P-32 a P-35)**. A regra do repositório diz que a spec só existe a partir da entrevista, então cada decisão nova precisa de um P-xx para a spec citar.\n\n**Mudanças na spec (`specs/M1-grade.md`)**\n- **R34 (nova):** no POST, campo desconhecido → 422 `DADOS_INVALIDOS`; `id` enviado no corpo é ignorado e vale o `id` gerado pelo servidor (P-32, P-19). Ficou logo depois da R13 para manter a numeração das outras regras.\n- **R20:** agora diz que a sobreposição é de intervalo aberto, então encontros que só se encostam são aceitos. Também diz que o intervalo de 15 min da R22 não vale entre encontros da mesma atividade (P-33).\n- **R18:** \"mesmo dia\" é pelo calendário de Brasília (`-03:00`), qualquer que seja o fuso enviado (P-34).\n- **R6 e modelo:** `cargaHorariaMinutos` pode ter fração; o critério 10, com 89,5, foi mantido (P-11, P-30, P-35).\n- **Critérios novos:**\n  - 42: cobre a R34, com campo desconhecido e com `id` no corpo.\n  - 43: cobre encontros que se encostam, 19–21 h e 21–23 h na mesma sala → 201.\n  - 44: cobre o mesmo dia em Brasília contra UTC, nos dois sentidos.\n\nConferi que todas as 34 regras têm pelo menos um critério.\n\n**Fatias de entrega (final)**\n1. **Salas e palestra mínima:** R1, R5, R6, R10, R11, R12, R13, R14, R15, R34. Critérios 1, 8–10, 15–20, 42.\n2. **Regras de criação:** R16–R20, R21 (POST), R22 (sem cancelamento), R23. Critérios 21–27, 29, 43, 44.\n3. **Listagem:** R2, R3. Critérios 2–6.\n4. **Tempo e cancelamento:** R4, R7, R9, R22 (cancelada libera a sala), R30, R31, R32, R33 (cancelar). Critérios 7, 11–13, 28, 38–41.\n5. **Alteração:** R21 (PATCH), R24, R25, R27, R28, R29 (sem inscrições), R33 (PATCH). Critérios 30–33, 35–37 (sem a parte do M2), 41.\n6. **Contagens com inscrições (depende do M2):** R8, R26, R29 completa. Critérios 14, 34 e a parte do 37 que depende do M2.\n\n**Não há mais pontos em aberto** com uma ressalva, que é uma leitura minha. A resposta 1 diz \"mesmo comportamento do PATCH\", mas no PATCH o `id` dá `CAMPO_NAO_EDITAVEL`, e no POST ele é ignorado, como vocês decidiram. Tratei como \"campo desconhecido\" qualquer campo fora da entrada `{titulo, tipo, salaId, vagas, encontros}`, exceto o `id`. Então campos calculados enviados no POST, como `situacao`, dão `DADOS_INVALIDOS`. Se não for isso, me avisem.\n\nNão fiz commit.",
+     "time": {
+      "start": 1790120342738
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1330,
+      "reasoning": 0,
+      "cache": {
+       "read": 94024,
+       "write": 2016
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790120400706
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"3198\">\nCorreto. No POST: id no corpo é ignorado silenciosamente; qualquer outro campo\nfora de {titulo, tipo, salaId, vagas, encontros} → DADOS_INVALIDOS, incluindo\ncampos calculados como situacao, ocupadas, emEspera, vagasRestantes,\ncargaHorariaMinutos. Atualize R34 com essa distinção se ainda não estiver\nexplícita. Confirme quando terminar.\n</pasted_content id=\"3198\">\n",
+     "time": {
+      "start": 1790120400706
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120402291
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01J1p9RQUw7GbFzb37py8ovS",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && python - <<'EOF'\ndef rep(p,a,b):\n    s=open(p,encoding='utf-8').read()\n    assert s.count(a)==1,a\n    open(p,'w',encoding='utf-8').write(s.replace(a,b))\nsp='specs/M1-grade.md'; en='entrevistas/M1-grade.md'\nrep(sp,\"- **R34** — Campo desconhecido no corpo do POST → 422 `DADOS_INVALIDOS`. `id` no corpo do POST é ignorado: a atividade recebe o `id` gerado pelo servidor. (P-32, P-19)\",\n\"- **R34** — No corpo do POST, `id` é ignorado em silêncio: a atividade recebe o `id` gerado pelo servidor. Qualquer outro campo fora de `{titulo, tipo, salaId, vagas, encontros}` → 422 `DADOS_INVALIDOS`, inclusive os calculados (`situacao`, `ocupadas`, `emEspera`, `vagasRestantes`, `cargaHorariaMinutos`). (P-32, P-19)\")\nrep(sp,\"42. (R34) Palestra válida com `\\\"descricao\\\":\\\"x\\\"` → 422 `DADOS_INVALIDOS`;\",\n\"42. (R34) Palestra válida com `\\\"descricao\\\":\\\"x\\\"` → 422 `DADOS_INVALIDOS`; com `\\\"situacao\\\":\\\"prevista\\\"`, `\\\"ocupadas\\\":0`, `\\\"emEspera\\\":0`, `\\\"vagasRestantes\\\":40` ou `\\\"cargaHorariaMinutos\\\":120` → cada um 422 `DADOS_INVALIDOS`;\")\nrep(en,\"`id` no corpo → ignorado, porque o id é gerado pelo servidor e não faz parte da entrada. |\",\n\"`id` no corpo → ignorado em silêncio, porque o id é gerado pelo servidor e não faz parte da entrada. Qualquer outro campo fora de `{titulo, tipo, salaId, vagas, encontros}` → `DADOS_INVALIDOS`, inclusive os calculados (`situacao`, `ocupadas`, `emEspera`, `vagasRestantes`, `cargaHorariaMinutos`). |\")\nrep(en,\"| P-32 | POST: campo desconhecido → `DADOS_INVALIDOS`; `id` no corpo é ignorado |\",\n\"| P-32 | POST: `id` no corpo é ignorado; qualquer outro campo fora da entrada (inclusive calculados) → `DADOS_INVALIDOS` |\")\nEOF\ngrep -n \"R34\\*\\*\\|^42\\.\" specs/M1-grade.md",
+       "description": "Make R34 and P-32 explicit about calculated fields"
+      },
+      "time": {
+       "start": 1790120408465,
+       "end": 1790120410079
+      },
+      "output": "94:- **R34** — No corpo do POST, `id` é ignorado em silêncio: a atividade recebe o `id` gerado pelo servidor. Qualquer outro campo fora de `{titulo, tipo, salaId, vagas, encontros}` → 422 `DADOS_INVALIDOS`, inclusive os calculados (`situacao`, `ocupadas`, `emEspera`, `vagasRestantes`, `cargaHorariaMinutos`). (P-32, P-19)\n170:42. (R34) Palestra válida com `\"descricao\":\"x\"` → 422 `DADOS_INVALIDOS`; com `\"situacao\":\"prevista\"`, `\"ocupadas\":0`, `\"emEspera\":0`, `\"vagasRestantes\":40` ou `\"cargaHorariaMinutos\":120` → cada um 422 `DADOS_INVALIDOS`; palestra válida com `\"id\":\"atv_00000000\"` → 201, `id` diferente de `atv_00000000` e no formato `atv_` + 8 hex.",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1078,
+      "reasoning": 0,
+      "cache": {
+       "read": 96040,
+       "write": 1537
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790120413888
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "A R34 agora deixa explícita a distinção (`specs/M1-grade.md:94`):\n\n> No corpo do POST, `id` é ignorado em silêncio: a atividade recebe o `id` gerado pelo servidor. Qualquer outro campo fora de `{titulo, tipo, salaId, vagas, encontros}` → 422 `DADOS_INVALIDOS`, inclusive os calculados (`situacao`, `ocupadas`, `emEspera`, `vagasRestantes`, `cargaHorariaMinutos`). (P-32, P-19)\n\nAjustei também:\n- **Critério 42:** agora testa cada campo calculado no POST, e cada um deve dar 422 `DADOS_INVALIDOS`. Continua testando o campo desconhecido e o `id` ignorado.\n- **P-32 na entrevista:** a resposta e a linha da tabela de decisões dizem a mesma coisa que a R34, para a spec continuar vindo da entrevista.\n\nA spec está fechada, sem pontos em aberto: 34 regras e 44 critérios. Não fiz commit.",
+     "time": {
+      "start": 1790120413888
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 379,
+      "reasoning": 0,
+      "cache": {
+       "read": 97577,
+       "write": 1461
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

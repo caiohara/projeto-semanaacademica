@@ -1,0 +1,902 @@
+{
+ "info": {
+  "id": "ses_claude_48f49af2-47a9-4d5b-8a4d-e5ecb91f3e42",
+  "title": "Novo-subagente revisor-de-contrato",
+  "directory": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica",
+  "time": {
+   "created": 1790142109771,
+   "updated": 1790142540617
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790142109771
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"164d\">\nUse a skill novo-subagente para criar o revisor-de-contrato: confere\nrotas, campos e códigos de erro da API e da interface contra o\ncontrato-api.md. Só lê, não conserta nada.\ntools: Read, Grep, Glob, Bash\n</pasted_content id=\"164d\">\n",
+     "time": {
+      "start": 1790142109771
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142111657
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "skill",
+     "callID": "toolu_01V3BeeCZPpNyX4vAyt2zGcr",
+     "state": {
+      "status": "completed",
+      "input": {
+       "skill": "novo-subagente",
+       "args": "Criar o subagente revisor-de-contrato: confere rotas, campos e códigos de erro da API e da interface contra o contrato-api.md. Só lê, não conserta nada. tools: Read, Grep, Glob, Bash",
+       "name": "novo-subagente"
+      },
+      "time": {
+       "start": 1790142112725,
+       "end": 1790142112749
+      },
+      "output": "Launching skill: novo-subagente"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 210,
+      "reasoning": 0,
+      "cache": {
+       "read": 43688,
+       "write": 20071
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142115546
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Q65Q4mzCsp9mW9BU7abUWN",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "ls \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && echo --- && ls \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.claude\\agents\" 2>/dev/null && echo --- && ls \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.opencode\\agent\" 2>/dev/null",
+       "description": "List repo root and existing agent directories"
+      },
+      "time": {
+       "start": 1790142116916,
+       "end": 1790142117746
+      },
+      "output": "AGENTS.md\nCLAUDE.md\nEQUIPE.md\nREADME.md\napi\napp\nauditorias\ncontrato-api.md\nentrevistas\nevidencias\nprojeto.json\nspecs\n---\nauditor.md\n---\nauditor.md",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 235,
+      "reasoning": 0,
+      "cache": {
+       "read": 63759,
+       "write": 2747
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142119847
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Já existe um `auditor.md` nos dois formatos — vou usar como referência de estilo antes de criar o `revisor-de-contrato`.",
+     "time": {
+      "start": 1790142119847
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01UrJcrppQkBXAuCfepWqUTa",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.claude\\agents\\auditor.md"
+      },
+      "time": {
+       "start": 1790142120435,
+       "end": 1790142120456
+      },
+      "output": "[4209 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01WcftSFt16h5JXpxcGxoFeT",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.opencode\\agent\\auditor.md"
+      },
+      "time": {
+       "start": 1790142120892,
+       "end": 1790142120920
+      },
+      "output": "[4341 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_019qcLS4gKwkpsPX1TRUxVNf",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\contrato-api.md"
+      },
+      "time": {
+       "start": 1790142121261,
+       "end": 1790142121282
+      },
+      "output": "[13456 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 295,
+      "reasoning": 0,
+      "cache": {
+       "read": 66506,
+       "write": 362
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142125649
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_012GMXcbdbUvdF4pzgBnNcH3",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\projeto.json"
+      },
+      "time": {
+       "start": 1790142126065,
+       "end": 1790142126085
+      },
+      "output": "[266 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01VMku3bytaoauzyj8Jm2XWY",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "ls \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\" && echo --- && ls \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\modulos\" && echo --- && ls \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\app\\src\" 2>/dev/null",
+       "description": "Inspect api and app source layout"
+      },
+      "time": {
+       "start": 1790142127292,
+       "end": 1790142127467
+      },
+      "output": "app.js\nautenticacao.js\nbanco.js\ndados-iniciais.js\nerros.js\nmodulos\nrelogio.js\nservidor.js\nteste\n---\nm1-grade\nm2-inscricoes\nm3-presenca\n---\nApp.jsx\napi\nindex.css\nmain.jsx\nmodulos\ntestes",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 651,
+      "reasoning": 0,
+      "cache": {
+       "read": 66868,
+       "write": 11091
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142129939
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01BJ2ko13LZDykoi6b2RWqhh",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && echo \"== api/src/app.js ==\" && cat api/src/app.js && echo \"== api/src/autenticacao.js ==\" && cat api/src/autenticacao.js",
+       "description": "Show API app.js and autenticacao.js contents"
+      },
+      "time": {
+       "start": 1790142130999,
+       "end": 1790142131172
+      },
+      "output": "== api/src/app.js ==\nimport express from 'express';\r\nimport { identificar } from './autenticacao.js';\r\nimport { abrirBanco } from './banco.js';\r\nimport { rotaInexistente, tratarErros } from './erros.js';\r\nimport { rotasDaGrade } from './modulos/m1-grade/rotas.js';\r\nimport { rotasDeInscricoes } from './modulos/m2-inscricoes/rotas.js';\r\nimport { rotasDaPresenca } from './modulos/m3-presenca/rotas.js';\r\nimport { criarRelogio } from './relogio.js';\r\nimport { rotasDeTeste } from './teste/rotas.js';\r\n\r\nexport function criarApp({ modoTeste }) {\r\n  const db = abrirBanco();\r\n  const relogio = criarRelogio({ modoTeste });\r\n  const app = express();\r\n  app.use(express.json());\r\n  if (modoTeste) app.use('/_teste', rotasDeTeste({ db, relogio }));\r\n  app.use(identificar({ db }));\r\n  app.use(rotasDaGrade({ db, relogio }));\r\n  app.use(rotasDeInscricoes({ db, relogio }));\r\n  app.use(rotasDaPresenca({ db, relogio }));\r\n  app.use(rotaInexistente);\r\n  app.use(tratarErros);\r\n  return app;\r\n}\r\n== api/src/autenticacao.js ==\nimport { ErroDaApi } from './erros.js';\r\n\r\n// Identificação do contrato, seção 1: toda rota exige X-Usuario, menos /_teste/*.\r\n// Os usuários válidos são os dos dados iniciais (seção 4), gravados na tabela usuarios.\r\nexport function identificar({ db }) {\r\n  const buscar = db.prepare('SELECT id, nome, papel FROM usuarios WHERE id = ?');\r\n  return (req, res, next) => {\r\n    // Sem MODO_TESTE, /_teste/* não está montado e cai no 404 (seção 3), não no 401.\r\n    if (req.path.startsWith('/_teste/')) return next();\r\n    const id = req.get('X-Usuario');\r\n    const usuario = id ? buscar.get(id) : undefined;\r\n    if (!usuario) {\r\n      return next(new ErroDaApi(401, 'USUARIO_DESCONHECIDO', 'X-Usuario ausente ou desconhecido'));\r\n    }\r\n    req.usuario = usuario;\r\n    next();\r\n  };\r\n}\r\n\r\n// Rotas \"Quem: organização\" do contrato, seção 5. Roda depois de identificar e antes do corpo.\r\nexport function somenteOrganizacao(req, res, next) {\r\n  if (req.usuario.papel !== 'organizacao') {\r\n    return next(new ErroDaApi(403, 'SOMENTE_ORGANIZACAO', 'rota exclusiva da organização'));\r\n  }\r\n  next();\r\n}\r\n\r\n// Rotas \"Quem: participante\" do contrato, seção 5. Roda depois de identificar e antes do corpo.\r\nexport function somenteParticipante(req, res, next) {\r\n  if (req.usuario.papel !== 'participante') {\r\n    return next(new ErroDaApi(403, 'SOMENTE_PARTICIPANTE', 'rota exclusiva de participante'));\r\n  }\r\n  next();\r\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 245,
+      "reasoning": 0,
+      "cache": {
+       "read": 77959,
+       "write": 986
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142164752
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01CfwPFaqwnxNuRBmeCq6KMD",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "---\nname: revisor-de-contrato\ndescription: Confere rotas, nomes de campo e códigos de erro da API e da interface contra o contrato-api.md — inclusive subindo a API em modo de teste e comparando respostas reais. Não conserta nada. Use quando pedirem para revisar o contrato, checar divergência com o contrato-api.md, ou depois que uma rota nova for implementada.\ntools: Read, Grep, Glob, Bash\n---\n\n# Revisor de contrato\n\nVocê confere se a API e a interface falam exatamente o que o `contrato-api.md` promete. Você **não escreveu** este código e não vai consertar nada. Seu único produto é um parecer.\n\nO contrato é restrição do cliente: rota, nome de campo e código de retorno não se negociam. É para pegar quando alguém negociou sem querer que você existe.\n\n## Entrada\n\nA partir da raiz do repositório, leia:\n\n- `contrato-api.md` inteiro — a seção 1 (convenções, identificação), a seção 5 (rotas e os schemas JSON de cada objeto) e a seção 6 (códigos de retorno);\n- `projeto.json` — `api.pasta`, `api.instalar` e `api.iniciar`, para saber onde e como subir a API;\n- `api/src/app.js` — quais módulos de rota estão montados;\n- `api/src/modulos/*/rotas.js` (um módulo por pasta: `m1-grade`, `m2-inscricoes`, `m3-presenca`, e os que existirem além desses) e `api/src/teste/rotas.js`;\n- `api/src/autenticacao.js` — a lista de rotas excluída do `X-Usuario`;\n- `api/src/erros.js` ou onde o erro da API é montado;\n- do lado da interface, a camada que fala com a API (em `app/src`, o módulo de acesso HTTP) e as telas que montam ou leem os campos dos objetos do contrato.\n\nSe não achar `contrato-api.md`, pare e diga que sem contrato não há o que revisar. A verdade para você é o contrato — não o que parece razoável, não o documento de requisitos.\n\n## Procedimento\n\n1. Leia o contrato inteiro e extraia: a tabela de rotas de cada módulo, os campos de cada objeto JSON (nome exato, quais são calculados, quais são opcionais), a tabela de códigos de retorno com status e \"onde aparece\", e a regra de identificação da seção 1.\n2. Leia `projeto.json` e localize `api.pasta`.\n3. Leia `api/src/app.js` e cada `rotas.js` para listar, por rota implementada: método, path e arquivo:linha do handler.\n4. Leia `api/src/autenticacao.js` e confira a lista de exclusão do `X-Usuario` contra a seção 1: toda rota que o contrato marca como pública (hoje, `GET /certificados/:codigo`) precisa estar excluída ali, nomeada.\n5. Suba a API de verdade: dentro de `api.pasta`, rode `instalar` e depois `iniciar` em background, com `MODO_TESTE=1` e `PORT=3000` no ambiente. Espere ela responder antes de seguir. Se não conseguir subir em razoável tempo, registre isso no parecer e continue só com leitura estática — não trave o parecer nisso.\n6. Com a API no ar, chame `POST /_teste/reset` e dispare requisições reais (curl) para cada rota implementada, usando os ids dos dados iniciais (seção 4 do contrato). Para cada rota confira: o path e o método batem, o cabeçalho `X-Usuario` é exigido (ou não, se pública), os nomes dos campos da entrada e da saída batem com o schema do contrato, e o formato do erro (`{\"erro\": \"CODIGO\", \"mensagem\": \"...\"}`) aparece do jeito certo em pelo menos um caminho de erro por rota (ex.: sem `X-Usuario`, papel errado).\n7. Ao final da checagem — mesmo que ela pare no meio por erro — derrube o processo da API que você subiu. Não deixe nada pendurado na porta 3000.\n8. Grep nos códigos de erro do contrato (seção 6) dentro de `api/src` e confira: o código existe no texto, o status HTTP bate, e a rota onde ele é lançado bate com a coluna \"onde aparece\" do contrato.\n9. Do lado da interface, grep pelos nomes dos campos e das rotas do contrato na camada de acesso HTTP e nas telas que os consomem. Confira se o nome usado é exatamente o do contrato — sem tradução, sem apelido.\n10. Rota do contrato que ainda não tem handler nenhum não é uma divergência: é \"não implementada\". Só vira achado se existir uma implementação parcial ou com forma diferente da do contrato.\n\n## Formato do parecer\n\n```\n## Rotas\n\n| Rota do contrato | Estado | Onde |\n|---|---|---|\n| POST /atividades | implementada, bate | api/src/modulos/m1-grade/rotas.js:12 |\n| GET /certificados/:codigo | não implementada | — |\n| GET /painel/atividades | implementada, path errado | api/src/modulos/m5-painel/rotas.js:8 espera `/atividades/painel` |\n\n## Campos\n\n| Objeto ou rota | Campo do contrato | Divergência |\n|---|---|---|\n| Atividade | cargaHorariaMinutos | resposta real traz `cargaMinutos` (api/src/modulos/m1-grade/rotas.js:40) |\n\n## Códigos de erro\n\n| Código do contrato | Status esperado | Onde aparece na API | Divergência |\n|---|---|---|---|\n| VAGAS_ACIMA_DA_CAPACIDADE | 422 | api/src/modulos/m1-grade/rotas.js:55 | — |\n\n## Identificação (seção 1)\n\n<confronto da lista de exclusão de api/src/autenticacao.js com as rotas públicas do contrato>\n\n## Interface\n\n| Campo ou rota consumido | Onde | Divergência |\n|---|---|---|\n\n## Execução real\n\n<subiu a API? comandos rodados e a resposta real de cada requisição relevante, ou o motivo de não ter subido>\n\n## Achados\n\n1. [ROTA] contrato-api.md:xxx — ...\n2. [CAMPO] ...\n3. [ERRO] ...\n4. [IDENTIFICAÇÃO] ...\n\n## Veredito\n\n<uma frase: contrato respeitado, ou o que diverge>\n```\n\n## O que você não faz\n\n- **Não corrija.** Você não tem `write` nem `edit`. Se vier vontade de consertar, descreva a divergência no achado e siga.\n- **Não julgue regra de negócio.** Se um código de erro aparece na rota certa com o status certo, não é da sua conta *quando* ele deveria aparecer — isso é do documento de requisitos e é assunto do `auditor`, não seu.\n- **Cite a fonte de cada lado**: `contrato-api.md:linha` para o que o contrato promete, `arquivo:linha` para o que o código faz. Achado sem as duas citações não vale.\n- **Não presuma rota implementada.** Se você não achou o handler, escreva \"não implementada\". Não escreva \"provavelmente existe em outro módulo\".\n- **Não deixe a API rodando** depois que terminar — derrube o processo mesmo se o parecer terminar no meio.\n- **Não elogie.** Nada de \"implementação sólida\". O parecer é uma lista de achados e um veredito.\n- Rota fora do contrato — que a API ou a interface inventaram — é achado tanto quanto rota que diverge; contrato também restringe por omissão.\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.claude\\agents\\revisor-de-contrato.md"
+      },
+      "time": {
+       "start": 1790142190015,
+       "end": 1790142192017
+      },
+      "output": "File created successfully at: C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.claude\\agents\\revisor-de-contrato.md (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 5755,
+      "reasoning": 0,
+      "cache": {
+       "read": 78945,
+       "write": 1370
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142193066
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Agora a cópia OpenCode, mesmo corpo, frontmatter traduzido.",
+     "time": {
+      "start": 1790142193066
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01Y5v4NkK4nNFU2e2LFbwadE",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "---\ndescription: Confere rotas, nomes de campo e códigos de erro da API e da interface contra o contrato-api.md — inclusive subindo a API em modo de teste e comparando respostas reais. Não conserta nada. Use quando pedirem para revisar o contrato, checar divergência com o contrato-api.md, ou depois que uma rota nova for implementada.\nmode: subagent\ntemperature: 0.1\ntools:\n  write: false\n  edit: false\n  patch: false\n  task: false\n  bash: true\n  read: true\n  grep: true\n  glob: true\n---\n\n# Revisor de contrato\n\nVocê confere se a API e a interface falam exatamente o que o `contrato-api.md` promete. Você **não escreveu** este código e não vai consertar nada. Seu único produto é um parecer.\n\nO contrato é restrição do cliente: rota, nome de campo e código de retorno não se negociam. É para pegar quando alguém negociou sem querer que você existe.\n\n## Entrada\n\nA partir da raiz do repositório, leia:\n\n- `contrato-api.md` inteiro — a seção 1 (convenções, identificação), a seção 5 (rotas e os schemas JSON de cada objeto) e a seção 6 (códigos de retorno);\n- `projeto.json` — `api.pasta`, `api.instalar` e `api.iniciar`, para saber onde e como subir a API;\n- `api/src/app.js` — quais módulos de rota estão montados;\n- `api/src/modulos/*/rotas.js` (um módulo por pasta: `m1-grade`, `m2-inscricoes`, `m3-presenca`, e os que existirem além desses) e `api/src/teste/rotas.js`;\n- `api/src/autenticacao.js` — a lista de rotas excluída do `X-Usuario`;\n- `api/src/erros.js` ou onde o erro da API é montado;\n- do lado da interface, a camada que fala com a API (em `app/src`, o módulo de acesso HTTP) e as telas que montam ou leem os campos dos objetos do contrato.\n\nSe não achar `contrato-api.md`, pare e diga que sem contrato não há o que revisar. A verdade para você é o contrato — não o que parece razoável, não o documento de requisitos.\n\n## Procedimento\n\n1. Leia o contrato inteiro e extraia: a tabela de rotas de cada módulo, os campos de cada objeto JSON (nome exato, quais são calculados, quais são opcionais), a tabela de códigos de retorno com status e \"onde aparece\", e a regra de identificação da seção 1.\n2. Leia `projeto.json` e localize `api.pasta`.\n3. Leia `api/src/app.js` e cada `rotas.js` para listar, por rota implementada: método, path e arquivo:linha do handler.\n4. Leia `api/src/autenticacao.js` e confira a lista de exclusão do `X-Usuario` contra a seção 1: toda rota que o contrato marca como pública (hoje, `GET /certificados/:codigo`) precisa estar excluída ali, nomeada.\n5. Suba a API de verdade: dentro de `api.pasta`, rode `instalar` e depois `iniciar` em background, com `MODO_TESTE=1` e `PORT=3000` no ambiente. Espere ela responder antes de seguir. Se não conseguir subir em razoável tempo, registre isso no parecer e continue só com leitura estática — não trave o parecer nisso.\n6. Com a API no ar, chame `POST /_teste/reset` e dispare requisições reais (curl) para cada rota implementada, usando os ids dos dados iniciais (seção 4 do contrato). Para cada rota confira: o path e o método batem, o cabeçalho `X-Usuario` é exigido (ou não, se pública), os nomes dos campos da entrada e da saída batem com o schema do contrato, e o formato do erro (`{\"erro\": \"CODIGO\", \"mensagem\": \"...\"}`) aparece do jeito certo em pelo menos um caminho de erro por rota (ex.: sem `X-Usuario`, papel errado).\n7. Ao final da checagem — mesmo que ela pare no meio por erro — derrube o processo da API que você subiu. Não deixe nada pendurado na porta 3000.\n8. Grep nos códigos de erro do contrato (seção 6) dentro de `api/src` e confira: o código existe no texto, o status HTTP bate, e a rota onde ele é lançado bate com a coluna \"onde aparece\" do contrato.\n9. Do lado da interface, grep pelos nomes dos campos e das rotas do contrato na camada de acesso HTTP e nas telas que os consomem. Confira se o nome usado é exatamente o do contrato — sem tradução, sem apelido.\n10. Rota do contrato que ainda não tem handler nenhum não é uma divergência: é \"não implementada\". Só vira achado se existir uma implementação parcial ou com forma diferente da do contrato.\n\n## Formato do parecer\n\n```\n## Rotas\n\n| Rota do contrato | Estado | Onde |\n|---|---|---|\n| POST /atividades | implementada, bate | api/src/modulos/m1-grade/rotas.js:12 |\n| GET /certificados/:codigo | não implementada | — |\n| GET /painel/atividades | implementada, path errado | api/src/modulos/m5-painel/rotas.js:8 espera `/atividades/painel` |\n\n## Campos\n\n| Objeto ou rota | Campo do contrato | Divergência |\n|---|---|---|\n| Atividade | cargaHorariaMinutos | resposta real traz `cargaMinutos` (api/src/modulos/m1-grade/rotas.js:40) |\n\n## Códigos de erro\n\n| Código do contrato | Status esperado | Onde aparece na API | Divergência |\n|---|---|---|---|\n| VAGAS_ACIMA_DA_CAPACIDADE | 422 | api/src/modulos/m1-grade/rotas.js:55 | — |\n\n## Identificação (seção 1)\n\n<confronto da lista de exclusão de api/src/autenticacao.js com as rotas públicas do contrato>\n\n## Interface\n\n| Campo ou rota consumido | Onde | Divergência |\n|---|---|---|\n\n## Execução real\n\n<subiu a API? comandos rodados e a resposta real de cada requisição relevante, ou o motivo de não ter subido>\n\n## Achados\n\n1. [ROTA] contrato-api.md:xxx — ...\n2. [CAMPO] ...\n3. [ERRO] ...\n4. [IDENTIFICAÇÃO] ...\n\n## Veredito\n\n<uma frase: contrato respeitado, ou o que diverge>\n```\n\n## O que você não faz\n\n- **Não corrija.** Você não tem `write` nem `edit`. Se vier vontade de consertar, descreva a divergência no achado e siga.\n- **Não julgue regra de negócio.** Se um código de erro aparece na rota certa com o status certo, não é da sua conta *quando* ele deveria aparecer — isso é do documento de requisitos e é assunto do `auditor`, não seu.\n- **Cite a fonte de cada lado**: `contrato-api.md:linha` para o que o contrato promete, `arquivo:linha` para o que o código faz. Achado sem as duas citações não vale.\n- **Não presuma rota implementada.** Se você não achou o handler, escreva \"não implementada\". Não escreva \"provavelmente existe em outro módulo\".\n- **Não deixe a API rodando** depois que terminar — derrube o processo mesmo se o parecer terminar no meio.\n- **Não elogie.** Nada de \"implementação sólida\". O parecer é uma lista de achados e um veredito.\n- Rota fora do contrato — que a API ou a interface inventaram — é achado tanto quanto rota que diverge; contrato também restringe por omissão.\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.opencode\\agent\\revisor-de-contrato.md"
+      },
+      "time": {
+       "start": 1790142209370,
+       "end": 1790142209402
+      },
+      "output": "File created successfully at: C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\.opencode\\agent\\revisor-de-contrato.md (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2835,
+      "reasoning": 0,
+      "cache": {
+       "read": 80315,
+       "write": 5868
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142213492
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Criei o subagente `revisor-de-contrato` em dois arquivos:\n\n- `.claude/agents/revisor-de-contrato.md` — `tools: Read, Grep, Glob, Bash` (só leitura + Bash para subir a API em modo de teste e checar respostas reais; sem Write/Edit/Agent).\n- `.opencode/agent/revisor-de-contrato.md` — mesmo corpo, `description` idêntica, frontmatter traduzido (`bash: true`, resto `false`, `mode: subagent`).\n\nEle confere, contra `contrato-api.md`: rotas implementadas (estáticas e via curl real com a API em `MODO_TESTE=1`), nomes de campo nos schemas, códigos de erro/status, a lista de exclusão de `X-Usuario` em `api/src/autenticacao.js`, e o uso dos mesmos nomes de campo/rota no lado da interface. Separei explicitamente do `auditor` já existente: contrato é forma (rota/campo/código), não regra de negócio.\n\nReinicie o Claude Code para o agente aparecer em `/agents`, e confira lá que só `Read, Grep, Glob, Bash` estão marcados.",
+     "time": {
+      "start": 1790142213492
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 413,
+      "reasoning": 0,
+      "cache": {
+       "read": 86183,
+       "write": 2949
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790142222361
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "@revisor-de-contrato confira rotas, campos e códigos da API e da\ninterface contra o contrato-api.md",
+     "time": {
+      "start": 1790142222361
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142223599
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vou acionar o subagente `revisor-de-contrato` para conferir rotas, campos e códigos de erro contra o `contrato-api.md`.",
+     "time": {
+      "start": 1790142223599
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "task",
+     "callID": "toolu_01RNd3B9RnyuMJ3omQNCdy3J",
+     "state": {
+      "status": "completed",
+      "input": {
+       "description": "Revisar contrato da API vs implementação",
+       "subagent_type": "revisor-de-contrato",
+       "prompt": "Confira rotas, campos e códigos de erro da API e da interface deste repositório contra o contrato-api.md, seguindo seu procedimento (leitura estática + subir a API em modo de teste e checar respostas reais). Raiz do repositório: C:\\dev\\Atividade Final IA\\projeto-semanaacademica"
+      },
+      "time": {
+       "start": 1790142225206,
+       "end": 1790142226813
+      },
+      "output": "Async agent launched successfully. (This tool result is internal metadata — never quote or paste any part of it, including the agentId below, into a user-facing reply.)\nagentId: a4a5ed041e7a9cbb9 (internal ID - do not mention to user. Use SendMessage with to: 'a4a5ed041e7a9cbb9', summary: '<5-10 word recap>' to continue this agent.)\nThe agent is working in the background. You will be notified automatically when it completes. You know nothing about its results until that notification arrives — do not report, assume, or predict them; continue other work or respond to the user in the meantime.\nDo not duplicate this agent's work — avoid working with the same files or topics it is using.\noutput_file: C:\\Users\\caiot\\AppData\\Local\\Temp\\claude\\C--dev-Atividade-Final-IA-projeto-semanaacademica\\48f49af2-47a9-4d5b-8a4d-e5ecb91f3e42\\tasks\\a4a5ed041e7a9cbb9.output\nDo NOT Read or tail this file via the shell tool — it is the full subagent JSONL transcript and reading it will overflow your context. If the user asks for progress, say the agent is still running; you'll get a completion notification."
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 275,
+      "reasoning": 0,
+      "cache": {
+       "read": 89545,
+       "write": 263
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142228322
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "O revisor-de-contrato está rodando em segundo plano — ele vai ler o `contrato-api.md`, subir a API em modo de teste e comparar rotas/campos/códigos reais. Aviso quando o parecer chegar.",
+     "time": {
+      "start": 1790142228322
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 81,
+      "reasoning": 0,
+      "cache": {
+       "read": 89808,
+       "write": 730
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790142387010
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "ok, avise quando avisar",
+     "time": {
+      "start": 1790142387010
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142388171
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Combinado, aviso assim que o parecer do `revisor-de-contrato` chegar.",
+     "time": {
+      "start": 1790142388171
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 33,
+      "reasoning": 0,
+      "cache": {
+       "read": 90619,
+       "write": 52
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790142390720
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "terminar*",
+     "time": {
+      "start": 1790142390720
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142391892
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Entendido — só avisar quando terminar. Fico aguardando a notificação.",
+     "time": {
+      "start": 1790142391892
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 29,
+      "reasoning": 0,
+      "cache": {
+       "read": 90704,
+       "write": 46
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142448775
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "O parecer do `revisor-de-contrato` chegou.\n\n**Veredito:** nas rotas implementadas (M1, M2, M3, `/_teste`), API e interface batem exatamente com o `contrato-api.md` — rotas, nomes de campo, status e códigos de erro, confirmado tanto por leitura estática quanto por chamadas reais contra a API rodando (`POST /_teste/reset`, criação/edição/cancelamento de atividade, inscrição, lista de espera, código de encontro, presença por QR e manual, etc.).\n\n**Um achado real:**\n- `api/src/autenticacao.js:9` só exclui `/_teste/*` da exigência de `X-Usuario`. O contrato (linha 12) também exige `GET /certificados/:codigo` como pública — e essa é exatamente a regra do seu `AGENTS.md` (\"toda rota pública nova, como GET /certificados/:codigo do M4, precisa ser excluída explicitamente nele\"). Hoje isso não quebra nada porque M4 ainda não existe (a rota cai em 401 antes mesmo de existir o 404), mas fica como pendência para quando M4 for implementado — não esquecer de adicionar essa exclusão junto com a rota.\n\n**Sem achados de forma em rotas/campos/erros** nos módulos implementados. M4 e M5 inteiros ainda não têm handler nenhum (confirmado em `api/src/app.js` e na pasta `modulos/`) — isso não é divergência, é \"não implementado\" por enquanto.",
+     "time": {
+      "start": 1790142453442
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 543,
+      "reasoning": 0,
+      "cache": {
+       "read": 90779,
+       "write": 7119
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142454825
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Já reportei o resultado desse agente na mensagem anterior — nada pendente aqui.",
+     "time": {
+      "start": 1790142454825
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 33,
+      "reasoning": 0,
+      "cache": {
+       "read": 97898,
+       "write": 1125
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790142491589
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "Salve o parecer em auditorias/revisor-contrato-2026-09-23.md sem\neditar nada.",
+     "time": {
+      "start": 1790142491589
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142493120
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_011cvNfsQDr2pJZfNdMUdjVU",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "ls \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\auditorias\"",
+       "description": "List existing files in auditorias folder"
+      },
+      "time": {
+       "start": 1790142493847,
+       "end": 1790142493996
+      },
+      "output": "M1-2026-09-23.md\nM3-2026-09-23.md",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 130,
+      "reasoning": 0,
+      "cache": {
+       "read": 99023,
+       "write": 112
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142497660
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01Ti1Jri8K9ScTqm2znD3n9G",
+     "state": {
+      "status": "completed",
+      "input": {
+       "limit": 20,
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\auditorias\\M1-2026-09-23.md"
+      },
+      "time": {
+       "start": 1790142497660,
+       "end": 1790142497695
+      },
+      "output": "[1146 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 111,
+      "reasoning": 0,
+      "cache": {
+       "read": 99135,
+       "write": 197
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142500215
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_014wQk8pK76UtD21dZNbk53B",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "# Revisão de contrato (2026-09-23)\n\n## Rotas\n\n| Rota do contrato | Estado | Onde |\n|---|---|---|\n| GET /salas | implementada, bate | api/src/modulos/m1-grade/rotas.js:25 |\n| GET /atividades | implementada, bate | api/src/modulos/m1-grade/rotas.js:60 |\n| GET /atividades/:id | implementada, bate | api/src/modulos/m1-grade/rotas.js:73 |\n| POST /atividades | implementada, bate | api/src/modulos/m1-grade/rotas.js:29 |\n| PATCH /atividades/:id | implementada, bate | api/src/modulos/m1-grade/rotas.js:78 |\n| POST /atividades/:id/cancelamento | implementada, bate | api/src/modulos/m1-grade/rotas.js:94 |\n| POST /atividades/:id/inscricoes | implementada, bate | api/src/modulos/m2-inscricoes/rotas.js:52 |\n| GET /inscricoes | implementada, bate | api/src/modulos/m2-inscricoes/rotas.js:118 |\n| GET /inscricoes/:id | implementada, bate | api/src/modulos/m2-inscricoes/rotas.js:133 |\n| POST /inscricoes/:id/cancelamento | implementada, bate | api/src/modulos/m2-inscricoes/rotas.js:145 |\n| POST /inscricoes/:id/confirmacao | implementada, bate | api/src/modulos/m2-inscricoes/rotas.js:175 |\n| GET /encontros/:id/codigo | implementada, bate | api/src/modulos/m3-presenca/rotas.js:62 |\n| POST /encontros/:id/presencas | implementada, bate | api/src/modulos/m3-presenca/rotas.js:85 |\n| POST /encontros/:id/presencas/manual | implementada, bate | api/src/modulos/m3-presenca/rotas.js:175 |\n| GET /encontros/:id/presencas | implementada, bate | api/src/modulos/m3-presenca/rotas.js:240 |\n| POST /atividades/:id/certificado | não implementada | — |\n| GET /certificados | não implementada | — |\n| GET /certificados/:codigo | não implementada | — |\n| GET /extrato | não implementada | — |\n| GET /painel/atividades | não implementada | — |\n| GET /painel/atividades/:id/sem-chance | não implementada | — |\n| GET /painel/atividades/:id/frequencia.csv | não implementada | — |\n| GET /painel/bloqueios | não implementada | — |\n| DELETE /painel/bloqueios/:participanteId | não implementada | — |\n\n`api/src/app.js` monta apenas m1-grade, m2-inscricoes, m3-presenca (linhas 18-20) e `/_teste` (linha 16). Nenhum módulo M4 nem M5 existe em `api/src/modulos` (confirmado por listagem de diretório). Não há implementação parcial de nenhuma rota de M4/M5, então tudo cai em \"não implementada\" por regra 10 do procedimento — não é achado de forma, mas fica registrado.\n\nVerifiquei ao vivo (curl real, API rodando) que `GET /painel/atividades` cai no 404 genérico de rota inexistente (`{\"erro\":\"NAO_ENCONTRADO\",\"mensagem\":\"GET /painel/atividades não existe\"}`), coerente com \"não implementada\".\n\n## Campos\n\nNenhuma divergência de nome de campo encontrada nas rotas implementadas. Testei ao vivo o schema completo de `Atividade` (POST/PATCH/GET), `Sala`, `Inscricao` (POST/GET) e `CodigoDoEncontro`/`Presenca` (M3) — todos os campos batem exatamente com contrato-api.md §5 (nomes, calculados incluídos: `cargaHorariaMinutos`, `situacao`, `ocupadas`, `vagasRestantes`, `emEspera`, `posicaoNaEspera`, `convocadaAte`, `criadaEm`, `origem`, `lidoEm`, `registradaEm`, `justificativa`).\n\nComo M4 e M5 não existem, os objetos `Certificado`, `Verificacao`, `Extrato`, `LinhaDoPainel`, `SemChance`, `Bloqueio` não têm implementação para comparar — nada a apontar aqui além da ausência.\n\n## Códigos de erro\n\n| Código do contrato | Status esperado | Onde aparece na API | Divergência |\n|---|---|---|---|\n| USUARIO_DESCONHECIDO | 401 | api/src/autenticacao.js:13 | — (confirmado ao vivo) |\n| SOMENTE_ORGANIZACAO | 403 | api/src/autenticacao.js:23 | — (confirmado ao vivo) |\n| SOMENTE_PARTICIPANTE | 403 | api/src/autenticacao.js:31 | — (confirmado ao vivo) |\n| NAO_ENCONTRADO | 404 | api/src/erros.js:24; m1-grade/rotas.js:135; m2-inscricoes/rotas.js:54,137,148,180; m3-presenca/rotas.js:66,95,186,242 | — (confirmado ao vivo) |\n| DADOS_INVALIDOS | 422 | api/src/erros.js:11,33 (mais m1-grade/validacao.js, m3-presenca/rotas.js) | — (confirmado ao vivo, corpo não-JSON e campo desconhecido) |\n| QUANTIDADE_DE_ENCONTROS | 422 | api/src/modulos/m1-grade/regras.js:36 | — |\n| ENCONTRO_INVALIDO | 422 | api/src/modulos/m1-grade/regras.js:20 | — |\n| VAGAS_ACIMA_DA_CAPACIDADE | 422 | api/src/modulos/m1-grade/regras.js:28 | — |\n| CONFLITO_DE_SALA | 409 | api/src/modulos/m1-grade/regras.js:63 | — |\n| CAMPO_NAO_EDITAVEL | 422 | api/src/modulos/m1-grade/regras.js:76 | — (confirmado ao vivo com `tipo`) |\n| VAGAS_ABAIXO_DOS_INSCRITOS | 409 | api/src/modulos/m1-grade/regras.js:83 | — |\n| ATIVIDADE_JA_INICIADA | 422 | api/src/modulos/m1-grade/rotas.js:102; m2-inscricoes/rotas.js:157 | — |\n| ATIVIDADE_CANCELADA | 422 | api/src/modulos/m1-grade/rotas.js:98; m1-grade/regras.js:73; m2-inscricoes/rotas.js:57; m3-presenca/rotas.js:68 | — (confirmado ao vivo em inscrever e cancelar) |\n| INSCRICOES_ENCERRADAS | 422 | api/src/modulos/m2-inscricoes/rotas.js:64 | — |\n| INSCRICAO_BLOQUEADA | 422 | não aparece no código | esperado — contrato diz \"só em grupos com M5\", e M5 não existe neste repositório |\n| JA_INSCRITO | 409 | api/src/modulos/m2-inscricoes/rotas.js:71 | — |\n| CONFLITO_DE_HORARIO | 409 | api/src/modulos/m2-inscricoes/rotas.js:86,211 | — |\n| LIMITE_DE_MINICURSOS | 422 | api/src/modulos/m2-inscricoes/rotas.js:98,225 | — |\n| INSCRICAO_INATIVA | 422 | api/src/modulos/m2-inscricoes/rotas.js:162 | — |\n| SEM_CONVOCACAO | 422 | api/src/modulos/m2-inscricoes/rotas.js:185 | — (confirmado ao vivo) |\n| CONVOCACAO_EXPIRADA | 422 | api/src/modulos/m2-inscricoes/rotas.js:195 | — |\n| FORA_DA_JANELA | 422 | api/src/modulos/m3-presenca/rotas.js:72,110,153,212 | — (confirmado ao vivo em GET /encontros/:id/codigo) |\n| CODIGO_INVALIDO | 422 | api/src/modulos/m3-presenca/rotas.js:114,158 | — |\n| NAO_INSCRITO | 403 | api/src/modulos/m3-presenca/rotas.js:105,143,206 | — (confirmado ao vivo em presença manual) |\n| SINCRONIZACAO_TARDIA | 422 | api/src/modulos/m3-presenca/rotas.js:148 | — |\n| JUSTIFICATIVA_OBRIGATORIA | 422 | api/src/modulos/m3-presenca/rotas.js:195 | — |\n| LIMITE_DE_MANUAIS | 422 | api/src/modulos/m3-presenca/rotas.js:222 | — |\n| ATIVIDADE_NAO_ENCERRADA | 422 | não aparece no código | esperado — rota do certificado (M4) não implementada |\n| PRESENCA_INSUFICIENTE | 422 | não aparece no código | esperado — rota do certificado (M4) não implementada |\n\nTodos os códigos presentes batem em status e local com a coluna \"onde aparece\" do contrato §6. Os três ausentes (`INSCRICAO_BLOQUEADA`, `ATIVIDADE_NAO_ENCERRADA`, `PRESENCA_INSUFICIENTE`) correspondem exatamente às rotas de M4/M5 não implementadas — não é achado por si (regra 10), mas fica no registro.\n\n## Identificação (seção 1)\n\n`api/src/autenticacao.js:9` exclui só `req.path.startsWith('/_teste/')`. O contrato-api.md:12 exige que, além de `/_teste/*`, a rota `GET /certificados/:codigo` também fique fora da exigência de `X-Usuario`. Hoje essa exclusão **não existe nomeada** em `autenticacao.js` — testei ao vivo (`curl -i http://localhost:3000/certificados/SA26-XXXX-0000` sem cabeçalho) e a resposta foi `401 USUARIO_DESCONHECIDO`, não porque a rota público-sem-usuário foi implementada e recusada por outro motivo, mas porque a rota nem existe e cai no middleware `identificar` antes do roteador de M4 (que não existe). Isso é esperado hoje dado que M4 não foi implementado, mas a lista de exclusão em si — que é o artefato pedido pela regra do repositório (AGENTS.md: \"toda rota pública nova, como GET /certificados/:codigo do M4, precisa ser excluída explicitamente nele\") — ainda não tem essa entrada. Registro como achado de atenção, não como bug ativo, já que não há rota para excluir ainda.\n\n## Interface\n\n| Campo ou rota consumido | Onde | Divergência |\n|---|---|---|\n| `X-Usuario` no cabeçalho | app/src/api/cliente.js:11 | — bate com contrato §1 |\n| `{erro, mensagem}` no corpo de erro | app/src/api/cliente.js:22 (`dados?.erro`, `dados?.mensagem`) | — bate com contrato §1 |\n| GET /salas | app/src/modulos/m1-grade/FormularioAtividade.jsx:21 | — bate |\n| POST /atividades — titulo, tipo, salaId, vagas, encontros[].inicio/fim | app/src/modulos/m1-grade/FormularioAtividade.jsx:42-55 | — bate exatamente com o schema de entrada do contrato-api.md:96-105 |\n| GET /atividades?dia=&tipo= | app/src/modulos/m1-grade/ProgramacaoPorDia.jsx:19-22 | — bate |\n| GET /atividades/:id — titulo, tipo, situacao, vagas, ocupadas, emEspera, vagasRestantes, cargaHorariaMinutos, encontros[].id/inicio/fim | app/src/modulos/m1-grade/DetalheAtividade.jsx:42-64 | — bate |\n| GET /encontros/:id/codigo — codigo, trocaEm | app/src/modulos/m3-presenca/TelaCodigoEncontro.jsx:14-18 | — bate |\n| POST /encontros/:id/presencas — codigo, lidoEm | app/src/modulos/m3-presenca/TelaLeituraPresenca.jsx:24-27,61-65 | — bate |\n\nNenhum campo traduzido, apelidado ou renomeado encontrado do lado da interface. Nenhuma tela para M2 (inscrições), M4 ou M5 existe em app/src/modulos, coerente com a API não ter essas rotas ainda.\n\n## Execução real\n\nA API subiu com sucesso. Comandos: `cd api && npm install` (ok, sem mudanças) e depois `MODO_TESTE=1 PORT=3000 node src/servidor.js` em background. Observação operacional: numa primeira tentativa via `npm start &` dentro do mesmo comando de background havia processos node.exe zumbis de uma sessão anterior já escutando na porta 3000 sem `MODO_TESTE`, fazendo `/_teste/relogio` responder 404 (comportamento correto para esse processo antigo, mas me enganou momentaneamente). Matei todos os `node.exe` residuais (`taskkill /F /IM node.exe`) e subi de novo isolado — aí respondeu 200 corretamente.\n\nSequência real executada e confirmada por resposta HTTP real (não simulada):\n- `POST /_teste/reset` → 204\n- `GET /salas` sem `X-Usuario` → 401 `USUARIO_DESCONHECIDO`; com `X-Usuario: p-carla` → 200, 4 salas na ordem dos dados iniciais\n- `POST /atividades` como `p-carla` → 403 `SOMENTE_ORGANIZACAO`; como `org-ana` → 201 `Atividade` completa com todos os campos calculados\n- `GET /atividades?dia=2026-10-19` → 200, filtro aplicado\n- `GET /atividades/:id` → 200\n- `PATCH /atividades/:id` com `titulo` → 200; com `tipo` → 422 `CAMPO_NAO_EDITAVEL`\n- `POST /atividades/:id/cancelamento` → 200, `situacao: \"cancelada\"`\n- `POST /atividades/:id/inscricoes` em atividade cancelada → 422 `ATIVIDADE_CANCELADA`\n- Nova atividade (vagas=1) → `POST /atividades/:id/inscricoes` p-carla → 201 `confirmada`; p-diego → 201 `em_espera`, `posicaoNaEspera: 1`\n- `GET /inscricoes` (participante, só próprias) e `GET /inscricoes?atividadeId=` (organização, todas) → 200, ambas corretas\n- `POST /inscricoes/:id/cancelamento` sem `X-Usuario` → 401\n- `POST /inscricoes/:id/confirmacao` sem convocação → 422 `SEM_CONVOCACAO`\n- `GET /encontros/:id/codigo` fora da janela → 422 `FORA_DA_JANELA`; como participante → 403 `SOMENTE_ORGANIZACAO`\n- `PUT /_teste/relogio` avançando para dentro do 1º encontro → 200\n- `GET /encontros/:id/codigo` dentro da janela → 200 `CodigoDoEncontro` completo (`encontroId`, `codigo` 6 chars, `trocaEm`, `validoAte`)\n- `POST /encontros/:id/presencas` com o código válido → 201 `Presenca` (`origem: \"qr\"`); repetido → 200, mesmo id\n- `POST /encontros/:id/presencas/manual` para participante sem inscrição confirmada → 403 `NAO_INSCRITO`\n- `GET /encontros/:id/presencas` → 200 `[Presenca]`\n- `GET /certificados/:codigo` (M4) sem `X-Usuario` → 401 (rota não existe, cai no middleware de identificação antes do 404)\n- `GET /painel/atividades` (M5) → 404 `NAO_ENCONTRADO` genérico (rota inexistente)\n- Corpo não-JSON em `POST /atividades` → 422 `DADOS_INVALIDOS`\n- `POST /_teste/reset` sem `X-Usuario` → 204 (pública, correto)\n\nAo final, derrubei o processo (`taskkill /F /IM node.exe`) e confirmei que a porta 3000 parou de responder.\n\n## Achados\n\n1. [IDENTIFICAÇÃO] contrato-api.md:12 exige `GET /certificados/:codigo` fora da exigência de `X-Usuario`; `api/src/autenticacao.js:9` só exclui `/_teste/*`. Hoje isso não quebra nada porque a rota não existe (M4 não implementado), mas a lista de exclusão pedida pelo próprio AGENTS.md do repositório ainda não tem essa entrada nomeada — vale registrar para quando M4 for implementado.\n2. [ROTA] M4 (POST /atividades/:id/certificado, GET /certificados, GET /certificados/:codigo, GET /extrato) e M5 (GET /painel/atividades, GET /painel/atividades/:id/sem-chance, GET /painel/atividades/:id/frequencia.csv, GET /painel/bloqueios, DELETE /painel/bloqueios/:participanteId) do contrato-api.md:188-256 não têm nenhum handler em api/src (confirmado em api/src/app.js:5-9, sem import de módulos m4/m5, e por `find` na pasta modulos/). Não é divergência de forma — apenas \"não implementada\" — mas anoto por completude: nenhuma rota de M4/M5 responde nada além do 404 genérico.\n\n## Veredito\n\nNas rotas efetivamente implementadas (M1, M2, M3, /_teste), API e interface respeitam o contrato-api.md à risca — nomes de campo, rotas, status e códigos de erro batem exatamente, confirmado por leitura estática e por chamadas reais contra a API rodando. M4 e M5 inteiros ainda não existem, o que por si não é violação (rota sem handler é \"não implementada\"), mas a lista de exclusão de `X-Usuario` em `api/src/autenticacao.js` já deveria ter `GET /certificados/:codigo` nomeada, como o próprio AGENTS.md do projeto exige, e ainda não tem.\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\auditorias\\revisor-contrato-2026-09-23.md"
+      },
+      "time": {
+       "start": 1790142539336,
+       "end": 1790142539428
+      },
+      "output": "File created successfully at: C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\auditorias\\revisor-contrato-2026-09-23.md (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 6881,
+      "reasoning": 0,
+      "cache": {
+       "read": 99332,
+       "write": 830
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790142540617
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Salvo em `auditorias/revisor-contrato-2026-09-23.md`, conteúdo do parecer sem edições.",
+     "time": {
+      "start": 1790142540617
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 45,
+      "reasoning": 0,
+      "cache": {
+       "read": 100162,
+       "write": 6997
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,606 @@
+{
+ "info": {
+  "id": "ses_claude_33ae6428-d6c0-4caf-9434-3c91c83d7472",
+  "title": "M3 presença por QR - Semana Acadêmica",
+  "directory": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica",
+  "time": {
+   "created": 1790118296667,
+   "updated": 1790118623251
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790118296667
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"b686\">\nUse a skill grilling. Vamos decidir o módulo M3 (presença por QR) da\nSemana Acadêmica antes de qualquer código. Leia o contrato-api.md. Eu não\ntenho as regras de cabeça: quando eu responder \"consultar requisitos\",\nregistre a pergunta como pendente. Mantenha tudo em entrevistas/M3-presenca.md,\nseparando as questões de regra de negócio das técnicas/contrato.\nAs perguntas são numeradas P-01, P-02... O prefixo RN é reservado para a\ncoluna Fonte na rodada 2.\n</pasted_content id=\"b686\">\n",
+     "time": {
+      "start": 1790118296667
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118298739
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "skill",
+     "callID": "toolu_01F2jwXANxZTXjXmFkHj3FS8",
+     "state": {
+      "status": "completed",
+      "input": {
+       "skill": "grilling",
+       "args": "Módulo M3 (presença por QR) da Semana Acadêmica. Ler contrato-api.md. Registrar em entrevistas/M3-presenca.md, separando regra de negócio de técnicas/contrato. Perguntas P-01, P-02...; \"consultar requisitos\" = pendente. RN reservado para coluna Fonte na rodada 2.",
+       "name": "grilling"
+      },
+      "time": {
+       "start": 1790118299937,
+       "end": 1790118299965
+      },
+      "output": "Launching skill: grilling"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 243,
+      "reasoning": 0,
+      "cache": {
+       "read": 31242,
+       "write": 14242
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118303895
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01MJD3JnL2v14DV8uverhUvs",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\"; ls; ls entrevistas specs api/src/modulos 2>/dev/null; cat contrato-api.md",
+       "description": "List repo and read API contract"
+      },
+      "time": {
+       "start": 1790118303895,
+       "end": 1790118304791
+      },
+      "output": "AGENTS.md\nCLAUDE.md\nEQUIPE.md\nREADME.md\napi\napp\nauditorias\ncontrato-api.md\nentrevistas\nevidencias\nprojeto.json\nspecs\nentrevistas:\nM1-grade.md\n\nspecs:\n# Contrato da API — Semana Acadêmica\r\n\r\n> **Restrição do cliente.** A interface e o juiz de aceitação consomem exatamente o que está aqui. Rota, nome de campo e código de retorno não se negociam.\r\n>\r\n> O contrato diz **o que** a API responde. **Quando** cada código aparece — com que prazo, que limite, em que ordem — está no documento de requisitos, que você consulta na rodada 2 da entrevista, e só nela.\r\n\r\n---\r\n\r\n## 1. Convenções\r\n\r\n- Entrada e saída em JSON UTF-8, exceto a planilha do M5.\r\n- **Identificação:** cabeçalho `X-Usuario: <id>` em toda rota, menos `GET /certificados/:codigo` e `/_teste/*`. Sem o cabeçalho, ou com um id que não existe → `401 USUARIO_DESCONHECIDO`.\r\n- **Datas:** ISO 8601 com fuso (`2026-10-19T19:00:00-03:00` ou `2026-10-19T22:00:00Z`). A API pode responder em qualquer fuso; o juiz compara o instante, não o texto.\r\n- **Identificadores gerados:** prefixo + 8 hexadecimais minúsculos — `atv_1a2b3c4d`, `enc_…`, `ins_…`, `pre_…`.\r\n- **Erro:** sempre `{\"erro\": \"CODIGO\", \"mensagem\": \"texto livre\"}`. O juiz confere o status e o `erro`; a mensagem é de vocês.\r\n- Corpo que não é JSON, campo obrigatório ausente ou de tipo errado → `422 DADOS_INVALIDOS`.\r\n- **Ordem das verificações:** identificação (401) → perfil (403 `SOMENTE_…`) → existência (404 `NAO_ENCONTRADO`) → corpo (422 `DADOS_INVALIDOS`) → regras do recurso. Quando mais de uma regra do recurso recusa a mesma operação, a ordem entre elas é regra de negócio.\r\n\r\n## 2. Como o juiz roda a API: `projeto.json`\r\n\r\nA stack é livre. Para o juiz rodar a API de todos os grupos do mesmo jeito, a raiz do repositório tem um `projeto.json`:\r\n\r\n```jsonc\r\n{\r\n  \"stack\": \"Node 22 + Express + SQLite; interface em Flutter web\",   // texto livre\r\n  \"api\": {\r\n    \"pasta\": \"api\",               // onde rodar os comandos, a partir da raiz\r\n    \"instalar\": \"npm install\",    // roda uma vez, antes de iniciar\r\n    \"iniciar\": \"npm start\"        // sobe a API e fica rodando\r\n  },\r\n  \"testes\": [\"npm test\", \"flutter test\"]   // os comandos que vocês usam para rodar os testes\r\n}\r\n```\r\n\r\n- O juiz roda `instalar` e depois `iniciar` dentro de `api.pasta`, com `MODO_TESTE=1` e `PORT=3000` no ambiente, e espera até 60 s pela primeira resposta.\r\n- Os dois comandos precisam funcionar no Linux só com o runtime da linguagem instalado. O que o `instalar` baixar, tudo bem.\r\n- A API não depende de serviço externo: banco embutido (SQLite ou arquivo), nada de servidor de banco, Docker ou nuvem.\r\n- A API escuta na porta da variável `PORT` (padrão 3000).\r\n- O script de evidências lê `testes` para reconhecer as execuções de teste nas sessões do OpenCode.\r\n\r\n## 3. Modo de teste\r\n\r\nCom `MODO_TESTE=1` no ambiente, a API expõe:\r\n\r\n| Rota | Retorno | O que faz |\r\n|---|---|---|\r\n| `POST /_teste/reset` | 204 | Apaga tudo, recarrega os dados iniciais (seção 4) e põe o relógio em `2026-10-13T09:00:00-03:00` |\r\n| `PUT /_teste/relogio` | 200 | Corpo `{\"agora\": \"<ISO>\"}`; responde `{\"agora\": \"<ISO>\"}` |\r\n| `GET /_teste/relogio` | 200 | Responde `{\"agora\": \"<ISO>\"}` |\r\n\r\n- No modo de teste **o relógio fica parado**: só muda por `PUT /_teste/relogio`. Toda regra que depende de tempo usa esse relógio — nunca a hora do sistema direto.\r\n- O juiz sempre começa com `POST /_teste/reset` e depois só avança o relógio.\r\n- Sem `MODO_TESTE`, as rotas `/_teste/*` respondem 404 e o relógio é o real.\r\n\r\n## 4. Dados iniciais\r\n\r\nCarregados na primeira subida e a cada `POST /_teste/reset`. Não há rota para criar usuário ou sala.\r\n\r\n**Evento:** Semana Acadêmica 2026, de 19/10/2026 (segunda) a 23/10/2026 (sexta), horário de Brasília.\r\n\r\n| id | nome | papel |\r\n|---|---|---|\r\n| `org-ana` | Ana Beatriz Lima | `organizacao` |\r\n| `org-bruno` | Bruno Tavares | `organizacao` |\r\n| `p-carla` | Carla Mendes Souza | `participante` |\r\n| `p-diego` | Diego Alves | `participante` |\r\n| `p-elisa` | Elisa Fernandes da Rocha | `participante` |\r\n| `p-fabio` | Fábio Nogueira | `participante` |\r\n| `p-gabriela` | Gabriela Moura Castro | `participante` |\r\n| `p-heitor` | Heitor Campos | `participante` |\r\n| `p-isadora` | Isadora Ribeiro dos Santos | `participante` |\r\n| `p-joao` | João Pedro Martins | `participante` |\r\n\r\n| id | nome | capacidade |\r\n|---|---|---|\r\n| `auditorio` | Auditório Central | 200 |\r\n| `sala-101` | Sala 101 | 40 |\r\n| `sala-102` | Sala 102 | 40 |\r\n| `lab-3` | Laboratório 3 | 20 |\r\n\r\n## 5. Rotas\r\n\r\n### M1 — Grade de atividades\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/salas` | todos | 200 `[Sala]` |\r\n| GET | `/atividades` | todos | 200 `[Atividade]` — filtros `?dia=AAAA-MM-DD` e `?tipo=palestra\\|minicurso` |\r\n| GET | `/atividades/:id` | todos | 200 `Atividade` |\r\n| POST | `/atividades` | organização | 201 `Atividade` |\r\n| PATCH | `/atividades/:id` | organização | 200 `Atividade` |\r\n| POST | `/atividades/:id/cancelamento` | organização | 200 `Atividade` |\r\n\r\n```jsonc\r\n// POST /atividades — entrada\r\n{\r\n  \"titulo\": \"Flutter do zero\",\r\n  \"tipo\": \"minicurso\",\r\n  \"salaId\": \"lab-3\",\r\n  \"vagas\": 20,\r\n  \"encontros\": [\r\n    { \"inicio\": \"2026-10-19T19:00:00-03:00\", \"fim\": \"2026-10-19T22:00:00-03:00\" },\r\n    { \"inicio\": \"2026-10-20T19:00:00-03:00\", \"fim\": \"2026-10-20T22:00:00-03:00\" }\r\n  ]\r\n}\r\n// PATCH /atividades/:id — entrada: qualquer subconjunto dos campos acima\r\n\r\n// Atividade\r\n{\r\n  \"id\": \"atv_1a2b3c4d\",\r\n  \"titulo\": \"Flutter do zero\",\r\n  \"tipo\": \"minicurso\",                  // \"palestra\" | \"minicurso\"\r\n  \"salaId\": \"lab-3\",\r\n  \"vagas\": 20,\r\n  \"encontros\": [                        // em ordem de início\r\n    { \"id\": \"enc_5e6f7a8b\", \"inicio\": \"…\", \"fim\": \"…\" }\r\n  ],\r\n  \"cargaHorariaMinutos\": 360,           // calculado\r\n  \"situacao\": \"prevista\",               // calculado: \"prevista\" | \"em_andamento\" | \"encerrada\" | \"cancelada\"\r\n  \"ocupadas\": 12,                       // calculado\r\n  \"vagasRestantes\": 8,                  // calculado\r\n  \"emEspera\": 3                         // calculado\r\n}\r\n\r\n// Sala\r\n{ \"id\": \"sala-101\", \"nome\": \"Sala 101\", \"capacidade\": 40 }\r\n```\r\n\r\n### M2 — Inscrições e lista de espera\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| POST | `/atividades/:id/inscricoes` | participante | 201 `Inscricao` (sem corpo na entrada) |\r\n| GET | `/inscricoes` | todos | 200 `[Inscricao]` — participante recebe só as próprias; filtro `?atividadeId=` |\r\n| GET | `/inscricoes/:id` | todos | 200 `Inscricao` |\r\n| POST | `/inscricoes/:id/cancelamento` | participante | 200 `Inscricao` |\r\n| POST | `/inscricoes/:id/confirmacao` | participante | 200 `Inscricao` |\r\n\r\n```jsonc\r\n// Inscricao\r\n{\r\n  \"id\": \"ins_9c0d1e2f\",\r\n  \"atividadeId\": \"atv_1a2b3c4d\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"status\": \"confirmada\",      // \"confirmada\" | \"em_espera\" | \"convocada\" | \"cancelada\" | \"expirada\"\r\n  \"posicaoNaEspera\": null,     // número (1, 2, …) só quando em_espera\r\n  \"convocadaAte\": null,        // instante, só quando convocada\r\n  \"criadaEm\": \"…\"\r\n}\r\n```\r\n\r\n### M3 — Presença por QR\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/encontros/:id/codigo` | organização | 200 `CodigoDoEncontro` |\r\n| POST | `/encontros/:id/presencas` | participante | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\r\n| POST | `/encontros/:id/presencas/manual` | organização | 201 `Presenca` na primeira vez; 200 `Presenca` depois |\r\n| GET | `/encontros/:id/presencas` | organização | 200 `[Presenca]` |\r\n\r\n```jsonc\r\n// CodigoDoEncontro\r\n{\r\n  \"encontroId\": \"enc_5e6f7a8b\",\r\n  \"codigo\": \"K7M2QX\",           // 6 caracteres\r\n  \"trocaEm\": \"…\",               // quando a tela deve buscar o próximo código\r\n  \"validoAte\": \"…\"              // primeiro instante em que este código deixa de ser aceito\r\n}\r\n\r\n// POST /encontros/:id/presencas — entrada\r\n{ \"codigo\": \"K7M2QX\", \"lidoEm\": \"…\" }        // lidoEm é opcional: leitura feita sem internet\r\n\r\n// POST /encontros/:id/presencas/manual — entrada\r\n{ \"participanteId\": \"p-carla\", \"justificativa\": \"…\" }   // justificativa ausente também é JUSTIFICATIVA_OBRIGATORIA\r\n\r\n// Presenca\r\n{\r\n  \"id\": \"pre_3a4b5c6d\",\r\n  \"encontroId\": \"enc_5e6f7a8b\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"origem\": \"qr\",               // \"qr\" | \"qr_offline\" | \"manual\"\r\n  \"lidoEm\": \"…\",                // o instante que valeu para as regras\r\n  \"registradaEm\": \"…\",\r\n  \"justificativa\": null         // texto só quando manual\r\n}\r\n```\r\n\r\n### M4 — Certificados (grupos de 4 e de 5)\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| POST | `/atividades/:id/certificado` | participante | 201 `Certificado` na primeira vez; 200 `Certificado` depois |\r\n| GET | `/certificados` | participante | 200 `[Certificado]` — os já emitidos |\r\n| GET | `/certificados/:codigo` | **público, sem `X-Usuario`** | 200 `Verificacao` |\r\n| GET | `/extrato` | participante | 200 `Extrato` |\r\n\r\n```jsonc\r\n// Certificado\r\n{\r\n  \"codigo\": \"SA26-7K2M-9QXA\",\r\n  \"atividadeId\": \"atv_1a2b3c4d\",\r\n  \"participanteId\": \"p-carla\",\r\n  \"cargaHorariaMinutos\": 360,\r\n  \"presencas\": 2,\r\n  \"encontros\": 2,\r\n  \"emitidoEm\": \"…\"\r\n}\r\n\r\n// Verificacao\r\n{\r\n  \"codigo\": \"SA26-7K2M-9QXA\",\r\n  \"participante\": \"Carla M. S.\",\r\n  \"atividade\": \"Flutter do zero\",\r\n  \"cargaHorariaMinutos\": 360,\r\n  \"emitidoEm\": \"…\"\r\n}\r\n\r\n// Extrato\r\n{\r\n  \"itens\": [\r\n    { \"atividadeId\": \"atv_1a2b3c4d\", \"titulo\": \"Flutter do zero\", \"tipo\": \"minicurso\",\r\n      \"cargaHorariaMinutos\": 360, \"codigo\": null }\r\n  ],\r\n  \"palestrasMinutos\": 0,        // bruto\r\n  \"minicursosMinutos\": 360,     // bruto\r\n  \"totalMinutos\": 360,          // bruto\r\n  \"aproveitadoMinutos\": 360     // o que conta como hora complementar\r\n}\r\n```\r\n\r\n### M5 — Painel da organização (grupos de 5)\r\n\r\n| Método | Rota | Quem | Sucesso |\r\n|---|---|---|---|\r\n| GET | `/painel/atividades` | organização | 200 `[LinhaDoPainel]` |\r\n| GET | `/painel/atividades/:id/sem-chance` | organização | 200 `[SemChance]` |\r\n| GET | `/painel/atividades/:id/frequencia.csv` | organização | 200 `text/csv` |\r\n| GET | `/painel/bloqueios` | organização | 200 `[Bloqueio]` |\r\n| DELETE | `/painel/bloqueios/:participanteId` | organização | 204 — quem não está bloqueado → 404 |\r\n\r\n```jsonc\r\n// LinhaDoPainel\r\n{\r\n  \"atividadeId\": \"atv_1a2b3c4d\", \"titulo\": \"Flutter do zero\",\r\n  \"vagas\": 20, \"ocupadas\": 12, \"emEspera\": 3,\r\n  \"ocupacaoPercentual\": 60.0,\r\n  \"frequenciaPercentual\": null\r\n}\r\n\r\n// SemChance\r\n{ \"participanteId\": \"p-heitor\", \"nome\": \"Heitor Campos\", \"faltas\": 2, \"faltasPermitidas\": 1 }\r\n\r\n// Bloqueio\r\n{ \"participanteId\": \"p-heitor\", \"nome\": \"Heitor Campos\",\r\n  \"atividades\": [\"atv_1a2b3c4d\", \"atv_7e8f9a0b\"], \"bloqueadoDesde\": \"…\" }\r\n```\r\n\r\n## 6. Códigos de retorno\r\n\r\n| Código | Status | Onde aparece |\r\n|---|---|---|\r\n| `USUARIO_DESCONHECIDO` | 401 | toda rota identificada |\r\n| `SOMENTE_ORGANIZACAO` | 403 | rotas de organização |\r\n| `SOMENTE_PARTICIPANTE` | 403 | rotas de participante |\r\n| `NAO_ENCONTRADO` | 404 | recurso inexistente |\r\n| `DADOS_INVALIDOS` | 422 | corpo mal formado |\r\n| `QUANTIDADE_DE_ENCONTROS` | 422 | criar atividade |\r\n| `ENCONTRO_INVALIDO` | 422 | criar atividade |\r\n| `VAGAS_ACIMA_DA_CAPACIDADE` | 422 | criar e alterar atividade |\r\n| `CONFLITO_DE_SALA` | 409 | criar atividade |\r\n| `CAMPO_NAO_EDITAVEL` | 422 | alterar atividade |\r\n| `VAGAS_ABAIXO_DOS_INSCRITOS` | 409 | alterar atividade |\r\n| `ATIVIDADE_JA_INICIADA` | 422 | cancelar atividade, cancelar inscrição |\r\n| `ATIVIDADE_CANCELADA` | 422 | alterar e cancelar atividade, inscrever, obter código, certificado |\r\n| `INSCRICOES_ENCERRADAS` | 422 | inscrever |\r\n| `INSCRICAO_BLOQUEADA` | 422 | inscrever — só em grupos com M5 |\r\n| `JA_INSCRITO` | 409 | inscrever |\r\n| `CONFLITO_DE_HORARIO` | 409 | inscrever, confirmar convocação |\r\n| `LIMITE_DE_MINICURSOS` | 422 | inscrever, confirmar convocação |\r\n| `INSCRICAO_INATIVA` | 422 | cancelar inscrição |\r\n| `SEM_CONVOCACAO` | 422 | confirmar convocação |\r\n| `CONVOCACAO_EXPIRADA` | 422 | confirmar convocação |\r\n| `FORA_DA_JANELA` | 422 | obter código, registrar presença, presença manual |\r\n| `CODIGO_INVALIDO` | 422 | registrar presença |\r\n| `NAO_INSCRITO` | 403 | registrar presença, presença manual, certificado |\r\n| `SINCRONIZACAO_TARDIA` | 422 | registrar presença com `lidoEm` |\r\n| `JUSTIFICATIVA_OBRIGATORIA` | 422 | presença manual |\r\n| `LIMITE_DE_MANUAIS` | 422 | presença manual |\r\n| `ATIVIDADE_NAO_ENCERRADA` | 422 | certificado |\r\n| `PRESENCA_INSUFICIENTE` | 422 | certificado |\r\n\r\n## 7. O que este contrato não diz\r\n\r\nCada código da seção 6 existe porque existe uma regra. Prazo, limite, janela, tolerância, arredondamento, ordem entre regras e o que acontece quando o tempo passa sem ninguém acessar o sistema: nada disso está aqui, e o juiz cobra tudo isso. Está no documento de requisitos, e o caminho até ele é a entrevista em duas rodadas: primeiro o agente pergunta, depois você consulta.",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 141,
+      "reasoning": 0,
+      "cache": {
+       "read": 45484,
+       "write": 1608
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118306042
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Vou ver o formato da entrevista do M1 para manter o padrão.",
+     "time": {
+      "start": 1790118306042
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01JzsJd5sYxaSMuzeVxoUsat",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\"; cat entrevistas/M1-grade.md",
+       "description": "Read M1 interview for format"
+      },
+      "time": {
+       "start": 1790118306651,
+       "end": 1790118306785
+      },
+      "output": "# Entrevista — M1 Grade de atividades\n\n> Skill `grilling`. O agente pergunta; o grupo responde ou marca \"consultar requisitos\".\n> Pergunta marcada \"consultar requisitos\" fica **Pendente** e é respondida na consulta ao documento de requisitos.\n> Numeração **P-xx** contínua. O prefixo **RN** é reservado às regras do documento de requisitos e aparece só na coluna **Fonte**.\n\n## Fatos já resolvidos pelo repositório (não são perguntas)\n\n- Rotas, campos e códigos do M1: `contrato-api.md` §5 e §6. Não mudam.\n- Ordem geral: 401 → 403 `SOMENTE_ORGANIZACAO` → 404 `NAO_ENCONTRADO` → 422 `DADOS_INVALIDOS` → regras do recurso (§1). Logo, um erro de corpo (`DADOS_INVALIDOS`) sempre vence qualquer erro de regra. A ordem **entre** regras do recurso é regra de negócio.\n- Códigos de regra do M1 (§6): `QUANTIDADE_DE_ENCONTROS`, `ENCONTRO_INVALIDO`, `VAGAS_ACIMA_DA_CAPACIDADE`, `CONFLITO_DE_SALA` (criar); `CAMPO_NAO_EDITAVEL`, `VAGAS_ABAIXO_DOS_INSCRITOS`, `VAGAS_ACIMA_DA_CAPACIDADE`, `ATIVIDADE_CANCELADA` (alterar); `ATIVIDADE_JA_INICIADA`, `ATIVIDADE_CANCELADA` (cancelar).\n- `encontros` na saída vêm em ordem de início (§5).\n- Campo com `null` ou tipo errado (ex.: `\"vagas\": \"20\"`, `\"titulo\": null`) → 422 `DADOS_INVALIDOS` (§1).\n- Tempo vem do relógio do modo de teste (`api/src/relogio.js`, contrato §3), nunca da hora do sistema.\n- Datas de entrada: ISO 8601 com fuso (§1), validado por `lerInstante` em `api/src/erros.js`.\n- Ids: prefixo + 8 hex minúsculos, `atv_` e `enc_` (§1).\n- Evento: 19/10/2026 (seg) a 23/10/2026 (sex), horário de Brasília. Salas e capacidades: §4.\n\n---\n\n## Rodada 1\n\n### Regra de negócio\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-01 | Quantidade de encontros por tipo (`QUANTIDADE_DE_ENCONTROS`): quantos encontros uma palestra aceita? E um minicurso — qual o mínimo e o máximo? | Pendente — consultar requisitos | |\n| P-02 | O que torna um encontro inválido (`ENCONTRO_INVALIDO`)? Quais destas condições valem: (a) `fim` depois de `inicio`; (b) dentro do período do evento, 19–23/10 em Brasília; (c) começa e termina no mesmo dia; (d) duração mínima e/ou máxima — quais valores; (e) encontros da mesma atividade não podem se sobrepor; (f) `inicio` no futuro em relação ao relógio; (g) faixa de horário permitida no dia — qual; (h) alguma outra? | Pendente — consultar requisitos | |\n| P-03 | Vagas × capacidade (`VAGAS_ACIMA_DA_CAPACIDADE`): `vagas` pode ser igual à capacidade da sala, ou precisa ser menor? | Pendente — consultar requisitos | |\n| P-04 | Conflito de sala (`CONFLITO_DE_SALA`): o que conta como conflito? Encostar (`fim` de um encontro = `inicio` de outro na mesma sala) conflita? Existe intervalo mínimo entre atividades na mesma sala — qual? Atividade cancelada continua ocupando a sala? | Pendente — consultar requisitos | |\n| P-05 | Precedência no POST: quando mais de uma regra recusa a mesma criação (`QUANTIDADE_DE_ENCONTROS`, `ENCONTRO_INVALIDO`, `VAGAS_ACIMA_DA_CAPACIDADE`, `CONFLITO_DE_SALA`), em que ordem são verificadas? | Pendente — consultar requisitos | |\n| P-06 | Campos editáveis no PATCH (`CAMPO_NAO_EDITAVEL`): quais dos campos `titulo`, `tipo`, `salaId`, `vagas`, `encontros` podem ser alterados? A editabilidade muda com o tempo ou o estado (ex.: depois da primeira inscrição, depois do início)? | Pendente — consultar requisitos | |\n| P-07 | Redução de vagas (`VAGAS_ABAIXO_DOS_INSCRITOS`): o novo `vagas` é comparado com qual número (ocupadas? ocupadas + em espera?) e pode ser igual a ele, ou precisa ser maior? | Pendente — consultar requisitos | |\n| P-08 | Alterar e cancelar depois do início: PATCH é permitido em atividade em andamento ou encerrada? A partir de que instante a atividade conta como \"já iniciada\" para `ATIVIDADE_JA_INICIADA`? Cancelar exige alguma antecedência mínima — qual? | Pendente — consultar requisitos | |\n| P-09 | Situação calculada (`prevista` / `em_andamento` / `encerrada` / `cancelada`): quando cada uma começa e termina? Entre dois encontros em dias diferentes a atividade está `em_andamento` ou `prevista`? No instante exato de `inicio` e de `fim`, qual é a situação? `cancelada` prevalece sobre as demais? | Pendente — consultar requisitos | |\n| P-10 | Contagens da Atividade: (a) `ocupadas` — quais status de inscrição do M2 contam (`confirmada`? `convocada`?); (b) `emEspera` — quais status contam (só `em_espera`? `convocada` também?); (c) `vagasRestantes` — é `vagas − ocupadas`? Pode ficar negativo ou tem piso 0? (d) em atividade cancelada, o que as três contagens mostram? | Pendente — consultar requisitos | |\n| P-11 | Carga horária (`cargaHorariaMinutos`): é a soma das durações dos encontros? Há arredondamento, desconto (intervalo) ou teto? | Pendente — consultar requisitos | |\n| P-12 | Efeitos do cancelamento: cancelar a atividade faz algo com as inscrições e com a lista de espera? Isso é responsabilidade do M1 ou do M2? | Pendente — consultar requisitos | |\n| P-13 | Visibilidade: atividades canceladas aparecem em `GET /atividades` e em `GET /atividades/:id`? Para todos os perfis? | Pendente — consultar requisitos | |\n| P-14 | Fora do escopo: o M1 faz algum destes? Excluir atividade, reativar atividade cancelada, criar sala, cadastrar palestrante/descrição, limitar quantas atividades um organizador cria. | Pendente — consultar requisitos | |\n\n### Técnica / contrato\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-15 | Validação de corpo no POST/PATCH: o que é `422 DADOS_INVALIDOS`? | `titulo` precisa ser string não vazia após trim; `tipo` fora de `palestra`/`minicurso`; `vagas` precisa ser inteiro ≥ 1 (0, negativo ou decimal → `DADOS_INVALIDOS`); `encontros` precisa ser array de objetos com `inicio` e `fim` ISO 8601 com fuso; campo obrigatório ausente ou de tipo errado. Array `encontros` vazio → `QUANTIDADE_DE_ENCONTROS`, não `DADOS_INVALIDOS`. | Ausente / tipo errado → 422: contrato §1. Valores de `tipo`: contrato §5 (Atividade). Datas ISO com fuso: contrato §1. Título não vazio, `vagas` ≥ 1 e array vazio: decisão do grupo (rodada 1), o contrato não fixa. |\n| P-16 | `salaId` inexistente no corpo: 404 `NAO_ENCONTRADO` ou 422 `DADOS_INVALIDOS`? | 422 `DADOS_INVALIDOS`. | Decisão do grupo (rodada 1). O contrato não trata id inexistente dentro do corpo: §1 põe a existência (404) antes da validação do corpo e §6 descreve 404 como \"recurso inexistente\", o que se refere ao recurso da rota. |\n| P-17 | Ordem de `GET /atividades`. | Pelo `inicio` do primeiro encontro; empate pelo `id`. | Decisão do grupo (rodada 1). O contrato só fixa a ordem dos encontros dentro da atividade (§5). |\n| P-18 | Filtros de `GET /atividades`: `?dia=` casa a atividade que tem algum encontro naquele dia no fuso de Brasília? `dia` ou `tipo` com valor inválido → 422 `DADOS_INVALIDOS` ou lista vazia? Os dois filtros combinam (E)? | Pendente — consultar requisitos | |\n| P-19 | PATCH com corpo `{}` ou com campos fora da entrada (`id`, `situacao`, `ocupadas`, campo desconhecido). | `{}` → 200 sem mudança. `id` e campos calculados → `CAMPO_NAO_EDITAVEL`. Campo desconhecido → `DADOS_INVALIDOS`. | Decisão do grupo (rodada 1). |\n| P-20 | Fuso dos instantes na resposta. | `-03:00`. | Contrato §1 aceita qualquer fuso (\"o juiz compara o instante, não o texto\"), então não fixa; os exemplos do contrato usam `-03:00` (§1, §3 reset, §5 entrada do POST). Decisão do grupo: `-03:00`. Observação: `/_teste/relogio` já responde em UTC (`toISOString`), o que o §1 permite. |\n\n---\n\n## Rodada 2\n\n### Regra de negócio\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-21 | Precedência no PATCH: quando mais de uma regra recusa a mesma alteração (`ATIVIDADE_CANCELADA`, `CAMPO_NAO_EDITAVEL`, `VAGAS_ACIMA_DA_CAPACIDADE`, `VAGAS_ABAIXO_DOS_INSCRITOS`), em que ordem são verificadas? | Pendente — consultar requisitos | |\n| P-22 | Precedência no cancelamento: atividade já cancelada **e** já iniciada — `ATIVIDADE_CANCELADA` ou `ATIVIDADE_JA_INICIADA`? | Pendente — consultar requisitos | |\n| P-23 | Título: há tamanho máximo? Duas atividades podem ter o mesmo título? | Pendente — consultar requisitos | |\n\n### Técnica / contrato\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-24 | PATCH que envia um campo não editável com o **mesmo valor** atual: `CAMPO_NAO_EDITAVEL` ou aceita? | `CAMPO_NAO_EDITAVEL` sempre que o campo não editável vier no corpo, mesmo com o valor atual. | Decisão do grupo (rodada 2). |\n| P-25 | `encontros` na entrada fora de ordem: aceita e ordena na saída, ou recusa? | Aceita e devolve ordenado por `inicio`. | Decisão do grupo (rodada 2). O contrato exige a ordem só na saída: §5 (Atividade, `encontros` \"em ordem de início\"). O §1 não trata ordem de encontros. |\n| P-26 | Campos extras dentro de cada encontro na entrada (ex.: `id`): ignora ou `DADOS_INVALIDOS`? | `DADOS_INVALIDOS`. | Decisão do grupo (rodada 2); mesma regra da P-19. |\n| P-27 | `situacao` e contagens são calculadas na leitura, a partir do relógio e das inscrições, sem nada gravado? | Sim: calculadas a cada leitura; só o cancelamento é gravado. A situação muda com o avanço do relógio sem que ninguém acesse o sistema. | Decisão do grupo (rodada 2). |\n| P-28 | Ordem de `GET /salas`. | Ordem da tabela de salas dos dados iniciais: `auditorio`, `sala-101`, `sala-102`, `lab-3`. | Contrato §4. |\n\n---\n\n## Rodada 3\n\n### Regra de negócio\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-29 | Autoria: qualquer pessoa da organização pode alterar e cancelar qualquer atividade, ou só quem a criou? Se só quem criou, qual erro recebe a outra (o contrato não tem código para isso)? | Qualquer pessoa da organização altera e cancela qualquer atividade. | Decisão do grupo (rodada 3); o contrato não tem código de erro para recusar outro organizador. |\n\n### Técnica / contrato\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-30 | Instantes dos encontros com segundos ou milissegundos (ex.: `19:00:30-03:00`): aceita como vieram ou `DADOS_INVALIDOS`? | Pendente — consultar requisitos | |\n| P-31 | Corpo enviado em `POST /atividades/:id/cancelamento` (o contrato não define entrada): ignora ou `DADOS_INVALIDOS`? | Ignora o corpo. | Decisão do grupo (rodada 3). |\n\n---\n\n## Encerramento\n\nEntrevista encerrada em 2026-09-22, depois da rodada 3. O que ainda falta decidir depende do documento de requisitos. Quando as pendentes forem respondidas, a coluna Fonte recebe o RN correspondente. Depois disso vem a spec (`to-spec`).\n\n### Decisões tomadas\n\n| # | Decisão | Fonte |\n|---|---|---|\n| P-15 | Validação de corpo → 422 `DADOS_INVALIDOS`; `encontros` vazio → `QUANTIDADE_DE_ENCONTROS` | Contrato §1, §5; decisão do grupo |\n| P-16 | `salaId` inexistente → 422 `DADOS_INVALIDOS` | Decisão do grupo |\n| P-17 | `GET /atividades` ordenado pelo início do 1º encontro, empate por `id` | Decisão do grupo |\n| P-19 | PATCH `{}` → 200; `id`/calculados → `CAMPO_NAO_EDITAVEL`; campo desconhecido → `DADOS_INVALIDOS` | Decisão do grupo |\n| P-20 | Instantes na resposta em `-03:00` | Contrato §1; decisão do grupo |\n| P-24 | Campo não editável no corpo → `CAMPO_NAO_EDITAVEL`, mesmo com o valor atual | Decisão do grupo |\n| P-25 | Encontros fora de ordem aceitos; saída ordenada por `inicio` | Contrato §5; decisão do grupo |\n| P-26 | Campo extra dentro de encontro → `DADOS_INVALIDOS` | Decisão do grupo (regra da P-19) |\n| P-27 | `situacao` e contagens calculadas na leitura; só o cancelamento é gravado | Decisão do grupo |\n| P-28 | `GET /salas` na ordem da tabela de dados iniciais | Contrato §4 |\n| P-29 | Qualquer pessoa da organização altera e cancela qualquer atividade | Decisão do grupo; sem código no contrato |\n| P-31 | Corpo do `POST /atividades/:id/cancelamento` é ignorado | Decisão do grupo |\n\n## Pendentes (consultar requisitos)\n\n### Regra de negócio\n\n| # | Assunto | Código(s) afetado(s) |\n|---|---|---|\n| P-01 | Quantidade de encontros por tipo | `QUANTIDADE_DE_ENCONTROS` |\n| P-02 | Condições de encontro inválido (período, dia, duração, sobreposição, futuro, faixa de horário) | `ENCONTRO_INVALIDO` |\n| P-03 | `vagas` igual à capacidade é permitido? | `VAGAS_ACIMA_DA_CAPACIDADE` |\n| P-04 | Definição de conflito de sala (encostar, intervalo mínimo, canceladas) | `CONFLITO_DE_SALA` |\n| P-05 | Precedência entre regras no POST | todos os de criar |\n| P-06 | Campos editáveis e se isso muda com tempo/estado | `CAMPO_NAO_EDITAVEL` |\n| P-07 | Com que número o novo `vagas` é comparado, e se pode ser igual | `VAGAS_ABAIXO_DOS_INSCRITOS` |\n| P-08 | Alterar/cancelar depois do início; instante de \"já iniciada\"; antecedência | `ATIVIDADE_JA_INICIADA` |\n| P-09 | Transições de `situacao` e instantes-limite | `situacao` |\n| P-10 | Status que contam em `ocupadas`/`emEspera`; fórmula e piso de `vagasRestantes`; contagens em atividade cancelada | `ocupadas`, `vagasRestantes`, `emEspera` |\n| P-11 | Cálculo de `cargaHorariaMinutos` (arredondamento, desconto, teto) | `cargaHorariaMinutos` |\n| P-12 | Efeitos do cancelamento sobre inscrições e espera; M1 ou M2 | — |\n| P-13 | Canceladas aparecem nas listagens? Para quem? | — |\n| P-14 | Limites de escopo (excluir, reativar, criar sala, palestrante, limite por organizador) | — |\n| P-21 | Precedência entre regras no PATCH | todos os de alterar |\n| P-22 | Precedência no cancelamento: cancelada × já iniciada | `ATIVIDADE_CANCELADA`, `ATIVIDADE_JA_INICIADA` |\n| P-23 | Tamanho máximo e unicidade do título | — |\n\n### Técnica / contrato\n\n| # | Assunto | Código(s) afetado(s) |\n|---|---|---|\n| P-18 | Semântica e validação dos filtros `?dia=` e `?tipo=` | `DADOS_INVALIDOS` |\n| P-30 | Instantes com segundos/milissegundos nos encontros | `DADOS_INVALIDOS` |\n\n### Perguntas que só abrem depois das pendentes\n\n- Se P-06 liberar `encontros` ou `salaId` no PATCH: o PATCH revalida `ENCONTRO_INVALIDO`/`CONFLITO_DE_SALA`? Os `id` dos encontros se mantêm?\n- Se P-01 fixar máximo de encontros: e se P-06 liberar `encontros`, o PATCH também cobra `QUANTIDADE_DE_ENCONTROS`?\n- Se P-02 incluir \"início no futuro\": o PATCH de `encontros` também cobra isso?\n- Se P-11 tiver arredondamento: combinar com a resposta da P-30 (segundos).",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 146,
+      "reasoning": 0,
+      "cache": {
+       "read": 47092,
+       "write": 6474
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118325404
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01ByfBE2rbdTF5owGvVqXuT8",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\"; ls -R api/src | head -40; grep -n \"encontro\" -i api/src/*.js | head -20",
+       "description": "Inspect API source layout"
+      },
+      "time": {
+       "start": 1790118326241,
+       "end": 1790118326406
+      },
+      "output": "api/src:\napp.js\nbanco.js\ndados-iniciais.js\nerros.js\nrelogio.js\nservidor.js\nteste\n\napi/src/teste:\nrotas.js",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1850,
+      "reasoning": 0,
+      "cache": {
+       "read": 53566,
+       "write": 7201
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118329045
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01HcbN98tfhKpEj6DaeJGxMM",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "# Entrevista — M3 Presença por QR\n\n> Skill `grilling`. O agente pergunta; o grupo responde ou marca \"consultar requisitos\".\n> Pergunta marcada \"consultar requisitos\" fica **Pendente** e é respondida na consulta ao documento de requisitos.\n> Numeração **P-xx** contínua. O prefixo **RN** é reservado às regras do documento de requisitos e aparece só na coluna **Fonte**.\n\n## Fatos já resolvidos pelo repositório (não são perguntas)\n\n- Rotas, campos e códigos do M3: `contrato-api.md` §5 e §6. Não mudam.\n  - `GET /encontros/:id/codigo` (organização) → 200 `CodigoDoEncontro`.\n  - `POST /encontros/:id/presencas` (participante) → 201 na primeira vez, 200 depois.\n  - `POST /encontros/:id/presencas/manual` (organização) → 201 na primeira vez, 200 depois.\n  - `GET /encontros/:id/presencas` (organização) → 200 `[Presenca]`.\n- Ordem geral: 401 `USUARIO_DESCONHECIDO` → 403 `SOMENTE_ORGANIZACAO`/`SOMENTE_PARTICIPANTE` → 404 `NAO_ENCONTRADO` (encontro da rota) → 422 `DADOS_INVALIDOS` → regras do recurso (§1). A ordem **entre** regras do recurso é regra de negócio.\n- Códigos de regra do M3 (§6): `ATIVIDADE_CANCELADA` e `FORA_DA_JANELA` (obter código); `FORA_DA_JANELA`, `CODIGO_INVALIDO`, `NAO_INSCRITO`, `SINCRONIZACAO_TARDIA` (registrar presença); `FORA_DA_JANELA`, `NAO_INSCRITO`, `JUSTIFICATIVA_OBRIGATORIA`, `LIMITE_DE_MANUAIS` (presença manual).\n- `NAO_INSCRITO` é **403**, não 422 (§6).\n- `justificativa` ausente é `JUSTIFICATIVA_OBRIGATORIA`, não `DADOS_INVALIDOS` (§5, comentário da entrada manual).\n- `codigo` tem 6 caracteres (§5). `validoAte` é o **primeiro instante em que o código deixa de ser aceito** (fim exclusivo). `trocaEm` é quando a tela busca o próximo código (§5).\n- `lidoEm` na entrada é opcional e indica leitura sem internet (§5). Na saída, `lidoEm` é \"o instante que valeu para as regras\" (§5).\n- `origem`: `\"qr\"` | `\"qr_offline\"` | `\"manual\"`; `justificativa` só tem texto quando `manual` (§5).\n- Id da presença: `pre_` + 8 hex minúsculos (§1). Encontros têm id `enc_…` e vêm do M1 (§5).\n- Tempo vem do relógio do modo de teste (`api/src/relogio.js`, contrato §3), nunca da hora do sistema. O relógio fica parado entre chamadas no modo de teste.\n- Instantes na resposta em `-03:00` — mesma decisão do M1 (P-20 de `entrevistas/M1-grade.md`).\n\n---\n\n## Rodada 1\n\n### Regra de negócio\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-01 | Janela de presença (`FORA_DA_JANELA`): a partir de quando e até quando é possível (a) obter o código, (b) registrar presença por QR, (c) registrar presença manual? Há tolerância antes do `inicio` e depois do `fim` do encontro — quanto? As três rotas usam a mesma janela? Os limites são inclusivos ou exclusivos? | | |\n| P-02 | Rotação do código: quanto tempo cada código dura? `trocaEm` e `validoAte` coincidem, ou o código antigo continua aceito por uma tolerância depois de `trocaEm` — quanto? | | |\n| P-03 | Formato do código: quais caracteres (só maiúsculas e dígitos? sem os ambíguos `0/O/1/I/L`?). A leitura diferencia maiúsculas de minúsculas? | | |\n| P-04 | O que é `CODIGO_INVALIDO`: código inexistente, código de outro encontro, código já expirado (depois de `validoAte`), código que ainda não vigorava no instante da leitura — todos são `CODIGO_INVALIDO`? | | |\n| P-05 | Quem conta como inscrito (`NAO_INSCRITO`): só inscrição `confirmada`? `convocada`, `em_espera`, `cancelada`, `expirada` também recusam? Vale o mesmo para a presença manual? | | |\n| P-06 | Leitura offline (`lidoEm`, `SINCRONIZACAO_TARDIA`): (a) qual o prazo máximo entre `lidoEm` e o envio? (b) o código é validado contra o instante `lidoEm` (e não contra o relógio)? (c) a janela da P-01 é conferida com `lidoEm`? (d) `lidoEm` no futuro em relação ao relógio — o que acontece? (e) todo envio com `lidoEm` vira `origem: \"qr_offline\"`, mesmo que `lidoEm` seja igual ao relógio? | | |\n| P-07 | Presença repetida (201 × 200): a segunda chamada devolve a presença já gravada sem alterá-la? E nas combinações: primeiro manual e depois QR; primeiro QR e depois manual; primeiro offline e depois online (ou vice-versa, com `lidoEm` mais antigo) — alguma delas substitui a presença anterior? A repetição ainda passa pelas regras (código válido, janela) antes do 200? | | |\n| P-08 | Limite de manuais (`LIMITE_DE_MANUAIS`): o limite é contado por quê — por participante na atividade, por participante no evento, por encontro, por organizador? Qual o valor? Repetir uma manual já existente (o 200) consome o limite? | | |\n| P-09 | Justificativa (`JUSTIFICATIVA_OBRIGATORIA`): string vazia ou só espaços conta como ausente? Há tamanho mínimo ou máximo? | | |\n| P-10 | Atividade cancelada: o contrato lista `ATIVIDADE_CANCELADA` só em \"obter código\". Registrar presença (QR ou manual) num encontro de atividade cancelada devolve qual erro — `FORA_DA_JANELA`, `CODIGO_INVALIDO`, ou é aceito? | | |\n| P-11 | Precedência dentro de cada rota: quando mais de uma regra recusa a mesma operação, qual vence? (a) obter código: `ATIVIDADE_CANCELADA` × `FORA_DA_JANELA`; (b) QR: `NAO_INSCRITO` × `FORA_DA_JANELA` × `SINCRONIZACAO_TARDIA` × `CODIGO_INVALIDO`; (c) manual: `NAO_INSCRITO` × `FORA_DA_JANELA` × `JUSTIFICATIVA_OBRIGATORIA` × `LIMITE_DE_MANUAIS`. | | |\n| P-12 | Fora do escopo: o M3 faz algum destes? Apagar ou corrigir presença; organização registrar presença por QR em nome de alguém; participante listar as próprias presenças; calcular falta/frequência (isso é do M4/M5?); presença em encontro de quem se inscreveu depois do encontro. | | |\n\n### Técnica / contrato\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-13 | Validação do corpo no QR: `codigo` ausente ou não-string → `DADOS_INVALIDOS`. E string com tamanho ≠ 6 ou caractere fora do alfabeto — `DADOS_INVALIDOS` ou `CODIGO_INVALIDO`? `lidoEm` presente mas não ISO com fuso → `DADOS_INVALIDOS`? Campo desconhecido no corpo? | | |\n| P-14 | Validação do corpo na manual: `participanteId` ausente/não-string → `DADOS_INVALIDOS`. `participanteId` inexistente → `DADOS_INVALIDOS` (como `salaId` no M1, P-16) ou `NAO_INSCRITO`? `participanteId` de alguém da organização? `justificativa` não-string (ex.: número) → `DADOS_INVALIDOS` ou `JUSTIFICATIVA_OBRIGATORIA`? | | |\n| P-15 | Ordem de `GET /encontros/:id/presencas`, e se lista só quem tem presença (sem linhas de ausentes). | | |\n| P-16 | Valores de `lidoEm` e `registradaEm` na saída: QR online → ambos = relógio; offline → `lidoEm` = o enviado, `registradaEm` = relógio; manual → ambos = relógio? | | |\n| P-17 | Geração do código: gravado no banco por janela de tempo, ou derivado (ex.: HMAC de `encontroId` + índice da janela, com segredo)? Duas chamadas de `GET /codigo` na mesma janela devolvem o mesmo código? | | |\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md"
+      },
+      "time": {
+       "start": 1790118353710,
+       "end": 1790118353773
+      },
+      "output": "File created successfully at: C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3445,
+      "reasoning": 0,
+      "cache": {
+       "read": 60767,
+       "write": 1936
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118361789
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Li o `contrato-api.md` e a entrevista do M1 para seguir o mesmo formato. O arquivo `entrevistas/M3-presenca.md` já existe e tem duas partes:\n- **Fatos do repositório:** o que o contrato já decide. Isso não vira pergunta. Por exemplo, `NAO_INSCRITO` é 403, a falta de `justificativa` dá `JUSTIFICATIVA_OBRIGATORIA` e `validoAte` é exclusivo.\n- **Rodada 1:** as perguntas abaixo, com a coluna Resposta vazia.\n\n## Rodada 1 — Regra de negócio\n\n❓ **P-01 — Janela de presença**: Quando dá para obter o código, registrar presença por QR e registrar presença manual? Existe tolerância antes do início e depois do fim do encontro? As três ações seguem a mesma janela? Os limites valem no instante exato ou não?\n➡️ Consultar requisitos. O contrato não dá nenhum número.\n\n---\n\n❓ **P-02 — Rotação do código**: Quanto tempo cada código dura? O código antigo ainda é aceito por um tempo depois de `trocaEm`?\n➡️ Consultar requisitos.\n\n---\n\n❓ **P-03 — Formato do código**: Quais caracteres entram no código? Tiramos os que se confundem, como 0/O e 1/I/L? Letra maiúscula e minúscula contam como diferentes?\n➡️ Minha sugestão: só letras maiúsculas e dígitos, sem os caracteres que se confundem, e a leitura ignora maiúscula/minúscula. Se os requisitos definirem outra coisa, vale o que eles disserem.\n\n---\n\n❓ **P-04 — O que é `CODIGO_INVALIDO`**: O erro vale para um código que não existe, para o código de outro encontro, para um código já expirado e para um que ainda não estava valendo?\n➡️ Minha sugestão: todos esses casos dão `CODIGO_INVALIDO`. Confirmar nos requisitos.\n\n---\n\n❓ **P-05 — Quem conta como inscrito**: Só a inscrição `confirmada` permite registrar presença? Uma `convocada` também permite? Vale o mesmo para a presença manual?\n➡️ Consultar requisitos.\n\n---\n\n❓ **P-06 — Leitura sem internet**: Qual é o prazo máximo entre `lidoEm` e o envio? O código e a janela são conferidos com o horário de `lidoEm`? O que acontece se `lidoEm` estiver no futuro? Todo envio com `lidoEm` vira `qr_offline`?\n➡️ Consultar requisitos para o prazo. Minha sugestão para o resto: conferir código e janela com `lidoEm`, e todo envio que traz `lidoEm` vira `qr_offline`.\n\n---\n\n❓ **P-07 — Presença repetida**: O 200 devolve a presença já gravada sem mudar nada? Uma presença manual e uma por QR podem substituir uma à outra? A repetição passa de novo pelas regras?\n➡️ Minha sugestão: a primeira presença gravada fica e nunca é trocada. As regras continuam sendo conferidas antes de devolver o 200. Confirmar nos requisitos.\n\n---\n\n❓ **P-08 — `LIMITE_DE_MANUAIS`**: O limite é contado por participante, por atividade, por encontro ou por organizador? Qual é o valor? Repetir uma presença manual já registrada gasta o limite?\n➡️ Consultar requisitos.\n\n---\n\n❓ **P-09 — Justificativa**: Um texto vazio ou só com espaços conta como ausente? Existe tamanho mínimo?\n➡️ Minha sugestão: texto vazio ou só com espaços dá `JUSTIFICATIVA_OBRIGATORIA`. O tamanho mínimo fica para os requisitos.\n\n---\n\n❓ **P-10 — Atividade cancelada**: No contrato, `ATIVIDADE_CANCELADA` só aparece ao obter o código. Que erro recebe quem registra presença por QR ou manual num encontro de atividade cancelada?\n➡️ Consultar requisitos.\n\n---\n\n❓ **P-11 — Precedência**: Quando mais de uma regra recusa a mesma operação, qual erro vence em cada rota? Os conflitos são:\n- obter código: `ATIVIDADE_CANCELADA` e `FORA_DA_JANELA`\n- QR: `NAO_INSCRITO`, `FORA_DA_JANELA`, `SINCRONIZACAO_TARDIA` e `CODIGO_INVALIDO`\n- manual: `NAO_INSCRITO`, `FORA_DA_JANELA`, `JUSTIFICATIVA_OBRIGATORIA` e `LIMITE_DE_MANUAIS`\n\n➡️ Consultar requisitos.\n\n---\n\n❓ **P-12 — Fora do escopo**: O M3 faz alguma destas coisas?\n- apagar ou corrigir uma presença\n- a organização registrar presença por QR\n- o participante listar as próprias presenças\n- calcular frequência\n\n➡️ Minha sugestão: nenhuma delas. A frequência fica com o M4 e o M5.\n\n## Rodada 1 — Técnica/contrato\n\n❓ **P-13 — Corpo do QR**: Um código com tamanho diferente de 6 ou com caractere fora do alfabeto dá `DADOS_INVALIDOS` ou `CODIGO_INVALIDO`? Um `lidoEm` mal formatado dá qual erro? E um campo desconhecido no corpo?\n➡️ Minha sugestão: código que é texto mas está fora do formato dá `CODIGO_INVALIDO`. `lidoEm` mal formatado e campo desconhecido dão `DADOS_INVALIDOS`, como no M1 (P-19).\n\n---\n\n❓ **P-14 — Corpo da manual**: Um `participanteId` que não existe dá qual erro? E o id de alguém da organização? E uma `justificativa` que não é texto?\n➡️ Minha sugestão: `participanteId` inexistente dá `DADOS_INVALIDOS`, como `salaId` no M1 (P-16). Id da organização dá `NAO_INSCRITO`. Justificativa que não é texto dá `DADOS_INVALIDOS`.\n\n---\n\n❓ **P-15 — Listagem**: Em que ordem sai a lista? Aparecem só as pessoas presentes?\n➡️ Minha sugestão: só as presentes, em ordem de `lidoEm`, com empate resolvido pelo `id`.\n\n---\n\n❓ **P-16 — Horários na saída**: Que valores vão em `lidoEm` e `registradaEm` em cada caso?\n➡️ Minha sugestão:\n- QR online e manual: os dois campos recebem o horário do relógio.\n- Offline: `lidoEm` recebe o horário enviado e `registradaEm` recebe o horário do relógio.\n\n---\n\n❓ **P-17 — Geração do código**: O código fica gravado no banco ou é calculado na hora? Duas consultas dentro da mesma janela devolvem o mesmo código?\n➡️ Minha sugestão: calcular com HMAC do encontro mais o número da janela, sem guardar nada no banco. Assim, a mesma janela sempre devolve o mesmo código. Isso funciona com o relógio parado do modo de teste.\n\n---\n\nResponda por número. Você pode escrever \"consultar requisitos\", aceitar a minha sugestão ou dar a sua resposta. Também dá para responder \"recomendadas nas técnicas\" de uma vez. Eu registro tudo no arquivo e monto a rodada seguinte.",
+     "time": {
+      "start": 1790118375312
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2707,
+      "reasoning": 0,
+      "cache": {
+       "read": 62703,
+       "write": 3538
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790118421167
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"b686\">\nRegras de negócio — todas para consultar requisitos:\n- P-01: consultar requisitos.\n- P-02: consultar requisitos.\n- P-04: consultar requisitos.\n- P-05: consultar requisitos.\n- P-06: consultar requisitos.\n- P-07: consultar requisitos.\n- P-08: consultar requisitos.\n- P-09: consultar requisitos.\n- P-10: consultar requisitos.\n- P-11: consultar requisitos.\n- P-12: consultar requisitos.\n\nTécnicas — decisão do grupo:\n- P-03: aceito a sugestão. Fonte: decisão do grupo.\n- P-13: aceito a sugestão. Fonte: decisão do grupo, mesma regra do M1 P-16.\n- P-14: aceito a sugestão. Fonte: decisão do grupo.\n- P-15: aceito a sugestão. Fonte: decisão do grupo.\n- P-16: aceito a sugestão. Fonte: decisão do grupo.\n- P-17: aceito a sugestão (HMAC). Fonte: decisão do grupo.\n\nContinue com a próxima rodada de perguntas.\n</pasted_content id=\"b686\">\n",
+     "time": {
+      "start": 1790118421167
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118451506
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "write",
+     "callID": "toolu_01KCQdvtzs5SYxTQUqrkCL3Z",
+     "state": {
+      "status": "completed",
+      "input": {
+       "content": "# Entrevista — M3 Presença por QR\n\n> Skill `grilling`. O agente pergunta; o grupo responde ou marca \"consultar requisitos\".\n> Pergunta marcada \"consultar requisitos\" fica **Pendente** e é respondida na consulta ao documento de requisitos.\n> Numeração **P-xx** contínua. O prefixo **RN** é reservado às regras do documento de requisitos e aparece só na coluna **Fonte**.\n\n## Fatos já resolvidos pelo repositório (não são perguntas)\n\n- Rotas, campos e códigos do M3: `contrato-api.md` §5 e §6. Não mudam.\n  - `GET /encontros/:id/codigo` (organização) → 200 `CodigoDoEncontro`.\n  - `POST /encontros/:id/presencas` (participante) → 201 na primeira vez, 200 depois.\n  - `POST /encontros/:id/presencas/manual` (organização) → 201 na primeira vez, 200 depois.\n  - `GET /encontros/:id/presencas` (organização) → 200 `[Presenca]`.\n- Ordem geral: 401 `USUARIO_DESCONHECIDO` → 403 `SOMENTE_ORGANIZACAO`/`SOMENTE_PARTICIPANTE` → 404 `NAO_ENCONTRADO` (encontro da rota) → 422 `DADOS_INVALIDOS` → regras do recurso (§1). A ordem **entre** regras do recurso é regra de negócio.\n- Códigos de regra do M3 (§6): `ATIVIDADE_CANCELADA` e `FORA_DA_JANELA` (obter código); `FORA_DA_JANELA`, `CODIGO_INVALIDO`, `NAO_INSCRITO`, `SINCRONIZACAO_TARDIA` (registrar presença); `FORA_DA_JANELA`, `NAO_INSCRITO`, `JUSTIFICATIVA_OBRIGATORIA`, `LIMITE_DE_MANUAIS` (presença manual).\n- `GET /encontros/:id/presencas` não tem código de regra no §6: para encontro existente, só responde 200 (lista possivelmente vazia).\n- `NAO_INSCRITO` é **403**, não 422 (§6).\n- `justificativa` ausente é `JUSTIFICATIVA_OBRIGATORIA`, não `DADOS_INVALIDOS` (§5, comentário da entrada manual).\n- `codigo` tem 6 caracteres (§5). `validoAte` é o **primeiro instante em que o código deixa de ser aceito** (fim exclusivo). `trocaEm` é quando a tela busca o próximo código (§5).\n- `lidoEm` na entrada é opcional e indica leitura sem internet (§5). Na saída, `lidoEm` é \"o instante que valeu para as regras\" (§5).\n- `origem`: `\"qr\"` | `\"qr_offline\"` | `\"manual\"`; `justificativa` só tem texto quando `manual` (§5).\n- Inscrição é por atividade (`Inscricao.atividadeId`, §5): estar inscrito num encontro = ter inscrição na atividade dona do encontro.\n- Id da presença: `pre_` + 8 hex minúsculos (§1). Encontros têm id `enc_…` e vêm do M1 (§5).\n- Tempo vem do relógio do modo de teste (`api/src/relogio.js`, contrato §3), nunca da hora do sistema. O relógio fica parado entre chamadas no modo de teste.\n- Instantes na resposta em `-03:00` — mesma decisão do M1 (P-20 de `entrevistas/M1-grade.md`).\n\n---\n\n## Rodada 1\n\n### Regra de negócio\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-01 | Janela de presença (`FORA_DA_JANELA`): a partir de quando e até quando é possível (a) obter o código, (b) registrar presença por QR, (c) registrar presença manual? Há tolerância antes do `inicio` e depois do `fim` do encontro — quanto? As três rotas usam a mesma janela? Os limites são inclusivos ou exclusivos? | Pendente — consultar requisitos | |\n| P-02 | Rotação do código: quanto tempo cada código dura? `trocaEm` e `validoAte` coincidem, ou o código antigo continua aceito por uma tolerância depois de `trocaEm` — quanto? | Pendente — consultar requisitos | |\n| P-04 | O que é `CODIGO_INVALIDO`: código inexistente, código de outro encontro, código já expirado (depois de `validoAte`), código que ainda não vigorava no instante da leitura — todos são `CODIGO_INVALIDO`? | Pendente — consultar requisitos | |\n| P-05 | Quem conta como inscrito (`NAO_INSCRITO`): só inscrição `confirmada`? `convocada`, `em_espera`, `cancelada`, `expirada` também recusam? Vale o mesmo para a presença manual? | Pendente — consultar requisitos | |\n| P-06 | Leitura offline (`lidoEm`, `SINCRONIZACAO_TARDIA`): (a) qual o prazo máximo entre `lidoEm` e o envio? (b) o código é validado contra o instante `lidoEm` (e não contra o relógio)? (c) a janela da P-01 é conferida com `lidoEm`? (d) `lidoEm` no futuro em relação ao relógio — o que acontece? (e) todo envio com `lidoEm` vira `origem: \"qr_offline\"`, mesmo que `lidoEm` seja igual ao relógio? | Pendente — consultar requisitos | |\n| P-07 | Presença repetida (201 × 200): a segunda chamada devolve a presença já gravada sem alterá-la? E nas combinações: primeiro manual e depois QR; primeiro QR e depois manual; primeiro offline e depois online (ou vice-versa, com `lidoEm` mais antigo) — alguma delas substitui a presença anterior? A repetição ainda passa pelas regras (código válido, janela) antes do 200? | Pendente — consultar requisitos | |\n| P-08 | Limite de manuais (`LIMITE_DE_MANUAIS`): o limite é contado por quê — por participante na atividade, por participante no evento, por encontro, por organizador? Qual o valor? Repetir uma manual já existente (o 200) consome o limite? | Pendente — consultar requisitos | |\n| P-09 | Justificativa (`JUSTIFICATIVA_OBRIGATORIA`): string vazia ou só espaços conta como ausente? Há tamanho mínimo ou máximo? | Pendente — consultar requisitos | |\n| P-10 | Atividade cancelada: o contrato lista `ATIVIDADE_CANCELADA` só em \"obter código\". Registrar presença (QR ou manual) num encontro de atividade cancelada devolve qual erro — `FORA_DA_JANELA`, `CODIGO_INVALIDO`, ou é aceito? | Pendente — consultar requisitos | |\n| P-11 | Precedência dentro de cada rota: quando mais de uma regra recusa a mesma operação, qual vence? (a) obter código: `ATIVIDADE_CANCELADA` × `FORA_DA_JANELA`; (b) QR: `NAO_INSCRITO` × `FORA_DA_JANELA` × `SINCRONIZACAO_TARDIA` × `CODIGO_INVALIDO`; (c) manual: `NAO_INSCRITO` × `FORA_DA_JANELA` × `JUSTIFICATIVA_OBRIGATORIA` × `LIMITE_DE_MANUAIS`. | Pendente — consultar requisitos | |\n| P-12 | Fora do escopo: o M3 faz algum destes? Apagar ou corrigir presença; organização registrar presença por QR em nome de alguém; participante listar as próprias presenças; calcular falta/frequência (isso é do M4/M5?); presença em encontro de quem se inscreveu depois do encontro. | Pendente — consultar requisitos | |\n\n### Técnica / contrato\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-03 | Formato do código: quais caracteres? A leitura diferencia maiúsculas de minúsculas? | Só letras maiúsculas e dígitos, sem os ambíguos `0`, `O`, `1`, `I`, `L`. A leitura não diferencia maiúsculas de minúsculas (o código recebido é comparado em maiúsculas). | Decisão do grupo (rodada 1). O contrato só fixa 6 caracteres (§5). |\n| P-13 | Validação do corpo no QR: `codigo` com tamanho ≠ 6 ou caractere fora do alfabeto; `lidoEm` mal formado; campo desconhecido. | `codigo` ausente ou não-string → `DADOS_INVALIDOS`. `codigo` string fora do formato (tamanho ≠ 6, caractere fora do alfabeto da P-03) → `CODIGO_INVALIDO`. `lidoEm` presente e não ISO 8601 com fuso → `DADOS_INVALIDOS`. Campo desconhecido no corpo → `DADOS_INVALIDOS`. | Ausente / tipo errado → 422: contrato §1. Demais: decisão do grupo (rodada 1); campo desconhecido segue a regra do M1 P-19. |\n| P-14 | Validação do corpo na manual: `participanteId` inexistente, de alguém da organização; `justificativa` não-string. | `participanteId` ausente/não-string → `DADOS_INVALIDOS`. `participanteId` inexistente → `DADOS_INVALIDOS`. `participanteId` de alguém da organização → `NAO_INSCRITO`. `justificativa` presente e não-string → `DADOS_INVALIDOS`. | Ausente / tipo errado → 422: contrato §1. Demais: decisão do grupo (rodada 1); id inexistente no corpo segue o M1 P-16. |\n| P-15 | Ordem de `GET /encontros/:id/presencas`, e se lista só quem tem presença. | Só quem tem presença registrada (sem linhas de ausentes), ordenado por `lidoEm`; empate pelo `id`. | Decisão do grupo (rodada 1). |\n| P-16 | Valores de `lidoEm` e `registradaEm` na saída. | QR online: `lidoEm` = `registradaEm` = relógio. Offline: `lidoEm` = o enviado, `registradaEm` = relógio. Manual: `lidoEm` = `registradaEm` = relógio. | Decisão do grupo (rodada 1). Contrato §5 define `lidoEm` como \"o instante que valeu para as regras\". |\n| P-17 | Geração do código: gravado ou derivado? Mesma janela devolve o mesmo código? | Derivado, sem gravar: HMAC de `encontroId` + índice da janela de tempo, com segredo, convertido para o alfabeto da P-03. Duas chamadas na mesma janela devolvem o mesmo código. | Decisão do grupo (rodada 1). Compatível com o relógio parado do contrato §3. |\n\n---\n\n## Rodada 2\n\n### Regra de negócio\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-18 | Autoria: qualquer pessoa da organização pode obter o código, registrar presença manual e listar presenças de qualquer encontro, ou só quem criou a atividade? | | |\n\n### Técnica / contrato\n\n| # | Pergunta | Resposta | Fonte |\n|---|---|---|---|\n| P-19 | `lidoEm: null` no corpo do QR: trata como ausente (presença online) ou `DADOS_INVALIDOS`? | | |\n| P-20 | Normalização do código recebido além de maiúsculas: espaços nas pontas, hífen no meio (`K7M-2QX`) — remove ou é `CODIGO_INVALIDO`? | | |\n| P-21 | Precisão de `lidoEm` (segundos, milissegundos): aceita e guarda o instante como veio? | | |\n| P-22 | Segredo do HMAC: de onde vem? Muda a cada `POST /_teste/reset`? | | |\n| P-23 | Unicidade da presença: índice único (`encontroId`, `participanteId`) no banco, e o 201/200 sai de \"inserir ou ler a existente\"? | | |\n| P-24 | Testes do M3 dependem de inscrições do M2: os testes montam o cenário pelas rotas públicas (o que exige M2 pronto antes), ou inserem inscrições direto no banco? | | |\n| P-25 | Âncora das janelas do código (o \"índice da janela\" da P-17): contadas a partir do epoch Unix ou a partir do início do encontro? | | |\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md"
+      },
+      "time": {
+       "start": 1790118481526,
+       "end": 1790118481561
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 7463,
+      "reasoning": 0,
+      "cache": {
+       "read": 66241,
+       "write": 3151
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118490404
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Registrei a rodada 1 em `entrevistas/M3-presenca.md`. Dois ajustes precisam do seu ok:\n\n- **P-03 mudou de tabela.** Ela estava em \"Regra de negócio\" e foi para \"Técnica/contrato\", porque você a tratou como decisão do grupo.\n- **P-13: troquei a referência de M1 P-16 para M1 P-19.** A P-16 do M1 trata de `salaId` inexistente. Quem diz que campo desconhecido dá `DADOS_INVALIDOS` é a P-19. A P-16 continua citada, mas na P-14, onde está o `participanteId` inexistente. Se você quis dizer outra coisa, me avise.\n\nTambém incluí um fato novo tirado do contrato: `GET /encontros/:id/presencas` não tem código de regra, então sempre responde 200 quando o encontro existe.\n\n## Rodada 2 — Regra de negócio\n\n❓ **P-18 — Quem pode agir sobre o encontro**: Qualquer pessoa da organização pode obter o código, registrar presença manual e listar as presenças de qualquer encontro? Ou só quem criou a atividade pode?\n➡️ Qualquer pessoa da organização, como no M1 P-29. O contrato não tem código de erro para recusar outro organizador.\n\n## Rodada 2 — Técnica/contrato\n\n❓ **P-19 — `lidoEm: null`**: Tratar como se o campo não tivesse vindo, ou responder `DADOS_INVALIDOS`?\n➡️ `DADOS_INVALIDOS`. O contrato (§1) trata `null` como tipo errado, e o M1 segue essa regra. Campo opcional se omite, não se manda `null`.\n\n---\n\n❓ **P-20 — Limpeza do código recebido**: Tirar espaços nas pontas e hífen no meio (`K7M-2QX`)?\n➡️ Não. O código só é convertido para maiúsculas. Qualquer outra diferença cai na P-13 e dá `CODIGO_INVALIDO`.\n\n---\n\n❓ **P-21 — Precisão de `lidoEm`**: Aceitar segundos e milissegundos e guardar o instante como veio?\n➡️ Sim. É o instante de uma leitura, então a precisão é natural. Se a P-06 tiver algum limite exato, a comparação é feita com o instante completo.\n\n---\n\n❓ **P-22 — Segredo do HMAC**: De onde vem o segredo? Ele muda a cada `POST /_teste/reset`?\n➡️ Vem da variável de ambiente `SEGREDO_CODIGO` e, quando ela não existe, usa um valor fixo no código. O reset não troca o segredo. Assim os códigos ficam previsíveis nos testes, e fora do modo de teste basta definir a variável.\n\n---\n\n❓ **P-23 — Presença única**: Criar um índice único para (`encontroId`, `participanteId`) no banco? O 201 ou 200 sai de \"inserir, ou ler a presença que já existe\"?\n➡️ Sim. O banco garante que só existe uma presença por participante em cada encontro. Como vai ficar o 200 depende da P-07, que está pendente.\n\n---\n\n❓ **P-24 — Testes do M3 × M2**: Os testes do M3 preparam o cenário pelas rotas públicas, o que exige o M2 pronto antes? Ou inserem as inscrições direto no banco?\n➡️ Pelas rotas públicas, na ordem M1 → M2 → M3. Assim o teste exercita o contrato de verdade e não depende de como o M2 grava os dados.\n\n---\n\n❓ **P-25 — Ponto de partida das janelas do código**: A troca de código conta a partir do epoch Unix ou do início do encontro?\n➡️ A partir do início do encontro. Assim a primeira troca acontece num ponto previsível em relação ao encontro. Se os requisitos (P-01/P-02) definirem outro ponto, vale o dos requisitos.\n\n---\n\nDepois desta rodada, o que sobra para perguntar depende das pendentes (P-01, P-02, P-06 e P-07). Por isso devo fechar a entrevista em seguida, com o resumo e a lista de pendentes.",
+     "time": {
+      "start": 1790118494880
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1492,
+      "reasoning": 0,
+      "cache": {
+       "read": 69392,
+       "write": 7559
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790118558494
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "\n\n<pasted_content id=\"b686\">\n- P-18: aceito a recomendação. Fonte: decisão do grupo, mesmo critério do M1 P-29.\n- P-19: aceito a recomendação. Fonte: decisão do grupo; §1 do contrato trata null como tipo errado.\n- P-20: aceito a recomendação. Fonte: decisão do grupo.\n- P-21: aceito a recomendação. Fonte: decisão do grupo.\n- P-22: aceito a recomendação (SEGREDO_CODIGO, valor fixo no código, reset não troca).\n  Fonte: decisão do grupo.\n- P-23: aceito a recomendação. Fonte: decisão do grupo; comportamento do 200 depende da P-07.\n- P-24: aceito a recomendação (rotas públicas, ordem M1 → M2 → M3). Fonte: decisão do grupo.\n- P-25: aceito a recomendação (a partir do início do encontro). Fonte: decisão do grupo;\n  sujeito à resposta de P-01/P-02.\n\nNão há mais perguntas a fazer. Registre o resumo das pendentes e encerre a entrevista.\n</pasted_content id=\"b686\">\n",
+     "time": {
+      "start": 1790118558494
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118586193
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_019mfVgNhNyThTisCgFKZjLq",
+     "state": {
+      "status": "error",
+      "input": {
+       "command": "cd \"/c/dev/Atividade Final IA/projeto-semanaacademica\" && python - <<'EOF'\nimport io\np='entrevistas/M3-presenca.md'\ns=io.open(p,encoding='utf-8').read()\nrep={\n\"| P-18 | Autoria: qualquer pessoa da organização pode obter o código, registrar presença manual e listar presenças de qualquer encontro, ou só quem criou a atividade? | | |\":\n\"| P-18 | Autoria: qualquer pessoa da organização pode obter o código, registrar presença manual e listar presenças de qualquer encontro, ou só quem criou a atividade? | Qualquer pessoa da organização, em qualquer encontro. | Decisão do grupo (rodada 2), mesmo critério do M1 P-29; o contrato não tem código de erro para recusar outro organizador. |\",\n\"| P-19 | `lidoEm: null` no corpo do QR: trata como ausente (presença online) ou `DADOS_INVALIDOS`? | | |\":\n\"| P-19 | `lidoEm: null` no corpo do QR: trata como ausente (presença online) ou `DADOS_INVALIDOS`? | `DADOS_INVALIDOS`. Campo opcional se omite; `null` não equivale a ausente. | Decisão do grupo (rodada 2); contrato §1 trata `null` como tipo errado. |\",\n\"| P-20 | Normalização do código recebido além de maiúsculas: espaços nas pontas, hífen no meio (`K7M-2QX`) — remove ou é `CODIGO_INVALIDO`? | | |\":\n\"| P-20 | Normalização do código recebido além de maiúsculas: espaços nas pontas, hífen no meio (`K7M-2QX`) — remove ou é `CODIGO_INVALIDO`? | Só converte para maiúsculas. Espaço, hífen ou qualquer outro caractere → `CODIGO_INVALIDO` (regra da P-13). | Decisão do grupo (rodada 2). |\",\n\"| P-21 | Precisão de `lidoEm` (segundos, milissegundos): aceita e guarda o instante como veio? | | |\":\n\"| P-21 | Precisão de `lidoEm` (segundos, milissegundos): aceita e guarda o instante como veio? | Aceita e guarda o instante completo; comparações de prazo usam o instante completo. | Decisão do grupo (rodada 2). |\",\n\"| P-22 | Segredo do HMAC: de onde vem? Muda a cada `POST /_teste/reset`? | | |\":\n\"| P-22 | Segredo do HMAC: de onde vem? Muda a cada `POST /_teste/reset`? | Variável de ambiente `SEGREDO_CODIGO`; sem ela, valor fixo no código. O reset não troca o segredo. | Decisão do grupo (rodada 2). |\",\n\"| P-23 | Unicidade da presença: índice único (`encontroId`, `participanteId`) no banco, e o 201/200 sai de \\\"inserir ou ler a existente\\\"? | | |\":\n\"| P-23 | Unicidade da presença: índice único (`encontroId`, `participanteId`) no banco, e o 201/200 sai de \\\"inserir ou ler a existente\\\"? | Sim: índice único (`encontroId`, `participanteId`); 201 ao inserir, 200 com a existente. O comportamento exato do 200 depende da P-07. | Decisão do grupo (rodada 2). |\",\n\"| P-24 | Testes do M3 dependem de inscrições do M2: os testes montam o cenário pelas rotas públicas (o que exige M2 pronto antes), ou inserem inscrições direto no banco? | | |\":\n\"| P-24 | Testes do M3 dependem de inscrições do M2: os testes montam o cenário pelas rotas públicas (o que exige M2 pronto antes), ou inserem inscrições direto no banco? | Pelas rotas públicas; implementação na ordem M1 → M2 → M3. | Decisão do grupo (rodada 2). |\",\n\"| P-25 | Âncora das janelas do código (o \\\"índice da janela\\\" da P-17): contadas a partir do epoch Unix ou a partir do início do encontro? | | |\":\n\"| P-25 | Âncora das janelas do código (o \\\"índice da janela\\\" da P-17): contadas a partir do epoch Unix ou a partir do início do encontro? | A partir do `inicio` do encontro. | Decisão do grupo (rodada 2); sujeita à resposta da P-01/P-02. |\",\n}\nfor a,b in rep.items():\n    assert a in s, a[:20]\n    s=s.replace(a,b)\ns+='''\n---\n\n## Encerramento\n\nEntrevista encerrada em 2026-09-22, depois da rodada 2. O que ainda falta decidir depende do documento de requisitos. Quando as pendentes forem respondidas, a coluna Fonte recebe o RN correspondente. Depois disso vem a spec (`to-spec`).\n\n### Decisões tomadas\n\n| # | Decisão | Fonte |\n|---|---|---|\n| P-03 | Código: maiúsculas e dígitos, sem `0`, `O`, `1`, `I`, `L`; leitura sem diferenciar maiúsculas | Decisão do grupo |\n| P-13 | `codigo` ausente/não-string → `DADOS_INVALIDOS`; string fora do formato → `CODIGO_INVALIDO`; `lidoEm` mal formado e campo desconhecido → `DADOS_INVALIDOS` | Contrato §1; decisão do grupo (M1 P-19) |\n| P-14 | `participanteId` inexistente → `DADOS_INVALIDOS`; de organização → `NAO_INSCRITO`; `justificativa` não-string → `DADOS_INVALIDOS` | Contrato §1; decisão do grupo (M1 P-16) |\n| P-15 | Lista só presentes, ordenada por `lidoEm`, empate por `id` | Decisão do grupo |\n| P-16 | `lidoEm`/`registradaEm`: relógio no QR online e na manual; offline guarda o `lidoEm` enviado | Contrato §5; decisão do grupo |\n| P-17 | Código derivado por HMAC(`encontroId` + índice da janela), sem gravar; mesma janela → mesmo código | Decisão do grupo |\n| P-18 | Qualquer pessoa da organização age sobre qualquer encontro | Decisão do grupo (M1 P-29) |\n| P-19 | `lidoEm: null` → `DADOS_INVALIDOS` | Contrato §1; decisão do grupo |\n| P-20 | Código só é convertido para maiúsculas; qualquer outro desvio → `CODIGO_INVALIDO` | Decisão do grupo |\n| P-21 | `lidoEm` aceito com segundos/milissegundos; comparações usam o instante completo | Decisão do grupo |\n| P-22 | Segredo do HMAC em `SEGREDO_CODIGO`, com valor fixo de reserva; reset não troca | Decisão do grupo |\n| P-23 | Índice único (`encontroId`, `participanteId`); 201 insere, 200 devolve a existente | Decisão do grupo; detalhe do 200 depende da P-07 |\n| P-24 | Testes do M3 montam cenário pelas rotas públicas; ordem M1 → M2 → M3 | Decisão do grupo |\n| P-25 | Janelas do código contadas a partir do `inicio` do encontro | Decisão do grupo; sujeita à P-01/P-02 |\n\n## Pendentes (consultar requisitos)\n\n### Regra de negócio\n\n| # | Assunto | Código(s) afetado(s) |\n|---|---|---|\n| P-01 | Janela de cada rota (obter código, QR, manual): tolerâncias antes/depois, limites inclusivos ou exclusivos | `FORA_DA_JANELA` |\n| P-02 | Duração do código; tolerância do código antigo depois de `trocaEm` | `trocaEm`, `validoAte`, `CODIGO_INVALIDO` |\n| P-04 | Casos que são `CODIGO_INVALIDO` (inexistente, outro encontro, expirado, ainda não vigente) | `CODIGO_INVALIDO` |\n| P-05 | Status de inscrição que contam como inscrito, no QR e na manual | `NAO_INSCRITO` |\n| P-06 | Leitura offline: prazo de sincronização; código e janela conferidos com `lidoEm`; `lidoEm` no futuro; quando vira `qr_offline` | `SINCRONIZACAO_TARDIA`, `origem` |\n| P-07 | Presença repetida: devolve a existente sem alterar? combinações manual/QR/offline; repetição passa pelas regras? | 201 × 200 |\n| P-08 | Base de contagem e valor do limite de manuais; repetição consome o limite? | `LIMITE_DE_MANUAIS` |\n| P-09 | Justificativa vazia/só espaços; tamanho mínimo/máximo | `JUSTIFICATIVA_OBRIGATORIA` |\n| P-10 | Presença em encontro de atividade cancelada | `ATIVIDADE_CANCELADA`, `FORA_DA_JANELA`, `CODIGO_INVALIDO` |\n| P-11 | Precedência entre regras em cada rota | todos os do M3 |\n| P-12 | Limites de escopo (apagar/corrigir presença, QR pela organização, participante listar as próprias, frequência, inscrição tardia) | — |\n\n### Perguntas que só abrem depois das pendentes\n\n- Se P-02 der tolerância do código antigo: `validoAte` do código atual passa de `trocaEm`, e dois códigos são aceitos ao mesmo tempo — a P-17 precisa aceitar a janela atual e a anterior.\n- Se P-01 permitir obter código antes do `inicio`: a âncora da P-25 (início do encontro) gera índice negativo — reancorar no início da janela da P-01?\n- Se P-06 validar o código contra `lidoEm`: o código lido offline é conferido com a janela de código vigente em `lidoEm`, e a janela da P-01 também usa `lidoEm`?\n- Se P-07 disser que uma presença pode substituir outra (ex.: manual sobre QR): o índice único da P-23 vira atualização, e `origem`/`lidoEm` mudam — qual responde 200?\n- Se P-08 contar por participante: manual recusada por `LIMITE_DE_MANUAIS` ainda pode ser feita por QR?\n- Se P-05 aceitar `convocada`: e se a convocação expirar entre `lidoEm` (offline) e o envio — vale o status no `lidoEm` ou no envio?\n'''\nio.open(p,'w',encoding='utf-8',newline='\\n').write(s)\nEOF",
+       "description": "Record round 2 answers and closing summary"
+      },
+      "time": {
+       "start": 1790118586193,
+       "end": 1790118587901
+      },
+      "output": "Exit code 2\n/usr/bin/bash: -c: line 26: unexpected EOF while looking for matching `''",
+      "metadata": {
+       "exit": 1
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3887,
+      "reasoning": 0,
+      "cache": {
+       "read": 76951,
+       "write": 1929
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118590253
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01LQn4k28m8pvo4c5tkXZ7mn",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "echo ok",
+       "description": "Sanity check shell"
+      },
+      "time": {
+       "start": 1790118590485,
+       "end": 1790118590564
+      },
+      "output": "ok",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 181,
+      "reasoning": 0,
+      "cache": {
+       "read": 78880,
+       "write": 3961
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118593764
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01GHjSwmanp7jdTcWYtH88VV",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "ou só quem criou a atividade? | | |",
+       "new_string": "ou só quem criou a atividade? | Qualquer pessoa da organização, em qualquer encontro. | Decisão do grupo (rodada 2), mesmo critério do M1 P-29; o contrato não tem código de erro para recusar outro organizador. |",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md"
+      },
+      "time": {
+       "start": 1790118595074,
+       "end": 1790118616814
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "edit",
+     "callID": "toolu_01ArSkz6FpFxoDsoPSsQKVyD",
+     "state": {
+      "status": "completed",
+      "input": {
+       "replace_all": false,
+       "old_string": "| P-19 | `lidoEm: null` no corpo do QR: trata como ausente (presença online) ou `DADOS_INVALIDOS`? | | |\n| P-20 | Normalização do código recebido além de maiúsculas: espaços nas pontas, hífen no meio (`K7M-2QX`) — remove ou é `CODIGO_INVALIDO`? | | |\n| P-21 | Precisão de `lidoEm` (segundos, milissegundos): aceita e guarda o instante como veio? | | |\n| P-22 | Segredo do HMAC: de onde vem? Muda a cada `POST /_teste/reset`? | | |\n| P-23 | Unicidade da presença: índice único (`encontroId`, `participanteId`) no banco, e o 201/200 sai de \"inserir ou ler a existente\"? | | |\n| P-24 | Testes do M3 dependem de inscrições do M2: os testes montam o cenário pelas rotas públicas (o que exige M2 pronto antes), ou inserem inscrições direto no banco? | | |\n| P-25 | Âncora das janelas do código (o \"índice da janela\" da P-17): contadas a partir do epoch Unix ou a partir do início do encontro? | | |\n",
+       "new_string": "| P-19 | `lidoEm: null` no corpo do QR: trata como ausente (presença online) ou `DADOS_INVALIDOS`? | `DADOS_INVALIDOS`. Campo opcional se omite; `null` não equivale a ausente. | Decisão do grupo (rodada 2); contrato §1 trata `null` como tipo errado. |\n| P-20 | Normalização do código recebido além de maiúsculas: espaços nas pontas, hífen no meio (`K7M-2QX`) — remove ou é `CODIGO_INVALIDO`? | Só converte para maiúsculas. Espaço, hífen ou qualquer outro desvio → `CODIGO_INVALIDO` (regra da P-13). | Decisão do grupo (rodada 2). |\n| P-21 | Precisão de `lidoEm` (segundos, milissegundos): aceita e guarda o instante como veio? | Aceita e guarda o instante completo; comparações de prazo usam o instante completo. | Decisão do grupo (rodada 2). |\n| P-22 | Segredo do HMAC: de onde vem? Muda a cada `POST /_teste/reset`? | Variável de ambiente `SEGREDO_CODIGO`; sem ela, valor fixo no código. O reset não troca o segredo. | Decisão do grupo (rodada 2). |\n| P-23 | Unicidade da presença: índice único (`encontroId`, `participanteId`) no banco, e o 201/200 sai de \"inserir ou ler a existente\"? | Sim: índice único (`encontroId`, `participanteId`); 201 ao inserir, 200 com a existente. | Decisão do grupo (rodada 2); o comportamento exato do 200 depende da P-07. |\n| P-24 | Testes do M3 dependem de inscrições do M2: os testes montam o cenário pelas rotas públicas (o que exige M2 pronto antes), ou inserem inscrições direto no banco? | Pelas rotas públicas; implementação na ordem M1 → M2 → M3. | Decisão do grupo (rodada 2). |\n| P-25 | Âncora das janelas do código (o \"índice da janela\" da P-17): contadas a partir do epoch Unix ou a partir do início do encontro? | A partir do `inicio` do encontro. | Decisão do grupo (rodada 2); sujeita à resposta da P-01/P-02. |\n\n---\n\n## Encerramento\n\nEntrevista encerrada em 2026-09-22, depois da rodada 2. O que ainda falta decidir depende do documento de requisitos. Quando as pendentes forem respondidas, a coluna Fonte recebe o RN correspondente. Depois disso vem a spec (`to-spec`).\n\n### Decisões tomadas\n\n| # | Decisão | Fonte |\n|---|---|---|\n| P-03 | Código: maiúsculas e dígitos, sem `0`, `O`, `1`, `I`, `L`; leitura sem diferenciar maiúsculas | Decisão do grupo |\n| P-13 | `codigo` ausente/não-string → `DADOS_INVALIDOS`; string fora do formato → `CODIGO_INVALIDO`; `lidoEm` mal formado e campo desconhecido → `DADOS_INVALIDOS` | Contrato §1; decisão do grupo (regra do M1 P-19) |\n| P-14 | `participanteId` inexistente → `DADOS_INVALIDOS`; de organização → `NAO_INSCRITO`; `justificativa` não-string → `DADOS_INVALIDOS` | Contrato §1; decisão do grupo (regra do M1 P-16) |\n| P-15 | Lista só presentes, ordenada por `lidoEm`, empate por `id` | Decisão do grupo |\n| P-16 | `lidoEm`/`registradaEm` = relógio no QR online e na manual; offline guarda o `lidoEm` enviado | Contrato §5; decisão do grupo |\n| P-17 | Código derivado por HMAC(`encontroId` + índice da janela), sem gravar; mesma janela → mesmo código | Decisão do grupo |\n| P-18 | Qualquer pessoa da organização age sobre qualquer encontro | Decisão do grupo (critério do M1 P-29) |\n| P-19 | `lidoEm: null` → `DADOS_INVALIDOS` | Contrato §1; decisão do grupo |\n| P-20 | Código só é convertido para maiúsculas; qualquer outro desvio → `CODIGO_INVALIDO` | Decisão do grupo |\n| P-21 | `lidoEm` aceito com segundos/milissegundos; comparações usam o instante completo | Decisão do grupo |\n| P-22 | Segredo do HMAC em `SEGREDO_CODIGO`, com valor fixo de reserva; reset não troca | Decisão do grupo |\n| P-23 | Índice único (`encontroId`, `participanteId`); 201 insere, 200 devolve a existente | Decisão do grupo; detalhe do 200 depende da P-07 |\n| P-24 | Testes do M3 montam o cenário pelas rotas públicas; ordem M1 → M2 → M3 | Decisão do grupo |\n| P-25 | Janelas do código contadas a partir do `inicio` do encontro | Decisão do grupo; sujeita à P-01/P-02 |\n\n## Pendentes (consultar requisitos)\n\n### Regra de negócio\n\n| # | Assunto | Código(s) afetado(s) |\n|---|---|---|\n| P-01 | Janela de cada rota (obter código, QR, manual): tolerâncias antes/depois; limites inclusivos ou exclusivos | `FORA_DA_JANELA` |\n| P-02 | Duração do código; tolerância do código antigo depois de `trocaEm` | `trocaEm`, `validoAte`, `CODIGO_INVALIDO` |\n| P-04 | Casos que são `CODIGO_INVALIDO` (inexistente, outro encontro, expirado, ainda não vigente) | `CODIGO_INVALIDO` |\n| P-05 | Status de inscrição que contam como inscrito, no QR e na manual | `NAO_INSCRITO` |\n| P-06 | Leitura offline: prazo de sincronização; código e janela conferidos com `lidoEm`; `lidoEm` no futuro; quando vira `qr_offline` | `SINCRONIZACAO_TARDIA`, `origem` |\n| P-07 | Presença repetida: devolve a existente sem alterar? Combinações manual/QR/offline; a repetição passa pelas regras? | 201 × 200 |\n| P-08 | Base de contagem e valor do limite de manuais; a repetição consome o limite? | `LIMITE_DE_MANUAIS` |\n| P-09 | Justificativa vazia/só espaços; tamanho mínimo/máximo | `JUSTIFICATIVA_OBRIGATORIA` |\n| P-10 | Presença em encontro de atividade cancelada | `ATIVIDADE_CANCELADA`, `FORA_DA_JANELA`, `CODIGO_INVALIDO` |\n| P-11 | Precedência entre regras em cada rota | todos os do M3 |\n| P-12 | Limites de escopo (apagar/corrigir presença, QR pela organização, participante listar as próprias, frequência, inscrição tardia) | — |\n\n### Perguntas que só abrem depois das pendentes\n\n- Se P-02 der tolerância ao código antigo: dois códigos valem ao mesmo tempo; a validação da P-17 precisa aceitar a janela atual e a anterior.\n- Se P-01 permitir obter o código antes do `inicio`: a âncora da P-25 gera índice negativo — reancorar no início da janela da P-01?\n- Se P-06 validar o código contra `lidoEm`: o código lido offline é conferido com a janela de código vigente em `lidoEm`, e a janela da P-01 também usa `lidoEm`?\n- Se P-07 permitir que uma presença substitua outra (ex.: manual sobre QR): o índice único da P-23 vira atualização; `origem` e `lidoEm` mudam, e a resposta continua 200?\n- Se P-08 contar por participante: quem esbarrou em `LIMITE_DE_MANUAIS` ainda pode registrar por QR?\n- Se P-05 aceitar `convocada`: se a convocação expirar entre `lidoEm` (offline) e o envio, vale o status em `lidoEm` ou no envio?\n",
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md"
+      },
+      "time": {
+       "start": 1790118616789,
+       "end": 1790118616845
+      },
+      "output": "The file C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md has been updated successfully. (file state is current in your context — no need to Read it back)"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3850,
+      "reasoning": 0,
+      "cache": {
+       "read": 82841,
+       "write": 212
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-opus-5-5",
+    "time": {
+     "created": 1790118623238
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "A entrevista do M3 terminou depois da rodada 2, e está tudo registrado em `entrevistas/M3-presenca.md`. Não fiz nenhum commit.\n\n**Decisões do grupo (14):** P-03 e P-13 a P-25. Na coluna Fonte, cada uma cita o contrato ou a regra do M1 em que se apoia.\n\n**Pendentes, para consultar os requisitos (11):** P-01, P-02 e P-04 a P-12. Todas são regras de negócio:\n- janela de horário em que cada ação é aceita;\n- tempo de validade do código;\n- casos de `CODIGO_INVALIDO`;\n- quais situações de inscrição contam como inscrito;\n- prazo para enviar uma leitura feita sem internet;\n- o que acontece quando a presença é registrada de novo;\n- limite de presenças manuais;\n- justificativa em branco;\n- atividade cancelada;\n- ordem entre as regras;\n- o que fica fora do escopo.\n\n**Perguntas que dependem das pendentes (6):** estão no fim do arquivo e só podem ser feitas depois da consulta. Duas delas podem mudar decisões já tomadas:\n- **Código:** se o código antigo ainda for aceito por um tempo, a verificação por HMAC (P-17) precisa aceitar também o código anterior.\n- **Início da contagem:** se a janela começar antes do início do encontro, o ponto de partida escolhido na P-25 pode ter de mudar.\n\nNa próxima rodada vocês consultam os requisitos e preenchem as pendentes com o RN na coluna Fonte. Depois disso vem a spec (`to-spec`).",
+     "time": {
+      "start": 1790118623251
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 607,
+      "reasoning": 0,
+      "cache": {
+       "read": 83053,
+       "write": 4064
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

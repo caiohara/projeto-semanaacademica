@@ -1,0 +1,1278 @@
+{
+ "info": {
+  "id": "ses_claude_87c7900b-6ed2-49ea-9a94-5b41ab73c1c4_a33a9cc272ad77c68",
+  "parentID": "ses_claude_87c7900b-6ed2-49ea-9a94-5b41ab73c1c4",
+  "title": "Audite o módulo M3 (api/src/modulos/m3-presenca) contra a spec specs/M3-presenc…",
+  "directory": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica",
+  "time": {
+   "created": 1790140308878,
+   "updated": 1790140650289
+  }
+ },
+ "messages": [
+  {
+   "info": {
+    "role": "user",
+    "time": {
+     "created": 1790140308878
+    }
+   },
+   "parts": [
+    {
+     "type": "text",
+     "text": "Audite o módulo M3 (api/src/modulos/m3-presenca) contra a spec specs/M3-presenca.md.\n\nPara cada regra da spec, confira:\n1. Se ela nasceu de uma pergunta/decisão registrada em entrevistas/ (regra de negócio só existe se estiver em specs/, e specs/ só existe a partir de entrevistas/).\n2. Se existe um teste (node --test) que comprove essa regra.\n3. Aponte o que ficou sem prova (regra sem teste) ou sem origem (regra na spec sem entrevista correspondente).\n\nNão conserte nada — apenas relate os achados. Preste atenção especial às regras mais recentes do módulo (contexto: os últimos commits tocaram em M3-R29, M3-R42, M3-R43 — listagem de presenças ordenada por lidoEm com desempate por id, e presença manual exclusiva da organização conforme contrato §1).",
+     "time": {
+      "start": 1790140308878
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140311269
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_014Db2W99XKYPBMwZZG73Nv2",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && ls specs/ && echo --- && ls entrevistas/ && echo --- && cat projeto.json",
+       "description": "List specs and entrevistas, show projeto.json"
+      },
+      "time": {
+       "start": 1790140312270,
+       "end": 1790140313107
+      },
+      "output": "M1-grade.md\nM2-inscricoes.md\nM3-presenca.md\n---\nM1-grade.md\nM2-inscricoes.md\nM3-presenca.md\n---\n{\n  \"stack\": \"Node 22.13+ + Express 5 + SQLite (node:sqlite, em arquivo); interface web em Vite + React\",\n  \"api\": {\n    \"pasta\": \"api\",\n    \"instalar\": \"npm install\",\n    \"iniciar\": \"npm start\"\n  },\n  \"testes\": [\"npm test\"]\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01EE6sR38JLJki4sFaMmqKJk",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\specs\\M3-presenca.md"
+      },
+      "time": {
+       "start": 1790140312797,
+       "end": 1790140312817
+      },
+      "output": "[19993 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2,
+      "reasoning": 0,
+      "cache": {
+       "read": 0,
+       "write": 11572
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140316526
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_011nkJarTzsBGTeva2JYDX66",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\entrevistas\\M3-presenca.md"
+      },
+      "time": {
+       "start": 1790140317389,
+       "end": 1790140317404
+      },
+      "output": "[20424 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01TXK6hNbYeotwyHPdWSWYfo",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && find api/src/modulos/m3-presenca -type f && echo --- && find api/test -iname \"*presenc*\" -o -iname \"*m3*\" 2>/dev/null",
+       "description": "List M3 source and test files"
+      },
+      "time": {
+       "start": 1790140318229,
+       "end": 1790140318381
+      },
+      "output": "api/src/modulos/m3-presenca/codigo.js\napi/src/modulos/m3-presenca/rotas.js\n---\napi/test/m3-presenca.test.js",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2,
+      "reasoning": 0,
+      "cache": {
+       "read": 11572,
+       "write": 13311
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140321441
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Boa entrevista. Agora vou ler os arquivos de implementação e o teste completo.",
+     "time": {
+      "start": 1790140321441
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01BvM2V2KYo7He64eL9QJZeA",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\modulos\\m3-presenca\\rotas.js"
+      },
+      "time": {
+       "start": 1790140322304,
+       "end": 1790140322321
+      },
+      "output": "[13430 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01Uut2wMxYcgYhzeWVGJXBE1",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\modulos\\m3-presenca\\codigo.js"
+      },
+      "time": {
+       "start": 1790140323058,
+       "end": 1790140323080
+      },
+      "output": "[1115 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 215,
+      "reasoning": 0,
+      "cache": {
+       "read": 24883,
+       "write": 10255
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140325351
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01FXJvLZGcnm1pJzrPqz7k9c",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && wc -l api/test/m3-presenca.test.js",
+       "description": "Count lines in M3 test file"
+      },
+      "time": {
+       "start": 1790140326255,
+       "end": 1790140326362
+      },
+      "output": "939 api/test/m3-presenca.test.js",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 6,
+      "reasoning": 0,
+      "cache": {
+       "read": 35138,
+       "write": 7640
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140329545
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01LYwS8V6vjLhbkw3VZav6RG",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js"
+      },
+      "time": {
+       "start": 1790140329545,
+       "end": 1790140329813
+      },
+      "output": "[47275 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 87,
+      "reasoning": 0,
+      "cache": {
+       "read": 42778,
+       "write": 211
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140358192
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01183qTWDuWqMb6qmSrcxBCZ",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && git log --oneline -- specs/M3-presenca.md | head -30 && echo --- && git log --oneline --all | grep -i \"M3-R\" ",
+       "description": "Check spec history and M3-related commits"
+      },
+      "time": {
+       "start": 1790140359865,
+       "end": 1790140360118
+      },
+      "output": "b6c3993 M1: spec e rodada 4; M3: spec e rodada de revisão\n---\n35364ca M3-R42-R43: listagem de presenças ordenada por lidoEm, desempate por id\n0b6e9d3 M3-R29: presença manual é exclusiva da organização (contrato §1)\nc3d5d40 M3-R29: precedência da presença manual\n25b80db M3-R24: presença manual repetida\n492736d M3-R23: limite de presenças manuais por encontro\nf9c1a0c M3-R13: presença manual exige inscrição confirmada\n0637491 M3-R15: participanteId da organização vira NAO_INSCRITO\nf8b6d2a M3-R21: corpo da presença manual\n2fd6e8d M3-R22: justificativa precisa de 10 caracteres\n1b1aaf8 M3-R5: janela da presença manual (início − 15 min a fim + 2 h)\n3930e4f M3-R25: presença manual grava origem manual\n0bb28a2 M3-R13: NAO_INSCRITO no QR offline\n1e439c1 M3-R24: presença repetida no QR offline\nd1f8081 M3-R28: QR online 401 → 403 SOMENTE_PARTICIPANTE → 404 NAO_ENCONTRADO\n37c4b54 M3-R28: NAO_INSCRITO precede FORA_DA_JANELA, que precede CODIGO_INVALIDO\n7174425 M3-R24: repetição vem antes de FORA_DA_JANELA e CODIGO_INVALIDO (R28)\n7da2a6c M3-R24: presença QR repetida → 200 com a presença gravada\na72f7e0 M3-R14: atividade cancelada → NAO_INSCRITO na presença por QR\n564c975 M3-R13: só confirmada pode registrar presença por QR\n6396055 M3-R4: QR online com relógio fora da janela → FORA_DA_JANELA\n9c7e215 M3-R11: código convertido para maiúsculas; outro desvio → CODIGO_INVALIDO\n90acfc4 M3-R10: código de outro encontro ou inexistente → CODIGO_INVALIDO\n9be614b M3-R10: código do minuto atual ou anterior, conferido com o relógio no QR online\nf7bacd9 M3-R25: QR online grava origem qr com lidoEm = registradaEm = relógio\ne8f9d38 M3-R19: lidoEm guardado com a precisão enviada\nd036e03 M3-R18: lidoEm posterior ao relógio → DADOS_INVALIDOS\ne208188 M3-R17: SINCRONIZACAO_TARDIA precede FORA_DA_JANELA e CODIGO_INVALIDO (R28)\nf0f249c M3-R17: SINCRONIZACAO_TARDIA depois de fim + 2 h\n702131d M3-R16: janela de presença conferida com lidoEm\n842a109 M3-R16: código conferido com lidoEm, não com o relógio\n1c7328d M3-R16: lidoEm igual ao relógio também é qr_offline\n3396a4c M3-R16: lidoEm vira qr_offline\n79c88dc M3-R26: listagem só para a organização, qualquer pessoa dela; encontro inexistente responde 404\n35354d1 M3-R26: listagem de presenças; encontro sem presenças responde 200 []\na0c5f64 M3-R20: campo desconhecido no corpo do QR responde DADOS_INVALIDOS\nd359d92 M3-R20: lidoEm null ou fora de ISO 8601 com fuso responde DADOS_INVALIDOS\n1c6304f M3-R20: codigo ausente ou não-string responde DADOS_INVALIDOS\n2da53c3 M3-R9: segredo do código vem de SEGREDO_CODIGO, com valor fixo sem ela\ne7e23f8 M3-R1: qualquer pessoa da organização obtém o código de qualquer encontro\nb25d408 M3-R12: obter código de atividade cancelada responde ATIVIDADE_CANCELADA\n6c3a977 M3-R27: obter código responde 401, depois 403 SOMENTE_ORGANIZACAO, depois 404\n4d6a8a7 M3-R7: código gerado por HMAC do encontro e do índice do minuto\n6146096 M3-R8: trocaEm no fim do minuto do código e validoAte no fim do seguinte\n1f1d63a M3-R6: código de 6 caracteres no alfabeto sem 0 O 1 I L\n9811ce5 M3-R3: obter código fora da janela de presença responde FORA_DA_JANELA",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2,
+      "reasoning": 0,
+      "cache": {
+       "read": 42989,
+       "write": 22242
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140364489
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01L6PgvLRwzt8GcbmUHXuZFp",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && git show 35364ca --stat && echo === && git show 35364ca -- api/test/m3-presenca.test.js | head -100",
+       "description": "Show details of the M3-R42-R43 commit"
+      },
+      "time": {
+       "start": 1790140366114,
+       "end": 1790140366368
+      },
+      "output": "commit 35364caf03b265677cf75913ed8e73a7915ae38c\nAuthor: Caio <caio.taniguti06@gmail.com>\nDate:   Wed Sep 23 02:06:30 2026 -0300\n\n    M3-R42-R43: listagem de presenças ordenada por lidoEm, desempate por id\n    \n    Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\n\n api/src/modulos/m3-presenca/rotas.js |  4 ++--\n api/test/m3-presenca.test.js         | 42 ++++++++++++++++++++++++++++++++++++\n 2 files changed, 44 insertions(+), 2 deletions(-)\n===\ncommit 35364caf03b265677cf75913ed8e73a7915ae38c\nAuthor: Caio <caio.taniguti06@gmail.com>\nDate:   Wed Sep 23 02:06:30 2026 -0300\n\n    M3-R42-R43: listagem de presenças ordenada por lidoEm, desempate por id\n    \n    Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\n\ndiff --git a/api/test/m3-presenca.test.js b/api/test/m3-presenca.test.js\nindex 2e7d3e3..39c996a 100644\n--- a/api/test/m3-presenca.test.js\n+++ b/api/test/m3-presenca.test.js\n@@ -828,6 +828,48 @@ describe('M3 — presença', () => {\n       assert.equal(res.status, 404);\n       assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');\n     });\n+\n+    it('R26: lista em ordem crescente de lidoEm; quem não tem presença não aparece', async () => {\n+      const { E } = await montarComInscritos();\n+\n+      const codigoAs1900 = await codigoAs(E, '2026-10-19T19:00:00-03:00');\n+      const codigoAs1910 = await codigoAs(E, '2026-10-19T19:10:00-03:00');\n+      await relogio('2026-10-19T21:00:00-03:00');\n+\n+      const carla = await enviar(E, 'p-carla', { codigo: codigoAs1900, lidoEm: '2026-10-19T19:00:45-03:00' });\n+      assert.equal(carla.status, 201, JSON.stringify(carla.corpo));\n+      const diego = await enviar(E, 'p-diego', { codigo: codigoAs1910, lidoEm: '2026-10-19T19:10:00-03:00' });\n+      assert.equal(diego.status, 201, JSON.stringify(diego.corpo));\n+\n+      await relogio('2026-10-19T19:30:00-03:00');\n+      const elisa = await pedir('POST', `/encontros/${E}/presencas/manual`, {\n+        usuario: 'org-ana',\n+        corpo: { participanteId: 'p-elisa', justificativa: 'Celular sem bateria' },\n+      });\n+      assert.equal(elisa.status, 201, JSON.stringify(elisa.corpo));\n+\n+      const lista = await pedir('GET', `/encontros/${E}/presencas`);\n+      assert.equal(lista.status, 200);\n+      assert.deepEqual(lista.corpo.map((p) => p.participanteId), ['p-carla', 'p-diego', 'p-elisa']);\n+    });\n+\n+    it('R26: duas presenças com o mesmo lidoEm vêm em ordem crescente de id', async () => {\n+      const { E } = await montarComInscritos();\n+\n+      const codigo = await codigoAs(E, '2026-10-19T19:00:00-03:00');\n+      await relogio('2026-10-19T19:05:00-03:00');\n+      const lidoEm = '2026-10-19T19:00:30-03:00';\n+\n+      const carla = await enviar(E, 'p-carla', { codigo, lidoEm });\n+      assert.equal(carla.status, 201, JSON.stringify(carla.corpo));\n+      const diego = await enviar(E, 'p-diego', { codigo, lidoEm });\n+      assert.equal(diego.status, 201, JSON.stringify(diego.corpo));\n+\n+      const lista = await pedir('GET', `/encontros/${E}/presencas`);\n+      assert.equal(lista.status, 200);\n+      const [primeiro, segundo] = [carla.corpo.id, diego.corpo.id].sort();\n+      assert.deepEqual(lista.corpo.map((p) => p.id), [primeiro, segundo]);\n+    });\n   });\n });",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2,
+      "reasoning": 0,
+      "cache": {
+       "read": 65231,
+       "write": 4259
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140371182
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01LugwgtTontNa1qRKh6NbMx",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && git show 35364ca -- api/src/modulos/m3-presenca/rotas.js",
+       "description": "Show rotas.js diff of the commit"
+      },
+      "time": {
+       "start": 1790140372838,
+       "end": 1790140373003
+      },
+      "output": "commit 35364caf03b265677cf75913ed8e73a7915ae38c\nAuthor: Caio <caio.taniguti06@gmail.com>\nDate:   Wed Sep 23 02:06:30 2026 -0300\n\n    M3-R42-R43: listagem de presenças ordenada por lidoEm, desempate por id\n    \n    Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\n\ndiff --git a/api/src/modulos/m3-presenca/rotas.js b/api/src/modulos/m3-presenca/rotas.js\nindex b5e83e1..112ce85 100644\n--- a/api/src/modulos/m3-presenca/rotas.js\n+++ b/api/src/modulos/m3-presenca/rotas.js\n@@ -236,12 +236,12 @@ export function rotasDaPresenca({ db, relogio }) {\n     res.status(201).json(comoPresenca(presenca));\n   });\n \n-  // R26: só quem tem presença registrada no encontro.\n+  // R26: só quem tem presença registrada no encontro, em ordem crescente de lidoEm, empate pelo id.\n   rotas.get('/encontros/:id/presencas', somenteOrganizacao, (req, res) => {\n     const encontro = db.prepare('SELECT id FROM encontros WHERE id = ?').get(req.params.id);\n     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);\n     const presencas = db.prepare(\n-      'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ?',\n+      'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ? ORDER BY lido_em_ms, id',\n     ).all(req.params.id);\n     res.json(presencas.map(comoPresenca));\n   });",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2,
+      "reasoning": 0,
+      "cache": {
+       "read": 69490,
+       "write": 1910
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140396703
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_01BGBsh18intTJokiatgr65K",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "cancelamento`\" ",
+       "path": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js",
+       "output_mode": "content"
+      },
+      "time": {
+       "start": 1790140397832,
+       "end": 1790140397893
+      },
+      "output": "[16 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2132,
+      "reasoning": 0,
+      "cache": {
+       "read": 71400,
+       "write": 1018
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140400406
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_01Q2HA2A6ibPHQ6AmQhU9K2y",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "cancelamento",
+       "path": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js",
+       "output_mode": "content",
+       "-n": true
+      },
+      "time": {
+       "start": 1790140400987,
+       "end": 1790140401035
+      },
+      "output": "[578 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 183,
+      "reasoning": 0,
+      "cache": {
+       "read": 72418,
+       "write": 2181
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140412634
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_01YW2p9oVA7tCge2qUaGSbN3",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "gabriela",
+       "path": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js",
+       "output_mode": "content",
+       "-n": true
+      },
+      "time": {
+       "start": 1790140413937,
+       "end": 1790140413997
+      },
+      "output": "[231 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1050,
+      "reasoning": 0,
+      "cache": {
+       "read": 74599,
+       "write": 477
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140440672
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_0192NS1szHAusR7N1ZQi9ke2",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "db\\.|INSERT INTO|\\.prepare\\(",
+       "path": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js",
+       "output_mode": "content"
+      },
+      "time": {
+       "start": 1790140441924,
+       "end": 1790140441994
+      },
+      "output": "[16 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2373,
+      "reasoning": 0,
+      "cache": {
+       "read": 75076,
+       "write": 1222
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140447520
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01SbtYuavs97utMeQovKjUSm",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\erros.js"
+      },
+      "time": {
+       "start": 1790140448106,
+       "end": 1790140448128
+      },
+      "output": "[1515 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_012ufQk37mpTnE8MQdNJkC22",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\" && cat package.json | head -30",
+       "description": "Check api package.json test script"
+      },
+      "time": {
+       "start": 1790140448802,
+       "end": 1790140448945
+      },
+      "output": "{\n  \"name\": \"semana-academica-api\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"engines\": {\n    \"node\": \">=22.13\"\n  },\n  \"scripts\": {\n    \"start\": \"node src/servidor.js\",\n    \"test\": \"node --test test/*.test.js\"\n  },\n  \"dependencies\": {\n    \"express\": \"^5.2.1\"\n  }\n}",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3,
+      "reasoning": 0,
+      "cache": {
+       "read": 76298,
+       "write": 2422
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140453068
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01NChrzoWE464sg2jwKhe1PN",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\" && ls && cat package.json 2>/dev/null | head -30",
+       "description": "Check root package.json for test script"
+      },
+      "time": {
+       "start": 1790140454134,
+       "end": 1790140454320
+      },
+      "output": "AGENTS.md\nCLAUDE.md\nEQUIPE.md\nREADME.md\napi\napp\nauditorias\ncontrato-api.md\nentrevistas\nevidencias\nprojeto.json\nspecs",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3,
+      "reasoning": 0,
+      "cache": {
+       "read": 78720,
+       "write": 1464
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140459128
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_014cQz5iRX6XZ73cUghZVNTZ",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\auditorias\\M1-2026-09-23.md"
+      },
+      "time": {
+       "start": 1790140459701,
+       "end": 1790140459716
+      },
+      "output": "[6731 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 243,
+      "reasoning": 0,
+      "cache": {
+       "read": 80184,
+       "write": 276
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140463202
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01X96VX6RDfvrUT3hTMgvzeH",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\" && npm test 2>&1 | tail -60",
+       "description": "Run API test suite"
+      },
+      "time": {
+       "start": 1790140464224,
+       "end": 1790140468705
+      },
+      "output": "    ✔ R17: envio com lidoEm aceito com o relógio até fim + 2 h, inclusive; depois → 422 SINCRONIZACAO_TARDIA (38.2772ms)\n    ✔ R17/R28: SINCRONIZACAO_TARDIA vem antes de FORA_DA_JANELA e de CODIGO_INVALIDO (26.105ms)\n    ✔ R18/R28: lidoEm posterior ao relógio → 422 DADOS_INVALIDOS, mesmo com presença já gravada (não 200) (32.2103ms)\n    ✔ R19: lidoEm é guardado com os milissegundos enviados; o prazo usa o instante completo (27.6197ms)\n    ✔ R24: presença repetida no QR offline → 200 com a presença já gravada, sem alteração (27.3009ms)\n    ✔ R13: QR offline com participante sem inscrição confirmada → 403 NAO_INSCRITO (21.9864ms)\n    ✔ R14: QR offline em encontro de atividade cancelada → 403 NAO_INSCRITO (25.1197ms)\n  ✔ presença por QR offline (R16–R19, R28) (336.2596ms)\n  ▶ presença manual (R5, R15, R21–R23, R25, R29)\n    ✔ R5/R25/R1: dentro da janela manual → 201 origem manual, lidoEm = registradaEm = relógio, justificativa enviada (22.717ms)\n    ✔ R5: janela manual de inicio − 15 min até fim + 2 h, inclusiva → 422 FORA_DA_JANELA fora dela (25.4653ms)\n    ✔ R22: justificativa precisa de 10 caracteres após trim → 422 JUSTIFICATIVA_OBRIGATORIA (33.738ms)\n    ✔ R25/R22: a justificativa é gravada exatamente como enviada, sem trim (critério 30a) (42.3473ms)\n    ✔ R21: participanteId ausente, não-string, inexistente, justificativa não-string ou campo desconhecido → 422 DADOS_INVALIDOS (32.1516ms)\n    ✔ R15: participanteId de alguém da organização → 403 NAO_INSCRITO (23.4145ms)\n    ✔ R13: participante sem inscrição confirmada → 403 NAO_INSCRITO (27.1841ms)\n    ✔ R14: presença manual em encontro de atividade cancelada → 403 NAO_INSCRITO (27.3498ms)\n    ✔ R23: LIMITE_DE_MANUAIS = ceil(10% das confirmadas) → 422 ao passar do limite (24.0102ms)\n    ✔ R23/R24: repetir uma manual já gravada não gasta o limite → 200, não LIMITE_DE_MANUAIS (24.0835ms)\n    ✔ R24: presença por qualquer origem não é substituída — manual não muda QR, QR não muda manual (37.126ms)\n    ✔ R29: JUSTIFICATIVA_OBRIGATORIA vem antes da presença existente (R24) → 422, não 200 (23.0544ms)\n    ✔ R29: presença existente (R24) vem antes de FORA_DA_JANELA (R5) → 200 mesmo fora da janela (27.4627ms)\n    ✔ R29: NAO_INSCRITO vem antes de FORA_DA_JANELA, que vem antes de LIMITE_DE_MANUAIS (24.6147ms)\n    ✔ contrato §1: participante chamando a rota manual → 403 SOMENTE_ORGANIZACAO (23.6922ms)\n  ✔ presença manual (R5, R15, R21–R23, R25, R29) (419.392ms)\n  ▶ listagem (R26)\n    ✔ R26: encontro existente sem presenças → 200 [] (10.6016ms)\n    ✔ R26/R1: qualquer pessoa da organização lista; participante → 403 SOMENTE_ORGANIZACAO; encontro inexistente → 404 (14.3596ms)\n    ✔ R26: lista em ordem crescente de lidoEm; quem não tem presença não aparece (39.1424ms)\n    ✔ R26: duas presenças com o mesmo lidoEm vêm em ordem crescente de id (32.6047ms)\n  ✔ listagem (R26) (97.1215ms)\n✔ M3 — presença (2009.7228ms)\n▶ M3 — segredo do código (R9)\n  ✔ R9: mesmo encontroId, índice e segredo dão o mesmo código; segredos diferentes, códigos diferentes (0.6317ms)\n  ✔ R9: sem SEGREDO_CODIGO a API usa o valor fixo (220.1398ms)\n  ✔ R9: com SEGREDO_CODIGO a API usa esse segredo, e POST /_teste/reset não o troca (229.332ms)\n✔ M3 — segredo do código (R9) (450.4042ms)\n▶ modo de teste (contrato, seção 3)\n  ✔ POST /_teste/reset responde 204 sem corpo (10.5754ms)\n  ✔ depois do reset o relógio marca 2026-10-13T09:00:00-03:00 (14.1407ms)\n  ✔ PUT /_teste/relogio ajusta o relógio, responde o instante e ele fica parado (52.649ms)\n  ✔ POST /_teste/reset devolve o relógio a 2026-10-13T09:00:00-03:00 depois de um PUT (14.3914ms)\n  ✔ PUT /_teste/relogio com corpo que não é JSON responde 422 DADOS_INVALIDOS e não mexe no relógio (10.2589ms)\n  ✔ PUT /_teste/relogio com sem o campo agora responde 422 DADOS_INVALIDOS e não mexe no relógio (8.4517ms)\n  ✔ PUT /_teste/relogio com agora que não é texto responde 422 DADOS_INVALIDOS e não mexe no relógio (9.6837ms)\n  ✔ PUT /_teste/relogio com agora que não é uma data responde 422 DADOS_INVALIDOS e não mexe no relógio (8.4601ms)\n✔ modo de teste (contrato, seção 3) (454.3502ms)\n▶ sem MODO_TESTE (contrato, seção 3)\n  ✔ POST /_teste/reset responde 404 NAO_ENCONTRADO (11.7996ms)\n  ✔ GET /_teste/relogio responde 404 NAO_ENCONTRADO (2.5518ms)\n  ✔ PUT /_teste/relogio responde 404 NAO_ENCONTRADO (3.5844ms)\n✔ sem MODO_TESTE (contrato, seção 3) (328.1543ms)\nℹ tests 177\nℹ suites 19\nℹ pass 177\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 2582.6128",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3,
+      "reasoning": 0,
+      "cache": {
+       "read": 80460,
+       "write": 3972
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140500719
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_01Xre5tMVegcB7W3qSso8onb",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "presencas",
+       "path": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src",
+       "output_mode": "content",
+       "-n": true
+      },
+      "time": {
+       "start": 1790140502017,
+       "end": 1790140502104
+      },
+      "output": "[1819 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2652,
+      "reasoning": 0,
+      "cache": {
+       "read": 84432,
+       "write": 2770
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140505015
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_016Lo5teaE1Y7srH26NG6Qd2",
+     "state": {
+      "status": "completed",
+      "input": {
+       "offset": 40,
+       "limit": 20,
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\banco.js"
+      },
+      "time": {
+       "start": 1790140505015,
+       "end": 1790140505048
+      },
+      "output": "[999 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 125,
+      "reasoning": 0,
+      "cache": {
+       "read": 87202,
+       "write": 3587
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140538122
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_01Mms5n49UECJC9XkqY86ygj",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "presencas/manual`, \\{ usuario: null|enc_00000000.*manual|presencas/manual.*usuario: null",
+       "path": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js",
+       "output_mode": "content",
+       "-n": true
+      },
+      "time": {
+       "start": 1790140540150,
+       "end": 1790140540241
+      },
+      "output": "[16 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2947,
+      "reasoning": 0,
+      "cache": {
+       "read": 90789,
+       "write": 662
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140543313
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "grep",
+     "callID": "toolu_01KeWQynhmEAtcWehre3VLbK",
+     "state": {
+      "status": "completed",
+      "input": {
+       "pattern": "enviarManual",
+       "path": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\m3-presenca.test.js",
+       "output_mode": "content",
+       "-n": true
+      },
+      "time": {
+       "start": 1790140544144,
+       "end": 1790140544224
+      },
+      "output": "[2929 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 259,
+      "reasoning": 0,
+      "cache": {
+       "read": 91451,
+       "write": 2996
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140551410
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01GoBapSqKidKQLRpEaETRSK",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\" && ls test/ && grep -rn \"presencas/manual\" test/autenticacao.test.js 2>/dev/null; grep -rln \"presencas/manual\" test/ 2>/dev/null",
+       "description": "Check for generic auth tests referencing manual presence route"
+      },
+      "time": {
+       "start": 1790140553141,
+       "end": 1790140553341
+      },
+      "output": "apoio\nautenticacao.test.js\nm1-grade.test.js\nm2-inscricoes.test.js\nm3-presenca.test.js\nmodo-teste.test.js\ntest/m3-presenca.test.js",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3,
+      "reasoning": 0,
+      "cache": {
+       "read": 94447,
+       "write": 1544
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140558053
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "bash",
+     "callID": "toolu_01Jf3TPQAjfJTgft18zArwKL",
+     "state": {
+      "status": "completed",
+      "input": {
+       "command": "cd \"C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\" && grep -n \"rota\\|ROTAS\\|encontros\" test/autenticacao.test.js | head -40",
+       "description": "Check autenticacao test structure"
+      },
+      "time": {
+       "start": 1790140559241,
+       "end": 1790140559388
+      },
+      "output": "1:// Identificação por X-Usuario (contrato-api.md §1 e §6). Vale para toda rota, menos /_teste/*.\n11:  encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T21:00:00-03:00' }],\n15:const ROTAS = [\n30:  const pedir = async (metodo, rota, { usuario, corpo } = {}) => {\n34:    const res = await fetch(`${api.url}${rota}`, {\n48:  for (const [metodo, rota, corpo] of ROTAS) {\n49:    it(`recusa ${metodo} ${rota} sem X-Usuario com 401 USUARIO_DESCONHECIDO`, async () => {\n50:      esperarErro(await pedir(metodo, rota, { corpo }), 401, 'USUARIO_DESCONHECIDO');\n54:  for (const [metodo, rota, corpo] of ROTAS) {\n55:    it(`recusa ${metodo} ${rota} com X-Usuario desconhecido com 401 USUARIO_DESCONHECIDO`, async () => {\n56:      esperarErro(await pedir(metodo, rota, { usuario: 'p-zeca', corpo }), 401, 'USUARIO_DESCONHECIDO');",
+      "metadata": {
+       "exit": 0
+      }
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 2,
+      "reasoning": 0,
+      "cache": {
+       "read": 95991,
+       "write": 680
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140563643
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01K6DdYoKpNQeCXvQQfMNbJC",
+     "state": {
+      "status": "completed",
+      "input": {
+       "offset": 1,
+       "limit": 30,
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\test\\autenticacao.test.js"
+      },
+      "time": {
+       "start": 1790140563643,
+       "end": 1790140563675
+      },
+      "output": "[1156 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 130,
+      "reasoning": 0,
+      "cache": {
+       "read": 96671,
+       "write": 693
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140575318
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "read",
+     "callID": "toolu_01UCS6C89yZGp3gJi2XC1B9B",
+     "state": {
+      "status": "completed",
+      "input": {
+       "filePath": "C:\\dev\\Atividade Final IA\\projeto-semanaacademica\\api\\src\\autenticacao.js"
+      },
+      "time": {
+       "start": 1790140576172,
+       "end": 1790140576187
+      },
+      "output": "[1477 caracteres omitidos]"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 1013,
+      "reasoning": 0,
+      "cache": {
+       "read": 97364,
+       "write": 728
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140612095
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "tool",
+     "tool": "subagenthandback",
+     "callID": "toolu_01WfBkQmZMsch7WrRAbPgyfx",
+     "state": {
+      "status": "completed",
+      "input": {
+       "message": "## Matriz de rastreabilidade\n\n| Regra | Origem | Teste que comprova | Veredito |\n|---|---|---|---|\n| R1 | P-18 | api/test/m3-presenca.test.js:186 (código), :601 (manual), :819 (listagem) | COMPROVADA |\n| R2 | P-01 | api/test/m3-presenca.test.js:83 | COMPROVADA |\n| R3 | P-01 | api/test/m3-presenca.test.js:83 | COMPROVADA |\n| R4 | P-01 | api/test/m3-presenca.test.js:310 | COMPROVADA |\n| R5 | P-01 | api/test/m3-presenca.test.js:612 | COMPROVADA |\n| R6 | P-03 | api/test/m3-presenca.test.js:107 | COMPROVADA |\n| R7 | P-02, P-17, P-25 | api/test/m3-presenca.test.js:131 | COMPROVADA (código é opaco por HMAC; a própria spec §7 diz que só a função é testável fora do HTTP — coberto por R9) |\n| R8 | P-02 | api/test/m3-presenca.test.js:115 | COMPROVADA |\n| R9 | P-22 | api/test/m3-presenca.test.js:907, :914, :924 | COMPROVADA |\n| R10 | P-02, P-04 | api/test/m3-presenca.test.js:247, :262, :277 | COMPROVADA |\n| R11 | P-03, P-13, P-20 | api/test/m3-presenca.test.js:295 | COMPROVADA |\n| R12 | P-10 | api/test/m3-presenca.test.js:170 | COMPROVADA |\n| R13 | P-05 | api/test/m3-presenca.test.js:331 (QR), :573 (offline), :687 (manual) | COMPROVADA |\n| R14 | P-10 | api/test/m3-presenca.test.js:381 (QR), :581 (offline), :696 (manual) | COMPROVADA |\n| R15 | P-14 | api/test/m3-presenca.test.js:678 | COMPROVADA |\n| R16 | P-06 | api/test/m3-presenca.test.js:451, :467, :477, :487 | COMPROVADA |\n| R17 | P-01, P-06 | api/test/m3-presenca.test.js:501, :516 | COMPROVADA |\n| R18 | P-06, P-11 | api/test/m3-presenca.test.js:525 | COMPROVADA |\n| R19 | P-21 | api/test/m3-presenca.test.js:541 | COMPROVADA |\n| R20 | P-13, P-19 | api/test/m3-presenca.test.js:200, :213, :226 | COMPROVADA |\n| R21 | P-14, P-26 | api/test/m3-presenca.test.js:660 | COMPROVADA |\n| R22 | P-09 | api/test/m3-presenca.test.js:630, :647 (30a) | COMPROVADA |\n| R23 | P-08 | api/test/m3-presenca.test.js:708, :721 | COMPROVADA |\n| R24 | P-07, P-23 | api/test/m3-presenca.test.js:392, :561, :721, :734, :769 | COMPROVADA |\n| R25 | P-06, P-16, P-27 | api/test/m3-presenca.test.js:247, :451, :597, :647 | COMPROVADA |\n| R26 | P-15 | api/test/m3-presenca.test.js:809, :816, :832, :856 | COMPROVADA |\n| R27 | P-11a | api/test/m3-presenca.test.js:149, :170 | COMPROVADA |\n| R28 | P-07, P-11b, P-13 | api/test/m3-presenca.test.js:407, :419, :432, :525 | PROVA FRACA (parcial) |\n| R29 | P-07, P-08, P-11c | api/test/m3-presenca.test.js:758, :769, :781, :799 | PROVA FRACA (parcial) |\n| R30 | P-12 | — | DELEGADA AO M2 (a própria spec, critério 45, diz que é \"sujeito à spec do M2\"; não é papel do M3 provar) |\n| R31 | P-24 | api/test/m3-presenca.test.js:41-70 (montarCenario/montarComInscritos só chamam rotas públicas) | COMPROVADA |\n\nTodas as 31 regras citam pergunta(s) P-xx que existem em `entrevistas/M3-presenca.md` e têm resposta (nenhuma `PENDENTE`; a seção \"Encerramento\" confirma que todas as pendentes foram respondidas em 2026-09-22). Não há regra SEM ORIGEM.\n\n## Suíte\n\nComando de `projeto.json` (`testes: [\"npm test\"]`, `api.pasta: \"api\"`), rodado em `api/`:\n\n```\nnpm test\n...\n✔ M3 — presença (2009.7228ms)\n✔ M3 — segredo do código (R9) (450.4042ms)\n✔ modo de teste (contrato, seção 3) (454.3502ms)\n✔ sem MODO_TESTE (contrato, seção 3) (328.1543ms)\nℹ tests 177\nℹ suites 19\nℹ pass 177\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\n```\n\nTodos os 177 testes da API passam, incluindo os 42 da suíte M3 (`m3-presenca.test.js`).\n\n## Achados\n\n1. [PROVA FRACA] **R28** — a precedência declarada é \"401 → 403 → 404 → 422 `DADOS_INVALIDOS` → presença existente 200 (R24) → `NAO_INSCRITO` → `SINCRONIZACAO_TARDIA` → `FORA_DA_JANELA` → `CODIGO_INVALIDO`\". Dois elos dessa cadeia não têm teste que os exercite:\n   - \"presença existente (200) vem antes de `NAO_INSCRITO`\": isso só é observável quando alguém que **já tem presença gravada** deixa de estar inscrito (por exemplo, cancelando a própria inscrição, `api/src/modulos/m2-inscricoes/rotas.js`, rota `POST /inscricoes/:id/cancelamento`, já usada em `m3-presenca.test.js:340`) e repete o envio. Nenhum teste faz isso: os testes de `NAO_INSCRITO` (`m3-presenca.test.js:331`, `:381`, `:573`, `:581`) sempre operam sobre participante que nunca teve presença gravada, e os testes de repetição (`:392`, `:407`, `:419`) sempre operam sobre participante inscrito e confirmado. Cenário que expõe: `p-carla` confirmada registra presença por QR; `p-carla` cancela a própria inscrição em A; `p-carla` repete o mesmo envio de presença — a spec exige 200 com a presença gravada, mas nada garante isso hoje sem uma leitura de código à parte.\n   - \"`NAO_INSCRITO` vem antes de `SINCRONIZACAO_TARDIA`\": o teste de `SINCRONIZACAO_TARDIA` em `m3-presenca.test.js:516` usa `p-carla`, que está inscrita e confirmada; não há teste com participante não inscrito e `lidoEm` fora do prazo de sincronização para confirmar que `NAO_INSCRITO` (403) vence, e não `SINCRONIZACAO_TARDIA` (422).\n\n2. [PROVA FRACA] **R29** — a precedência declarada é \"401 → 403 → 404 → 422 `DADOS_INVALIDOS` (R21) → `JUSTIFICATIVA_OBRIGATORIA` (R22) → presença existente 200 (R24) → `NAO_INSCRITO` → `FORA_DA_JANELA` → `LIMITE_DE_MANUAIS`\". Faltam:\n   - O mesmo elo \"presença existente antes de `NAO_INSCRITO`\" do achado 1, agora na rota manual: nenhum teste cancela a inscrição de alguém que já tem presença manual gravada e repete o envio.\n   - \"`DADOS_INVALIDOS` (R21) vem antes de `JUSTIFICATIVA_OBRIGATORIA` (R22)\": o teste de R21 (`m3-presenca.test.js:660`) sempre usa `justificativa: 'Celular sem bateria'` (válida) junto dos corpos malformados, e o teste de R22 (`:630`) sempre usa `participanteId: 'p-carla'` (válido) junto das justificativas curtas. Nenhum teste combina as duas falhas (por exemplo `{ participanteId: 42, justificativa: 'curta' }`) para confirmar que `DADOS_INVALIDOS` vence.\n   - 401 `USUARIO_DESCONHECIDO` e 404 `NAO_ENCONTRADO` para esta rota especificamente: o único teste de perfil em `POST /encontros/:id/presencas/manual` é o 403 `SOMENTE_ORGANIZACAO` (`m3-presenca.test.js:799`). `grep` por `presencas/manual` em `api/test/autenticacao.test.js` não encontra nada — a suíte genérica de autenticação (`autenticacao.test.js:15-19`) só cobre `/salas`, `POST /atividades` e `GET /atividades/:id`, não as rotas do M3. O middleware `identificar` (`api/src/autenticacao.js:5-18`) é de fato global, o que reduz o risco, mas nenhum teste executa o cenário 401/404 nessa rota específica, então a ordem completa do início de R29 fica sem prova direta.\n\n3. [PROVA FRACA — observação correlata, não afeta o veredito de R26] `GET /encontros/:id/presencas` também nunca é chamado sem `X-Usuario` em nenhum teste (`m3-presenca.test.js:816-830` só testa 403 e 404). R26 em si (conteúdo da listagem e ordenação) está comprovada; a lacuna é só na parte \"401\" da ordem geral do contrato, que R26 não enuncia explicitamente (diferente de R28/R29).\n\n## Veredito\n\nConferi as 31 regras (R1–R31) uma a uma contra a entrevista e contra o teste que a exercita; 28 estão comprovadas com teste que executa o cenário e verifica o valor exigido pela spec, R30 é deliberadamente delegada à spec do M2 (não é papel do M3 provar), e R28/R29 têm prova fraca por não cobrirem todos os elos da própria cadeia de precedência que elas mesmas declaram — especificamente \"presença existente vale antes de `NAO_INSCRITO`\" (R28 e R29), \"`NAO_INSCRITO` antes de `SINCRONIZACAO_TARDIA`\" (R28) e \"`DADOS_INVALIDOS` antes de `JUSTIFICATIVA_OBRIGATORIA`\" (R29). Nenhuma regra da spec ficou sem teste algum (não há SEM PROVA) e nenhuma ficou sem origem na entrevista. Não pode ser aceito sem ressalva: falta pelo menos um teste por elo de precedência apontado nos achados 1 e 2 antes de considerar R28 e R29 comprovadas."
+      },
+      "time": {
+       "start": 1790140646777,
+       "end": 1790140648135
+      },
+      "output": "{\"success\":true,\"message\":\"Report delivered to your caller.\"}"
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 3,
+      "reasoning": 0,
+      "cache": {
+       "read": 98092,
+       "write": 1760
+      }
+     }
+    }
+   ]
+  },
+  {
+   "info": {
+    "role": "assistant",
+    "providerID": "anthropic",
+    "modelID": "claude-sonnet-5",
+    "time": {
+     "created": 1790140650289
+    }
+   },
+   "parts": [
+    {
+     "type": "step-start"
+    },
+    {
+     "type": "text",
+     "text": "Parecer entregue ao agente chamador via SubagentHandback.",
+     "time": {
+      "start": 1790140650289
+     }
+    },
+    {
+     "type": "step-finish",
+     "tokens": {
+      "input": 2,
+      "output": 25,
+      "reasoning": 0,
+      "cache": {
+       "read": 99852,
+       "write": 7019
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

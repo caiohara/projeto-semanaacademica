@@ -238,6 +238,19 @@ describe('M2 — inscrições', () => {
       const segundo = await pedir('POST', `/inscricoes/${inscricao.corpo.id}/cancelamento`, { usuario: 'p-carla' });
       esperarErro(segundo, 422, 'INSCRICAO_INATIVA');
     });
+
+    it('R11: ATIVIDADE_JA_INICIADA vence INSCRICAO_INATIVA quando as duas valem', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const inscricao = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(inscricao.status, 201);
+
+      const primeiro = await pedir('POST', `/inscricoes/${inscricao.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(primeiro.status, 200);
+
+      await relogio('2026-10-19T19:00:00-03:00');
+      const segundo = await pedir('POST', `/inscricoes/${inscricao.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      esperarErro(segundo, 422, 'ATIVIDADE_JA_INICIADA');
+    });
   });
 
   describe('leitura (fatia 1)', () => {

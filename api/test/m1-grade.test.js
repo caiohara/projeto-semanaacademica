@@ -734,4 +734,15 @@ describe('M1 — grade de atividades', () => {
     assert.equal(encerrada.corpo.vagas, 35);
     assert.equal(encerrada.corpo.vagasRestantes, 35);
   });
+
+  it('R29: precedência no PATCH — ATIVIDADE_CANCELADA → CAMPO_NAO_EDITAVEL → VAGAS_ACIMA_DA_CAPACIDADE', async () => {
+    const cancelada = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    const ativa = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), salaId: 'sala-102' } });
+    assert.equal(cancelada.status, 201);
+    assert.equal(ativa.status, 201);
+    assert.equal((await cancelar(cancelada.corpo.id)).status, 200);
+
+    esperarErro(await alterar(cancelada.corpo.id, { tipo: 'minicurso', vagas: 999 }), 422, 'ATIVIDADE_CANCELADA');
+    esperarErro(await alterar(ativa.corpo.id, { tipo: 'minicurso', vagas: 999 }), 422, 'CAMPO_NAO_EDITAVEL');
+  });
 });

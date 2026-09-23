@@ -64,11 +64,15 @@ export function validarCriacao({ tipo, vagas, encontros }, sala, ocupacaoDaSala)
   }
 }
 
-// Regras do PATCH /atividades/:id, depois da forma do corpo (R24, R25).
-export function validarAlteracao({ vagas }, atividade, sala) {
+// Regras do PATCH /atividades/:id, depois da forma do corpo (R25).
+// R29: a ordem das checagens abaixo é a precedência — ATIVIDADE_CANCELADA →
+// CAMPO_NAO_EDITAVEL → VAGAS_ACIMA_DA_CAPACIDADE (→ VAGAS_ABAIXO_DOS_INSCRITOS, com o M2).
+export function validarAlteracao({ vagas, naoEditavel }, atividade, sala) {
   // R27: atividade cancelada não se altera.
   if (atividade.situacao === 'cancelada') {
     throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade está cancelada e não pode ser alterada');
   }
+  // R24: só titulo e vagas são editáveis, mesmo que o valor enviado seja o atual.
+  if (naoEditavel) throw new ErroDaApi(422, 'CAMPO_NAO_EDITAVEL', `${naoEditavel} não pode ser alterado`);
   if (vagas !== undefined) validarVagasNaSala(vagas, sala);
 }

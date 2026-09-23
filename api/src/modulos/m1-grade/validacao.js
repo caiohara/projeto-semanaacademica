@@ -1,4 +1,4 @@
-import { dadosInvalidos, ErroDaApi, lerInstante } from '../../erros.js';
+import { dadosInvalidos, lerInstante } from '../../erros.js';
 
 const TIPOS = ['palestra', 'minicurso'];
 const CAMPOS_DO_ENCONTRO = ['inicio', 'fim'];
@@ -80,8 +80,8 @@ export function lerAlteracao(corpo) {
   if (desconhecido) throw dadosInvalidos(`${desconhecido} não é aceito`);
   if ('titulo' in corpo) validarTitulo(corpo.titulo);
   if ('vagas' in corpo) validarVagas(corpo.vagas);
+  // R24: o CAMPO_NAO_EDITAVEL em si é regra do recurso e sai depois (R29).
   const naoEditavel = Object.keys(corpo).find((campo) => CAMPOS_NAO_EDITAVEIS.includes(campo));
-  if (naoEditavel) throw new ErroDaApi(422, 'CAMPO_NAO_EDITAVEL', `${naoEditavel} não pode ser alterado`);
   const { titulo, vagas } = corpo;
-  return { titulo, vagas };
+  return { titulo, vagas, naoEditavel };
 }

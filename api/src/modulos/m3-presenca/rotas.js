@@ -72,14 +72,17 @@ export function rotasDaPresenca({ db, relogio }) {
     const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
-    // R17: com o relógio, aceito até fim + 2 h, inclusive. Vem antes da janela (R28).
+    // R18: lidoEm no futuro é dado inválido; vem logo depois do 404 (R28), antes da repetição.
     const agoraMs = relogio.agora().getTime();
+    const lidoEmMs = Date.parse(corpo.lidoEm);
+    if (lidoEmMs > agoraMs) throw dadosInvalidos('lidoEm não pode ser posterior ao relógio');
+
+    // R17: com o relógio, aceito até fim + 2 h, inclusive. Vem antes da janela (R28).
     if (agoraMs > encontro.fim_ms + 2 * 60 * MINUTO_MS) {
       throw new ErroDaApi(422, 'SINCRONIZACAO_TARDIA', 'leitura offline enviada depois de fim + 2 h');
     }
 
     // R16/R2: a janela de presença é conferida com lidoEm, não com o relógio.
-    const lidoEmMs = Date.parse(corpo.lidoEm);
     if (!dentroDaJanela(encontro, lidoEmMs)) {
       throw new ErroDaApi(422, 'FORA_DA_JANELA', 'lidoEm fora da janela de presença do encontro');
     }

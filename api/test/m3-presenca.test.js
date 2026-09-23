@@ -317,6 +317,22 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'SINCRONIZACAO_TARDIA');
     });
+
+    it('R18/R28: lidoEm posterior ao relógio → 422 DADOS_INVALIDOS, mesmo com presença já gravada (não 200)', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:30-03:00');
+
+      let res = await enviar(E, 'p-carla', { codigo, lidoEm: '2026-10-19T19:00:31-03:00' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
+
+      res = await enviar(E, 'p-carla', { codigo, lidoEm: '2026-10-19T19:00:30-03:00' });
+      assert.equal(res.status, 201);
+
+      res = await enviar(E, 'p-carla', { codigo, lidoEm: '2026-10-19T19:00:31-03:00' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
+    });
   });
 
   describe('listagem (R26)', () => {

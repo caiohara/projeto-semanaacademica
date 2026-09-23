@@ -745,4 +745,16 @@ describe('M1 — grade de atividades', () => {
     esperarErro(await alterar(cancelada.corpo.id, { tipo: 'minicurso', vagas: 999 }), 422, 'ATIVIDADE_CANCELADA');
     esperarErro(await alterar(ativa.corpo.id, { tipo: 'minicurso', vagas: 999 }), 422, 'CAMPO_NAO_EDITAVEL');
   });
+
+  it('R33: qualquer pessoa da organização altera atividade criada por outra', async () => {
+    const daAna = await pedir('POST', '/atividades', { usuario: 'org-ana', corpo: palestraValida() });
+    assert.equal(daAna.status, 201);
+
+    const res = await alterar(daAna.corpo.id, { titulo: 'x' }, { usuario: 'org-bruno' });
+    assert.equal(res.status, 200, JSON.stringify(res.corpo));
+    assert.equal(res.corpo.titulo, 'x');
+
+    const cancelada = await cancelar(daAna.corpo.id, { usuario: 'org-bruno' });
+    assert.equal(cancelada.status, 200, JSON.stringify(cancelada.corpo));
+  });
 });

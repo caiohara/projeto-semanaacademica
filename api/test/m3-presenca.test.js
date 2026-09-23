@@ -388,6 +388,21 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 403);
       assert.equal(res.corpo.erro, 'NAO_INSCRITO');
     });
+
+    it('R24: presença repetida → 200 com a presença já gravada, sem alteração', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:30-03:00');
+      const primeira = await enviar(E, 'p-carla', { codigo });
+      assert.equal(primeira.status, 201);
+
+      const outro = await codigoAs(E, '2026-10-19T19:10:00-03:00');
+      const res = await enviar(E, 'p-carla', { codigo: outro });
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.corpo, primeira.corpo);
+      assert.equal(res.corpo.lidoEm, '2026-10-19T19:00:30-03:00');
+      assert.equal(res.corpo.registradaEm, '2026-10-19T19:00:30-03:00');
+      assert.equal(res.corpo.origem, 'qr');
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

@@ -90,6 +90,11 @@ export function rotasDaPresenca({ db, relogio }) {
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
     if (!('lidoEm' in corpo)) {
+      // R24: presença já gravada volta 200, sem alteração; vem antes de NAO_INSCRITO (R28).
+      const existente = db.prepare(
+        'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ? AND participante_id = ?',
+      ).get(encontro.id, req.usuario.id);
+      if (existente) return res.json(comoPresenca(existente));
       // R13: só inscrição confirmada na atividade dona do encontro; vem antes da janela (R28).
       if (!confirmado(encontro.atividade_id, req.usuario.id)) {
         throw new ErroDaApi(403, 'NAO_INSCRITO', 'sem inscrição confirmada na atividade');

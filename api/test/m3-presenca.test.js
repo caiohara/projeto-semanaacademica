@@ -187,6 +187,19 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
     });
+
+    it('R20: lidoEm null ou sem fuso → 422 DADOS_INVALIDOS (null não equivale a ausente)', async () => {
+      const { E } = await montarCenario();
+      await relogio('2026-10-19T19:00:30-03:00');
+
+      let res = await enviar(E, { codigo: 'ZZZZZZ', lidoEm: null });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
+
+      res = await enviar(E, { codigo: 'ZZZZZZ', lidoEm: '2026-10-19T19:00:00' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
+    });
   });
 });
 

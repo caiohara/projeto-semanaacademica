@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { somenteOrganizacao } from '../../autenticacao.js';
-import { dadosInvalidos, ErroDaApi } from '../../erros.js';
+import { dadosInvalidos, ErroDaApi, lerInstante } from '../../erros.js';
 import { derivarCodigo, indiceDoMinuto } from './codigo.js';
 
 // M3 — Presença por QR (specs/M3-presenca.md).
@@ -47,6 +47,8 @@ export function rotasDaPresenca({ db, relogio }) {
     const corpo = req.body ?? {};
     // R20
     if (typeof corpo.codigo !== 'string') throw dadosInvalidos('codigo é obrigatório e precisa ser texto');
+    // R20: lidoEm é opcional, mas null não equivale a ausente.
+    if ('lidoEm' in corpo) lerInstante(corpo.lidoEm, 'lidoEm');
     next();
   });
 

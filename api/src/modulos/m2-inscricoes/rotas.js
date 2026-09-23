@@ -75,6 +75,21 @@ export function rotasDeInscricoes({ db, relogio }) {
     res.status(201).json(lerInscricao(db, id));
   });
 
+  // R22: organização vê todas; participante só as próprias. Ordem: criadaEm, empate por id.
+  rotas.get('/inscricoes', (req, res) => {
+    const { atividadeId } = req.query;
+    const linhas = req.usuario.papel === 'organizacao'
+      ? (atividadeId === undefined
+        ? db.prepare('SELECT id FROM inscricoes ORDER BY criada_em_ms, id').all()
+        : db.prepare('SELECT id FROM inscricoes WHERE atividade_id = ? ORDER BY criada_em_ms, id').all(atividadeId))
+      : (atividadeId === undefined
+        ? db.prepare('SELECT id FROM inscricoes WHERE participante_id = ? ORDER BY criada_em_ms, id').all(req.usuario.id)
+        : db.prepare(
+          'SELECT id FROM inscricoes WHERE participante_id = ? AND atividade_id = ? ORDER BY criada_em_ms, id',
+        ).all(req.usuario.id, atividadeId));
+    res.json(linhas.map(({ id }) => lerInscricao(db, id)));
+  });
+
   // R12 (parcial nesta fatia; guardas R9-R11 e convocação R14 ficam para as próximas fatias):
   // cancelar muda o status para cancelada.
   rotas.post('/inscricoes/:id/cancelamento', somenteParticipante, (req, res) => {

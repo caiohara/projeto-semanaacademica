@@ -209,4 +209,29 @@ describe('M2 — inscrições', () => {
       esperarErro(res, 422, 'ATIVIDADE_CANCELADA');
     });
   });
+
+  describe('leitura (fatia 1)', () => {
+    it('R22: organização vê as inscrições de todos; participante só as próprias; empate por id; filtro sem match é []', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(carla.status, 201);
+      assert.equal(diego.status, 201);
+      // Mesmo relógio parado: as duas nasceram no mesmo instante, então o empate é pelo id.
+      assert.equal(carla.corpo.criadaEm, diego.corpo.criadaEm);
+      const [primeiroId, segundoId] = [carla.corpo.id, diego.corpo.id].sort();
+
+      const daOrganizacao = await pedir('GET', '/inscricoes', { usuario: 'org-ana' });
+      assert.equal(daOrganizacao.status, 200);
+      assert.deepEqual(daOrganizacao.corpo.map((i) => i.id), [primeiroId, segundoId]);
+
+      const daCarla = await pedir('GET', '/inscricoes', { usuario: 'p-carla' });
+      assert.equal(daCarla.status, 200);
+      assert.deepEqual(daCarla.corpo.map((i) => i.id), [carla.corpo.id]);
+
+      const semMatch = await pedir('GET', '/inscricoes?atividadeId=atv_inexistente', { usuario: 'org-ana' });
+      assert.equal(semMatch.status, 200);
+      assert.deepEqual(semMatch.corpo, []);
+    });
+  });
 });

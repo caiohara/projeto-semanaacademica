@@ -558,5 +558,31 @@ describe('M2 — inscrições', () => {
       const diegoDepois = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
       assert.equal(diegoDepois.corpo.status, 'convocada');
     });
+
+    it('R20/R20a: confirmação aceita após o início da atividade, enquanto convocadaAte não vence; sucesso zera convocadaAte', async () => {
+      const m = await criarAtividadeM({ vagas: 1 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.corpo.status, 'em_espera');
+
+      await relogio('2026-10-19T18:59:50-03:00');
+      const cancelamento = await pedir('POST', `/inscricoes/${carla.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(cancelamento.status, 200);
+      const diegoConvocado = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
+      assert.equal(diegoConvocado.corpo.status, 'convocada');
+      assert.equal(Date.parse(diegoConvocado.corpo.convocadaAte), Date.parse('2026-10-19T20:59:50-03:00'));
+
+      // Atividade já começou (19:00) mas convocadaAte (20:59:50) ainda não venceu.
+      await relogio('2026-10-19T19:00:01-03:00');
+      const res = await pedir('POST', `/inscricoes/${diego.corpo.id}/confirmacao`, { usuario: 'p-diego' });
+      assert.equal(res.status, 200);
+      assert.equal(res.corpo.status, 'confirmada');
+      assert.equal(res.corpo.convocadaAte, null);
+
+      const diegoDepois = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
+      assert.equal(diegoDepois.corpo.status, 'confirmada');
+      assert.equal(diegoDepois.corpo.convocadaAte, null);
+    });
   });
 });

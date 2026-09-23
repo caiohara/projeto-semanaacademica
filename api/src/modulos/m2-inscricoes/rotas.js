@@ -226,6 +226,10 @@ export function rotasDeInscricoes({ db, relogio }) {
       }
     }
 
+    // R20a: sucesso muda o status para confirmada e zera convocadaAte.
+    // R20: sem checagem de ATIVIDADE_JA_INICIADA — não está no contrato para esta rota.
+    db.prepare("UPDATE inscricoes SET status = 'confirmada', convocada_ate = NULL, convocada_ate_ms = NULL WHERE id = ?")
+      .run(req.params.id);
     res.json(lerInscricao(db, req.params.id));
   });
 

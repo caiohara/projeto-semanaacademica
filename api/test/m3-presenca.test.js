@@ -269,6 +269,16 @@ describe('M3 — presença', () => {
       assert.equal(res.corpo.origem, 'qr_offline');
       assert.equal(res.corpo.lidoEm, '2026-10-19T19:00:30-03:00');
     });
+
+    it('R16/R10: o código é conferido com lidoEm — código de minuto futuro em relação a lidoEm → 422 CODIGO_INVALIDO', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:05:00-03:00');
+
+      await relogio('2026-10-19T19:05:30-03:00');
+      const res = await enviar(E, 'p-carla', { codigo, lidoEm: '2026-10-19T19:03:10-03:00' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'CODIGO_INVALIDO');
+    });
   });
 
   describe('listagem (R26)', () => {

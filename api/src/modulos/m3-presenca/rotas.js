@@ -72,6 +72,12 @@ export function rotasDaPresenca({ db, relogio }) {
     const encontro = db.prepare('SELECT id FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
+    // R16/R10: o código vale no minuto de lidoEm ou no minuto anterior.
+    const indice = indiceDoMinuto(Date.parse(corpo.lidoEm));
+    if (corpo.codigo !== derivarCodigo(encontro.id, indice) && corpo.codigo !== derivarCodigo(encontro.id, indice - 1)) {
+      throw new ErroDaApi(422, 'CODIGO_INVALIDO', 'código inválido ou expirado');
+    }
+
     // R16/R25: com lidoEm é sempre qr_offline; lidoEm é o enviado, registradaEm é o relógio.
     const presenca = {
       id: novoId(),

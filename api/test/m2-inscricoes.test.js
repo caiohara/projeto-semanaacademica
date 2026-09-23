@@ -315,6 +315,29 @@ describe('M2 — inscrições', () => {
         Date.parse('2026-10-13T09:00:00-03:00') + 2 * 60 * 60 * 1000,
       );
     });
+
+    it('R14/R15: PATCH aumentando vagas em mais de 1 convoca quantos couberem, em ordem de fila', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.corpo.status, 'confirmada');
+      const elisa = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-elisa' });
+      assert.equal(elisa.corpo.status, 'em_espera');
+      const fabio = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-fabio' });
+      assert.equal(fabio.corpo.status, 'em_espera');
+
+      const patch = await pedir('PATCH', `/atividades/${m.id}`, { usuario: 'org-ana', corpo: { vagas: 4 } });
+      assert.equal(patch.status, 200);
+
+      // A convocação é efeito imediato do PATCH (R14), não de uma leitura seguinte:
+      // usar GET /inscricoes (lista), que não toca a fila, para confirmar sem mascarar isso.
+      const lista = await pedir('GET', '/inscricoes', { usuario: 'org-ana' });
+      assert.equal(lista.status, 200);
+      const porId = Object.fromEntries(lista.corpo.map((i) => [i.id, i]));
+      assert.equal(porId[elisa.corpo.id].status, 'convocada');
+      assert.equal(porId[fabio.corpo.id].status, 'convocada');
+    });
   });
 
   describe('leitura (fatia 1)', () => {

@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { Router } from 'express';
 import { somenteOrganizacao } from '../../autenticacao.js';
 import { dadosInvalidos, ErroDaApi } from '../../erros.js';
+import { processarConvocacoes } from '../m2-inscricoes/rotas.js';
 import { validarAlteracao, validarCriacao } from './regras.js';
 import { lerAlteracao, lerFiltros, lerNovaAtividade } from './validacao.js';
 
@@ -81,7 +82,11 @@ export function rotasDaGrade({ db, relogio }) {
     validarAlteracao(alteracao, atividade, sala);
     const { titulo, vagas } = alteracao;
     if (titulo !== undefined) db.prepare('UPDATE atividades SET titulo = ? WHERE id = ?').run(titulo, req.params.id);
-    if (vagas !== undefined) db.prepare('UPDATE atividades SET vagas = ? WHERE id = ?').run(vagas, req.params.id);
+    if (vagas !== undefined) {
+      db.prepare('UPDATE atividades SET vagas = ? WHERE id = ?').run(vagas, req.params.id);
+      // R14: aumento de vagas convoca o próximo (ou os próximos, R15) da fila do M2.
+      processarConvocacoes(db, relogio, req.params.id);
+    }
     res.json(lerAtividade(db, relogio, req.params.id));
   });
 

@@ -72,18 +72,27 @@ export function rotasDaGrade({ db, relogio }) {
     res.json(lerAtividade(db, relogio, req.params.id));
   });
 
+  // R32: o corpo da requisição é ignorado.
+  rotas.post('/atividades/:id/cancelamento', somenteOrganizacao, (req, res) => {
+    lerAtividade(db, relogio, req.params.id);
+    db.prepare('UPDATE atividades SET cancelada = 1 WHERE id = ?').run(req.params.id);
+    res.json(lerAtividade(db, relogio, req.params.id));
+  });
+
   return rotas;
 }
 
-// R7: calculada a cada leitura pelo relógio; as transições valem no instante exato.
-function situacaoNoInstante(encontros, agoraMs) {
+// R7: calculada a cada leitura pelo relógio; as transições valem no instante exato
+// e cancelada prevalece sobre todas.
+function situacaoNoInstante(cancelada, encontros, agoraMs) {
+  if (cancelada) return 'cancelada';
   if (agoraMs < encontros[0].inicio_ms) return 'prevista';
   if (agoraMs < encontros[encontros.length - 1].fim_ms) return 'em_andamento';
   return 'encerrada';
 }
 
 function lerAtividade(db, relogio, id) {
-  const a = db.prepare('SELECT id, titulo, tipo, sala_id, vagas FROM atividades WHERE id = ?').get(id);
+  const a = db.prepare('SELECT id, titulo, tipo, sala_id, vagas, cancelada FROM atividades WHERE id = ?').get(id);
   if (!a) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${id} não existe`);
   // R5: encontros sempre em ordem de inicio.
   const encontros = db.prepare(
@@ -102,7 +111,7 @@ function lerAtividade(db, relogio, id) {
     })),
     // R6: soma exata em minutos; pode ter fração quando os instantes têm segundos.
     cargaHorariaMinutos: encontros.reduce((soma, e) => soma + (e.fim_ms - e.inicio_ms), 0) / 60000,
-    situacao: situacaoNoInstante(encontros, relogio.agora().getTime()),
+    situacao: situacaoNoInstante(a.cancelada, encontros, relogio.agora().getTime()),
     // Sem inscrições do M2 (R8), as contagens são zeradas.
     ocupadas: 0,
     vagasRestantes: a.vagas,

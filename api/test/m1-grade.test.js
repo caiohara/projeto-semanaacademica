@@ -536,4 +536,15 @@ describe('M1 — grade de atividades', () => {
     assert.equal(await situacaoEm(minicurso.corpo.id, '2026-10-20T10:00:00-03:00'), 'em_andamento');
     assert.equal(await situacaoEm(minicurso.corpo.id, '2026-10-20T22:00:00-03:00'), 'encerrada');
   });
+
+  const cancelar = (id, opcoes = {}) => pedir('POST', `/atividades/${id}/cancelamento`, opcoes);
+
+  it('R32: cancelar responde 200 com a atividade cancelada e ignora o corpo', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+
+    const res = await cancelar(palestra.corpo.id, { corpo: { motivo: 'x' } });
+    assert.equal(res.status, 200, JSON.stringify(res.corpo));
+    assert.deepEqual(res.corpo, { ...palestra.corpo, situacao: 'cancelada' });
+  });
 });

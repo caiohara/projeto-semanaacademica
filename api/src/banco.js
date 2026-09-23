@@ -29,7 +29,9 @@ export function abrirBanco(arquivo = process.env.ARQUIVO_BANCO || ARQUIVO_PADRAO
       titulo TEXT NOT NULL,
       tipo   TEXT NOT NULL CHECK (tipo IN ('palestra', 'minicurso')),
       sala_id TEXT NOT NULL REFERENCES salas (id),
-      vagas  INTEGER NOT NULL
+      vagas  INTEGER NOT NULL,
+      -- M1: o único estado gravado além da entrada (P-27); situacao e contagens são calculadas.
+      cancelada INTEGER NOT NULL DEFAULT 0
     );
     -- inicio e fim guardam o texto como veio (M1 R11); os _ms servem para ordenar e calcular.
     CREATE TABLE IF NOT EXISTS encontros (
@@ -41,6 +43,9 @@ export function abrirBanco(arquivo = process.env.ARQUIVO_BANCO || ARQUIVO_PADRAO
       fim_ms       INTEGER NOT NULL
     );
   `);
+  // Banco criado antes da coluna cancelada existir.
+  const colunas = db.prepare('PRAGMA table_info(atividades)').all().map((c) => c.name);
+  if (!colunas.includes('cancelada')) db.exec('ALTER TABLE atividades ADD COLUMN cancelada INTEGER NOT NULL DEFAULT 0');
   const vazio = db.prepare('SELECT COUNT(*) AS n FROM usuarios').get().n === 0;
   if (vazio) carregarDadosIniciais(db);
   return db;

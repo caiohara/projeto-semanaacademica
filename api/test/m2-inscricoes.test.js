@@ -389,6 +389,19 @@ describe('M2 — inscrições', () => {
       const fabioDepois = await pedir('GET', `/inscricoes/${fabio.corpo.id}`, { usuario: 'p-fabio' });
       assert.equal(fabioDepois.corpo.posicaoNaEspera, 2);
     });
+
+    it('R25: inscrição de atividade cancelada continua respondendo 200 com status cancelada', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+
+      const cancelamento = await pedir('POST', `/atividades/${m.id}/cancelamento`, { usuario: 'org-ana' });
+      assert.equal(cancelamento.status, 200);
+
+      const res = await pedir('GET', `/inscricoes/${carla.corpo.id}`, { usuario: 'p-carla' });
+      assert.equal(res.status, 200);
+      assert.equal(res.corpo.status, 'cancelada');
+    });
   });
 
   describe('leitura (fatia 1)', () => {

@@ -188,13 +188,17 @@ function lerInscricao(db, id) {
   const i = db.prepare(
     'SELECT id, atividade_id, participante_id, status, convocada_ate, criada_em_ms FROM inscricoes WHERE id = ?',
   ).get(id);
+  // R25: atividade cancelada (efeito do M1) cancela a inscrição na leitura, mesmo sem
+  // gravar isso na linha.
+  const { cancelada } = db.prepare('SELECT cancelada FROM atividades WHERE id = ?').get(i.atividade_id);
+  const status = cancelada ? 'cancelada' : i.status;
   return {
     id: i.id,
     atividadeId: i.atividade_id,
     participanteId: i.participante_id,
-    status: i.status,
-    posicaoNaEspera: posicaoNaEspera(db, i),
-    convocadaAte: i.convocada_ate,
+    status,
+    posicaoNaEspera: status === 'em_espera' ? posicaoNaEspera(db, i) : null,
+    convocadaAte: status === 'convocada' ? i.convocada_ate : null,
     criadaEm: emBrasilia(i.criada_em_ms),
   };
 }

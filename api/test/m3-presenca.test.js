@@ -279,6 +279,20 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'CODIGO_INVALIDO');
     });
+
+    it('R16/R2: a janela de presença é conferida com lidoEm — lidoEm após fim + 30 min → 422 FORA_DA_JANELA', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T22:30:00-03:00');
+
+      await relogio('2026-10-19T22:40:00-03:00');
+      let res = await enviar(E, 'p-carla', { codigo, lidoEm: '2026-10-19T22:30:00-03:00' });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.origem, 'qr_offline');
+
+      res = await enviar(E, 'p-diego', { codigo, lidoEm: '2026-10-19T22:30:00.001-03:00' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
+    });
   });
 
   describe('listagem (R26)', () => {

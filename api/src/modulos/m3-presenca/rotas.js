@@ -69,11 +69,17 @@ export function rotasDaPresenca({ db, relogio }) {
     // Sem lidoEm é a presença online (fatia 2).
     if (!('lidoEm' in corpo)) return next();
 
-    const encontro = db.prepare('SELECT id FROM encontros WHERE id = ?').get(req.params.id);
+    const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
+    // R16/R2: a janela de presença é conferida com lidoEm, não com o relógio.
+    const lidoEmMs = Date.parse(corpo.lidoEm);
+    if (!dentroDaJanela(encontro, lidoEmMs)) {
+      throw new ErroDaApi(422, 'FORA_DA_JANELA', 'lidoEm fora da janela de presença do encontro');
+    }
+
     // R16/R10: o código vale no minuto de lidoEm ou no minuto anterior.
-    const indice = indiceDoMinuto(Date.parse(corpo.lidoEm));
+    const indice = indiceDoMinuto(lidoEmMs);
     if (corpo.codigo !== derivarCodigo(encontro.id, indice) && corpo.codigo !== derivarCodigo(encontro.id, indice - 1)) {
       throw new ErroDaApi(422, 'CODIGO_INVALIDO', 'código inválido ou expirado');
     }
@@ -91,7 +97,7 @@ export function rotasDaPresenca({ db, relogio }) {
     db.prepare(
       'INSERT INTO presencas (id, encontro_id, participante_id, origem, lido_em, lido_em_ms, registrada_em, justificativa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     ).run(presenca.id, presenca.encontro_id, presenca.participante_id, presenca.origem, presenca.lido_em,
-      Date.parse(presenca.lido_em), presenca.registrada_em, presenca.justificativa);
+      lidoEmMs, presenca.registrada_em, presenca.justificativa);
     res.status(201).json(comoPresenca(presenca));
   });
 

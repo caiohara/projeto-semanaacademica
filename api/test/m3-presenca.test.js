@@ -333,6 +333,26 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
     });
+
+    it('R19: lidoEm é guardado com os milissegundos enviados; o prazo usa o instante completo', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:00-03:00');
+
+      await relogio('2026-10-20T00:00:00.000-03:00');
+      let res = await enviar(E, 'p-carla', { codigo, lidoEm: '2026-10-19T19:00:45.123-03:00' });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.lidoEm, '2026-10-19T19:00:45.123-03:00');
+
+      const lista = await pedir('GET', `/encontros/${E}/presencas`);
+      assert.equal(lista.status, 200);
+      assert.equal(lista.corpo.length, 1);
+      assert.equal(lista.corpo[0].lidoEm, '2026-10-19T19:00:45.123-03:00');
+
+      await relogio('2026-10-20T00:00:00.001-03:00');
+      res = await enviar(E, 'p-diego', { codigo, lidoEm: '2026-10-19T19:00:45.123-03:00' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'SINCRONIZACAO_TARDIA');
+    });
   });
 
   describe('listagem (R26)', () => {

@@ -133,6 +133,11 @@ export function rotasDaPresenca({ db, relogio }) {
     ).get(encontro.id, req.usuario.id);
     if (existente) return res.json(comoPresenca(existente));
 
+    // R13/R14: só inscrição confirmada na atividade dona do encontro; vem antes da janela (R28).
+    if (!confirmado(encontro.atividade_id, req.usuario.id)) {
+      throw new ErroDaApi(403, 'NAO_INSCRITO', 'sem inscrição confirmada na atividade');
+    }
+
     // R17: com o relógio, aceito até fim + 2 h, inclusive. Vem antes da janela (R28).
     if (agoraMs > encontro.fim_ms + 2 * 60 * MINUTO_MS) {
       throw new ErroDaApi(422, 'SINCRONIZACAO_TARDIA', 'leitura offline enviada depois de fim + 2 h');

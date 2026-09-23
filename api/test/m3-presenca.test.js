@@ -608,6 +608,24 @@ describe('M3 — presença', () => {
       assert.equal(res.corpo.registradaEm, '2026-10-19T19:30:00-03:00');
       assert.equal(res.corpo.justificativa, 'Celular sem bateria');
     });
+
+    it('R5: janela manual de inicio − 15 min até fim + 2 h, inclusiva → 422 FORA_DA_JANELA fora dela', async () => {
+      const { E } = await montarComInscritos();
+
+      await relogio('2026-10-19T18:44:59.999-03:00');
+      let res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
+
+      await relogio('2026-10-20T00:00:00-03:00');
+      res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 201);
+
+      await relogio('2026-10-20T00:00:00.001-03:00');
+      res = await enviarManual(E, 'org-ana', { participanteId: 'p-diego', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
+    });
   });
 
   describe('listagem (R26)', () => {

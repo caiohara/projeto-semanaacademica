@@ -17,6 +17,10 @@ const emBrasilia = (ms) => `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0
 const dentroDaJanela = (encontro, agoraMs) =>
   agoraMs >= encontro.inicio_ms - 15 * MINUTO_MS && agoraMs <= encontro.fim_ms + 30 * MINUTO_MS;
 
+// R5: janela da presença manual, de inicio − 15 min até fim + 2 h, os dois limites inclusivos.
+const dentroDaJanelaManual = (encontro, agoraMs) =>
+  agoraMs >= encontro.inicio_ms - 15 * MINUTO_MS && agoraMs <= encontro.fim_ms + 2 * 60 * MINUTO_MS;
+
 const CAMPOS_DO_QR = ['codigo', 'lidoEm'];
 
 // R10: vale o código do minuto do instante de referência ou o do minuto anterior.
@@ -173,6 +177,10 @@ export function rotasDaPresenca({ db, relogio }) {
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
     const agoraMs = relogio.agora().getTime();
+    // R5: janela manual de inicio − 15 min até fim + 2 h, os dois limites inclusivos.
+    if (!dentroDaJanelaManual(encontro, agoraMs)) {
+      throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença manual do encontro');
+    }
     // R25: manual grava origem manual, lidoEm = registradaEm = relógio, justificativa como veio.
     const presenca = {
       id: novoId(),

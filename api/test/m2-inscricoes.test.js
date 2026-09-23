@@ -226,6 +226,18 @@ describe('M2 — inscrições', () => {
       const noInicio = await pedir('POST', `/inscricoes/${depois.corpo.id}/cancelamento`, { usuario: 'p-diego' });
       esperarErro(noInicio, 422, 'ATIVIDADE_JA_INICIADA');
     });
+
+    it('R10: 422 INSCRICAO_INATIVA ao cancelar a mesma inscrição pela 2ª vez', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const inscricao = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(inscricao.status, 201);
+
+      const primeiro = await pedir('POST', `/inscricoes/${inscricao.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(primeiro.status, 200);
+
+      const segundo = await pedir('POST', `/inscricoes/${inscricao.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      esperarErro(segundo, 422, 'INSCRICAO_INATIVA');
+    });
   });
 
   describe('leitura (fatia 1)', () => {

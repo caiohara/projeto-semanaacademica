@@ -102,17 +102,23 @@ export function rotasDeInscricoes({ db, relogio }) {
   // R12 (parcial nesta fatia; convocação R14 fica para a próxima fatia):
   // cancelar muda o status para cancelada.
   rotas.post('/inscricoes/:id/cancelamento', somenteParticipante, (req, res) => {
-    const inscricao = db.prepare('SELECT id, participante_id, atividade_id FROM inscricoes WHERE id = ?').get(req.params.id);
+    const inscricao = db.prepare('SELECT id, participante_id, atividade_id, status FROM inscricoes WHERE id = ?').get(req.params.id);
     if (!inscricao || inscricao.participante_id !== req.usuario.id) {
       throw new ErroDaApi(404, 'NAO_ENCONTRADO', `inscrição ${req.params.id} não existe`);
     }
 
+    // R11: ATIVIDADE_JA_INICIADA (R9) vence INSCRICAO_INATIVA (R10) quando as duas valem.
     // R9: a atividade já iniciada (relógio no início do 1º encontro ou depois) impede o cancelamento.
     const primeiroEncontro = db.prepare(
       'SELECT inicio_ms FROM encontros WHERE atividade_id = ? ORDER BY inicio_ms, id LIMIT 1',
     ).get(inscricao.atividade_id);
     if (relogio.agora().getTime() >= primeiroEncontro.inicio_ms) {
       throw new ErroDaApi(422, 'ATIVIDADE_JA_INICIADA', 'a atividade já começou');
+    }
+
+    // R10: uma inscrição já cancelada ou expirada não pode ser cancelada de novo.
+    if (inscricao.status === 'cancelada' || inscricao.status === 'expirada') {
+      throw new ErroDaApi(422, 'INSCRICAO_INATIVA', 'a inscrição já não está ativa');
     }
 
     db.prepare("UPDATE inscricoes SET status = 'cancelada' WHERE id = ?").run(req.params.id);

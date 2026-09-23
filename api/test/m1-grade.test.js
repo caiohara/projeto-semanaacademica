@@ -547,4 +547,17 @@ describe('M1 — grade de atividades', () => {
     assert.equal(res.status, 200, JSON.stringify(res.corpo));
     assert.deepEqual(res.corpo, { ...palestra.corpo, situacao: 'cancelada' });
   });
+
+  it('R4: atividade cancelada aparece na listagem e na consulta para participante', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+    assert.equal((await cancelar(palestra.corpo.id)).status, 200);
+
+    const lista = await pedir('GET', '/atividades', { usuario: 'p-carla' });
+    assert.equal(lista.status, 200);
+    assert.deepEqual(lista.corpo.map((atv) => [atv.id, atv.situacao]), [[palestra.corpo.id, 'cancelada']]);
+    const uma = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
+    assert.equal(uma.status, 200);
+    assert.equal(uma.corpo.situacao, 'cancelada');
+  });
 });

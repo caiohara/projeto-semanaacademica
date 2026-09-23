@@ -428,6 +428,29 @@ describe('M2 — inscrições', () => {
       assert.deepEqual(semMatch.corpo, []);
     });
 
+    it('R22 (autoria plena): posicaoNaEspera aparece em GET /inscricoes para quem está em_espera', async () => {
+      const m = await criarAtividadeM({ vagas: 1 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.corpo.status, 'em_espera');
+      await relogio('2026-10-13T09:00:00.001-03:00');
+      const elisa = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-elisa' });
+      assert.equal(elisa.corpo.status, 'em_espera');
+
+      const daOrganizacao = await pedir('GET', '/inscricoes', { usuario: 'org-ana' });
+      assert.equal(daOrganizacao.status, 200);
+      const porId = Object.fromEntries(daOrganizacao.corpo.map((i) => [i.id, i]));
+      assert.equal(porId[carla.corpo.id].posicaoNaEspera, null);
+      assert.equal(porId[diego.corpo.id].posicaoNaEspera, 1);
+      assert.equal(porId[elisa.corpo.id].posicaoNaEspera, 2);
+
+      const doDiego = await pedir('GET', '/inscricoes', { usuario: 'p-diego' });
+      assert.equal(doDiego.status, 200);
+      assert.deepEqual(doDiego.corpo.map((i) => i.id), [diego.corpo.id]);
+      assert.equal(doDiego.corpo[0].posicaoNaEspera, 1);
+    });
+
     it('R23: participante só vê a própria inscrição por GET /inscricoes/:id; organização vê qualquer uma', async () => {
       const m = await criarAtividadeM({ vagas: 2 });
       const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });

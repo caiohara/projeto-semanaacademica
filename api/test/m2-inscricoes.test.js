@@ -106,5 +106,13 @@ describe('M2 — inscrições', () => {
       const segunda = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
       assert.equal(segunda.status, 201);
     });
+
+    it('R4: 422 ATIVIDADE_CANCELADA ao se inscrever numa atividade cancelada', async () => {
+      const m = await criarAtividadeM();
+      const cancelamento = await pedir('POST', `/atividades/${m.id}/cancelamento`, { usuario: 'org-ana' });
+      assert.equal(cancelamento.status, 200);
+      const res = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      esperarErro(res, 422, 'ATIVIDADE_CANCELADA');
+    });
   });
 });

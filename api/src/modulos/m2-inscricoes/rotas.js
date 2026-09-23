@@ -16,8 +16,11 @@ export function rotasDeInscricoes({ db, relogio }) {
 
   // R1: o corpo é ignorado — não há campos de entrada definidos para esta rota.
   rotas.post('/atividades/:id/inscricoes', somenteParticipante, (req, res) => {
-    const atividade = db.prepare('SELECT id FROM atividades WHERE id = ?').get(req.params.id);
+    const atividade = db.prepare('SELECT id, cancelada FROM atividades WHERE id = ?').get(req.params.id);
     if (!atividade) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${req.params.id} não existe`);
+
+    // R8: ATIVIDADE_CANCELADA (R4) vem antes de JA_INSCRITO (R3).
+    if (atividade.cancelada) throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade está cancelada');
 
     // R3: uma inscrição ativa (confirmada, em_espera ou convocada) bloqueia nova inscrição.
     const jaInscrito = db.prepare(

@@ -683,6 +683,27 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 403);
       assert.equal(res.corpo.erro, 'NAO_INSCRITO');
     });
+
+    it('R13: participante sem inscrição confirmada → 403 NAO_INSCRITO', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T19:30:00-03:00');
+
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'p-fabio', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'NAO_INSCRITO');
+    });
+
+    it('R14: presença manual em encontro de atividade cancelada → 403 NAO_INSCRITO', async () => {
+      const { A, E } = await montarComInscritos();
+      // Cancela antes do início (M1 R30); a janela manual (R5) segue aberta depois.
+      const cancelada = await pedir('POST', `/atividades/${A.id}/cancelamento`);
+      assert.equal(cancelada.status, 200);
+
+      await relogio('2026-10-19T19:30:00-03:00');
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'NAO_INSCRITO');
+    });
   });
 
   describe('listagem (R26)', () => {

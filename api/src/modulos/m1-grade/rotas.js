@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { somenteOrganizacao } from '../../autenticacao.js';
 import { dadosInvalidos, ErroDaApi } from '../../erros.js';
 import { validarCriacao } from './regras.js';
-import { lerFiltros, lerNovaAtividade } from './validacao.js';
+import { lerAlteracao, lerFiltros, lerNovaAtividade } from './validacao.js';
 
 // M1 — Grade de atividades (specs/M1-grade.md).
 
@@ -76,7 +76,7 @@ export function rotasDaGrade({ db, relogio }) {
   // R24: só titulo e vagas são editáveis.
   rotas.patch('/atividades/:id', somenteOrganizacao, (req, res) => {
     lerAtividade(db, relogio, req.params.id);
-    const { titulo, vagas } = req.body;
+    const { titulo, vagas } = lerAlteracao(req.body);
     if (titulo !== undefined) db.prepare('UPDATE atividades SET titulo = ? WHERE id = ?').run(titulo, req.params.id);
     if (vagas !== undefined) db.prepare('UPDATE atividades SET vagas = ? WHERE id = ?').run(vagas, req.params.id);
     res.json(lerAtividade(db, relogio, req.params.id));

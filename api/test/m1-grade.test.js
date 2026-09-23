@@ -643,4 +643,26 @@ describe('M1 — grade de atividades', () => {
     const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
     assert.deepEqual(lida.corpo, vagas.corpo);
   });
+
+  it('R24: tipo, salaId, encontros, id e campos calculados no PATCH respondem 422 CAMPO_NAO_EDITAVEL, mesmo com o valor atual', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+
+    const corpos = [
+      { tipo: 'minicurso' },
+      { salaId: 'sala-101' },
+      { encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T21:00:00-03:00' }] },
+      { id: 'atv_00000000' },
+      { situacao: 'encerrada' },
+      { ocupadas: 0 },
+      { emEspera: 0 },
+      { vagasRestantes: 40 },
+      { cargaHorariaMinutos: 120 },
+    ];
+    for (const corpo of corpos) {
+      esperarErro(await alterar(palestra.corpo.id, corpo), 422, 'CAMPO_NAO_EDITAVEL');
+    }
+    const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
+    assert.deepEqual(lida.corpo, palestra.corpo);
+  });
 });

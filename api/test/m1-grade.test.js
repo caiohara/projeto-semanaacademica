@@ -692,4 +692,17 @@ describe('M1 — grade de atividades', () => {
     const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
     assert.deepEqual(lida.corpo, palestra.corpo);
   });
+
+  it('R21: PATCH com vagas acima da capacidade da sala responde 422 VAGAS_ACIMA_DA_CAPACIDADE; igual é aceito', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: { ...palestraValida(), vagas: 30 } });
+    assert.equal(palestra.status, 201);
+
+    esperarErro(await alterar(palestra.corpo.id, { vagas: 41 }), 422, 'VAGAS_ACIMA_DA_CAPACIDADE');
+    const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
+    assert.equal(lida.corpo.vagas, 30);
+
+    const aceito = await alterar(palestra.corpo.id, { vagas: 40 });
+    assert.equal(aceito.status, 200, JSON.stringify(aceito.corpo));
+    assert.equal(aceito.corpo.vagas, 40);
+  });
 });

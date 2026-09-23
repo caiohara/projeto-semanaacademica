@@ -22,6 +22,13 @@ const encontroInvalido = (mensagem) => new ErroDaApi(422, 'ENCONTRO_INVALIDO', m
 // R22: entre o fim de um encontro e o início de outro na mesma sala, pelo menos 15 minutos.
 const INTERVALO_DA_SALA_MS = 15 * MINUTO_MS;
 
+// R21: vagas igual à capacidade é aceito. Vale no POST e no PATCH.
+function validarVagasNaSala(vagas, sala) {
+  if (vagas > sala.capacidade) {
+    throw new ErroDaApi(422, 'VAGAS_ACIMA_DA_CAPACIDADE', `a sala comporta ${sala.capacidade} pessoas`);
+  }
+}
+
 // ocupacaoDaSala: os encontros das outras atividades na mesma sala.
 export function validarCriacao({ tipo, vagas, encontros }, sala, ocupacaoDaSala) {
   const [minimo, maximo] = QUANTIDADE[tipo];
@@ -49,13 +56,15 @@ export function validarCriacao({ tipo, vagas, encontros }, sala, ocupacaoDaSala)
       throw encontroInvalido('dois encontros da mesma atividade se sobrepõem');
     }
   }
-  // R21: vagas igual à capacidade é aceito.
-  if (vagas > sala.capacidade) {
-    throw new ErroDaApi(422, 'VAGAS_ACIMA_DA_CAPACIDADE', `a sala comporta ${sala.capacidade} pessoas`);
-  }
+  validarVagasNaSala(vagas, sala);
   // R22: encostar conflita; exatamente 15 minutos de intervalo é aceito.
   const conflita = (a, b) => a.inicioMs < b.fimMs + INTERVALO_DA_SALA_MS && b.inicioMs < a.fimMs + INTERVALO_DA_SALA_MS;
   if (encontros.some((novo) => ocupacaoDaSala.some((ocupado) => conflita(novo, ocupado)))) {
     throw new ErroDaApi(409, 'CONFLITO_DE_SALA', 'a sala já está ocupada a menos de 15 minutos desse horário');
   }
+}
+
+// Regras do PATCH /atividades/:id, depois da forma do corpo (R24, R25).
+export function validarAlteracao({ vagas }, sala) {
+  if (vagas !== undefined) validarVagasNaSala(vagas, sala);
 }

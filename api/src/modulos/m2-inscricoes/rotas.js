@@ -173,7 +173,9 @@ export function rotasDeInscricoes({ db, relogio }) {
 
   // R17-R21a: confirmar a convocação.
   rotas.post('/inscricoes/:id/confirmacao', somenteParticipante, (req, res) => {
-    const inscricao = db.prepare('SELECT id, participante_id, atividade_id, status FROM inscricoes WHERE id = ?').get(req.params.id);
+    const inscricao = db.prepare(
+      'SELECT id, participante_id, atividade_id, status, convocada_ate_ms FROM inscricoes WHERE id = ?',
+    ).get(req.params.id);
     if (!inscricao || inscricao.participante_id !== req.usuario.id) {
       throw new ErroDaApi(404, 'NAO_ENCONTRADO', `inscrição ${req.params.id} não existe`);
     }
@@ -181,6 +183,16 @@ export function rotasDeInscricoes({ db, relogio }) {
     // R21: SEM_CONVOCACAO (R17) → CONVOCACAO_EXPIRADA (R18) → ...
     if (inscricao.status !== 'convocada') {
       throw new ErroDaApi(422, 'SEM_CONVOCACAO', 'esta inscrição não tem convocação ativa');
+    }
+
+    // R18: se convocadaAte já venceu, a checagem de tempo roda antes de gravar a expiração.
+    const vencida = relogio.agora().getTime() >= inscricao.convocada_ate_ms;
+
+    // R16: a expiração lazy roda antes de checar, garantindo que a cadeia já aconteceu.
+    processarConvocacoes(db, relogio, inscricao.atividade_id);
+
+    if (vencida) {
+      throw new ErroDaApi(422, 'CONVOCACAO_EXPIRADA', 'a convocação já venceu');
     }
 
     res.json(lerInscricao(db, req.params.id));

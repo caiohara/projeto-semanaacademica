@@ -625,4 +625,22 @@ describe('M1 — grade de atividades', () => {
     assert.equal(res.status, 200, JSON.stringify(res.corpo));
     assert.equal(res.corpo.situacao, 'cancelada');
   });
+
+  const alterar = (id, corpo, opcoes = {}) => pedir('PATCH', `/atividades/${id}`, { ...opcoes, corpo });
+
+  it('R24: PATCH altera titulo e vagas e devolve a atividade', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+
+    const titulo = await alterar(palestra.corpo.id, { titulo: 'Novo' });
+    assert.equal(titulo.status, 200, JSON.stringify(titulo.corpo));
+    assert.deepEqual(titulo.corpo, { ...palestra.corpo, titulo: 'Novo' });
+
+    const vagas = await alterar(palestra.corpo.id, { vagas: 30 });
+    assert.equal(vagas.status, 200, JSON.stringify(vagas.corpo));
+    assert.deepEqual(vagas.corpo, { ...palestra.corpo, titulo: 'Novo', vagas: 30, vagasRestantes: 30 });
+
+    const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
+    assert.deepEqual(lida.corpo, vagas.corpo);
+  });
 });

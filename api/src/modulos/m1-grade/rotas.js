@@ -73,6 +73,15 @@ export function rotasDaGrade({ db, relogio }) {
     res.json(lerAtividade(db, relogio, req.params.id));
   });
 
+  // R24: só titulo e vagas são editáveis.
+  rotas.patch('/atividades/:id', somenteOrganizacao, (req, res) => {
+    lerAtividade(db, relogio, req.params.id);
+    const { titulo, vagas } = req.body;
+    if (titulo !== undefined) db.prepare('UPDATE atividades SET titulo = ? WHERE id = ?').run(titulo, req.params.id);
+    if (vagas !== undefined) db.prepare('UPDATE atividades SET vagas = ? WHERE id = ?').run(vagas, req.params.id);
+    res.json(lerAtividade(db, relogio, req.params.id));
+  });
+
   // R32: o corpo da requisição é ignorado.
   rotas.post('/atividades/:id/cancelamento', somenteOrganizacao, (req, res) => {
     const atividade = lerAtividade(db, relogio, req.params.id);

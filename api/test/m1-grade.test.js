@@ -826,4 +826,13 @@ describe('M1 — grade de atividades', () => {
     assert.equal(igual.corpo.vagas, 3);
     assert.equal(igual.corpo.ocupadas, 3);
   });
+
+  it('R29 (M2): VAGAS_ACIMA_DA_CAPACIDADE vence mesmo com inscrições reais ocupando vagas', async () => {
+    const atividade = await minicursoComVagas(3); // sala-101, capacidade 40
+    await inscrever(atividade.id, 'p-carla');
+    await inscrever(atividade.id, 'p-diego');
+    await inscrever(atividade.id, 'p-elisa');
+
+    esperarErro(await alterar(atividade.id, { vagas: 999 }), 422, 'VAGAS_ACIMA_DA_CAPACIDADE');
+  });
 });

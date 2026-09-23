@@ -211,6 +211,16 @@ describe('M3 — presença', () => {
     });
   });
 
+  describe('perfil na presença por QR (contrato §1)', () => {
+    it('organização enviando presença por QR → 403 SOMENTE_PARTICIPANTE', async () => {
+      const { E } = await montarCenario();
+      await relogio('2026-10-19T19:00:30-03:00');
+      const res = await pedir('POST', `/encontros/${E}/presencas`, { usuario: 'org-ana', corpo: { codigo: 'ZZZZZZ' } });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'SOMENTE_PARTICIPANTE');
+    });
+  });
+
   describe('listagem (R26)', () => {
     it('R26: encontro existente sem presenças → 200 []', async () => {
       const { E } = await montarCenario();

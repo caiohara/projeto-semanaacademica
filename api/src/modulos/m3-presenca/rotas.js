@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { somenteOrganizacao } from '../../autenticacao.js';
+import { somenteOrganizacao, somenteParticipante } from '../../autenticacao.js';
 import { dadosInvalidos, ErroDaApi, lerInstante } from '../../erros.js';
 import { derivarCodigo, indiceDoMinuto } from './codigo.js';
 
@@ -45,7 +45,7 @@ export function rotasDaPresenca({ db, relogio }) {
     });
   });
 
-  rotas.post('/encontros/:id/presencas', (req, res, next) => {
+  rotas.post('/encontros/:id/presencas', somenteParticipante, (req, res, next) => {
     const corpo = req.body ?? {};
     // R20
     const desconhecido = Object.keys(corpo).find((campo) => !CAMPOS_DO_QR.includes(campo));

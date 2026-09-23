@@ -584,5 +584,43 @@ describe('M2 — inscrições', () => {
       assert.equal(diegoDepois.corpo.status, 'confirmada');
       assert.equal(diegoDepois.corpo.convocadaAte, null);
     });
+
+    it('R21: convocação vencida e com conflito de horário → CONVOCACAO_EXPIRADA (vence CONFLITO_DE_HORARIO)', async () => {
+      const m = await criarAtividadeM({ vagas: 1 });
+      const outra = await pedir('POST', '/atividades', {
+        usuario: 'org-ana',
+        corpo: {
+          titulo: 'Outra atividade',
+          tipo: 'palestra',
+          salaId: 'sala-101',
+          vagas: 1,
+          encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T21:00:00-03:00' }],
+        },
+      });
+      assert.equal(outra.status, 201);
+
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.corpo.status, 'em_espera');
+
+      const elisa = await pedir('POST', `/atividades/${outra.corpo.id}/inscricoes`, { usuario: 'p-elisa' });
+      assert.equal(elisa.corpo.status, 'confirmada');
+      const diegoOutra = await pedir('POST', `/atividades/${outra.corpo.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diegoOutra.corpo.status, 'em_espera');
+
+      const cancelaCarla = await pedir('POST', `/inscricoes/${carla.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(cancelaCarla.status, 200);
+      const cancelaElisa = await pedir('POST', `/inscricoes/${elisa.corpo.id}/cancelamento`, { usuario: 'p-elisa' });
+      assert.equal(cancelaElisa.status, 200);
+
+      const diegoM = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
+      assert.equal(diegoM.corpo.status, 'convocada');
+      const convocadaAte = Date.parse(diegoM.corpo.convocadaAte);
+
+      await relogio(new Date(convocadaAte).toISOString());
+      const res = await pedir('POST', `/inscricoes/${diego.corpo.id}/confirmacao`, { usuario: 'p-diego' });
+      esperarErro(res, 422, 'CONVOCACAO_EXPIRADA');
+    });
   });
 });

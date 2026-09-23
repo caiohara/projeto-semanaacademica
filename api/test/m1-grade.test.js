@@ -705,4 +705,15 @@ describe('M1 — grade de atividades', () => {
     assert.equal(aceito.status, 200, JSON.stringify(aceito.corpo));
     assert.equal(aceito.corpo.vagas, 40);
   });
+
+  it('R27: PATCH em atividade cancelada responde 422 ATIVIDADE_CANCELADA', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+    const cancelada = await cancelar(palestra.corpo.id);
+    assert.equal(cancelada.status, 200);
+
+    esperarErro(await alterar(palestra.corpo.id, { titulo: 'x' }), 422, 'ATIVIDADE_CANCELADA');
+    const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
+    assert.deepEqual(lida.corpo, cancelada.corpo);
+  });
 });

@@ -78,7 +78,7 @@ export function rotasDaGrade({ db, relogio }) {
     const atividade = lerAtividade(db, relogio, req.params.id);
     const alteracao = lerAlteracao(req.body);
     const sala = db.prepare('SELECT capacidade FROM salas WHERE id = ?').get(atividade.salaId);
-    validarAlteracao(alteracao, sala);
+    validarAlteracao(alteracao, atividade, sala);
     const { titulo, vagas } = alteracao;
     if (titulo !== undefined) db.prepare('UPDATE atividades SET titulo = ? WHERE id = ?').run(titulo, req.params.id);
     if (vagas !== undefined) db.prepare('UPDATE atividades SET vagas = ? WHERE id = ?').run(vagas, req.params.id);

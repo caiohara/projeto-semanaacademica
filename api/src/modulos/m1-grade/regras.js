@@ -65,6 +65,10 @@ export function validarCriacao({ tipo, vagas, encontros }, sala, ocupacaoDaSala)
 }
 
 // Regras do PATCH /atividades/:id, depois da forma do corpo (R24, R25).
-export function validarAlteracao({ vagas }, sala) {
+export function validarAlteracao({ vagas }, atividade, sala) {
+  // R27: atividade cancelada não se altera.
+  if (atividade.situacao === 'cancelada') {
+    throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade está cancelada e não pode ser alterada');
+  }
   if (vagas !== undefined) validarVagasNaSala(vagas, sala);
 }

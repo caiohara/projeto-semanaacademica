@@ -16,7 +16,7 @@ export function rotasDeInscricoes({ db, relogio }) {
 
   // R1: o corpo é ignorado — não há campos de entrada definidos para esta rota.
   rotas.post('/atividades/:id/inscricoes', somenteParticipante, (req, res) => {
-    const atividade = db.prepare('SELECT id, cancelada FROM atividades WHERE id = ?').get(req.params.id);
+    const atividade = db.prepare('SELECT id, cancelada, tipo FROM atividades WHERE id = ?').get(req.params.id);
     if (!atividade) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${req.params.id} não existe`);
 
     // R8: ATIVIDADE_CANCELADA (R4) vem antes de JA_INSCRITO (R3).
@@ -50,6 +50,19 @@ export function rotasDeInscricoes({ db, relogio }) {
     const sobrepoe = (a, b) => a.inicio_ms < b.fimMs && b.inicioMs < a.fim_ms;
     if (encontrosDaAtividade.some((novo) => encontrosConflitantes.some((outro) => sobrepoe(novo, outro)))) {
       throw new ErroDaApi(409, 'CONFLITO_DE_HORARIO', 'conflito de horário com outra inscrição ativa');
+    }
+
+    // R7: contando esta como confirmada, no máximo 3 minicursos confirmados/convocados.
+    if (atividade.tipo === 'minicurso') {
+      const { total } = db.prepare(
+        `SELECT COUNT(*) AS total
+         FROM inscricoes i
+         JOIN atividades a ON a.id = i.atividade_id
+         WHERE i.participante_id = ? AND a.tipo = 'minicurso' AND i.status IN ('confirmada', 'convocada')`,
+      ).get(req.usuario.id);
+      if (total + 1 > 3) {
+        throw new ErroDaApi(422, 'LIMITE_DE_MINICURSOS', 'limite de 3 minicursos confirmados atingido');
+      }
     }
 
     const agora = relogio.agora();

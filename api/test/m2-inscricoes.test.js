@@ -144,5 +144,57 @@ describe('M2 — inscrições', () => {
       const res = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
       esperarErro(res, 409, 'CONFLITO_DE_HORARIO');
     });
+
+    it('R7: 422 LIMITE_DE_MINICURSOS ao ultrapassar 3 minicursos confirmados; uma palestra passa', async () => {
+      const criarMinicurso = async (titulo, encontros) => {
+        const res = await pedir('POST', '/atividades', {
+          usuario: 'org-ana',
+          corpo: { titulo, tipo: 'minicurso', salaId: 'sala-101', vagas: 40, encontros },
+        });
+        assert.equal(res.status, 201);
+        return res.corpo;
+      };
+      const inscrever = async (atividadeId) => {
+        const res = await pedir('POST', `/atividades/${atividadeId}/inscricoes`, { usuario: 'p-carla' });
+        assert.equal(res.status, 201);
+      };
+
+      const mc1 = await criarMinicurso('MC1', [
+        { inicio: '2026-10-21T09:00:00-03:00', fim: '2026-10-21T11:00:00-03:00' },
+        { inicio: '2026-10-21T12:00:00-03:00', fim: '2026-10-21T14:00:00-03:00' },
+      ]);
+      const mc2 = await criarMinicurso('MC2', [
+        { inicio: '2026-10-21T15:00:00-03:00', fim: '2026-10-21T17:00:00-03:00' },
+        { inicio: '2026-10-22T09:00:00-03:00', fim: '2026-10-22T11:00:00-03:00' },
+      ]);
+      const mc3 = await criarMinicurso('MC3', [
+        { inicio: '2026-10-22T12:00:00-03:00', fim: '2026-10-22T14:00:00-03:00' },
+        { inicio: '2026-10-22T15:00:00-03:00', fim: '2026-10-22T17:00:00-03:00' },
+      ]);
+      const mc4 = await criarMinicurso('MC4', [
+        { inicio: '2026-10-23T09:00:00-03:00', fim: '2026-10-23T11:00:00-03:00' },
+        { inicio: '2026-10-23T12:00:00-03:00', fim: '2026-10-23T14:00:00-03:00' },
+      ]);
+      await inscrever(mc1.id);
+      await inscrever(mc2.id);
+      await inscrever(mc3.id);
+
+      const quarto = await pedir('POST', `/atividades/${mc4.id}/inscricoes`, { usuario: 'p-carla' });
+      esperarErro(quarto, 422, 'LIMITE_DE_MINICURSOS');
+
+      const palestra = await pedir('POST', '/atividades', {
+        usuario: 'org-ana',
+        corpo: {
+          titulo: 'Palestra extra',
+          tipo: 'palestra',
+          salaId: 'sala-101',
+          vagas: 40,
+          encontros: [{ inicio: '2026-10-23T15:00:00-03:00', fim: '2026-10-23T16:00:00-03:00' }],
+        },
+      });
+      assert.equal(palestra.status, 201);
+      const inscricaoPalestra = await pedir('POST', `/atividades/${palestra.corpo.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(inscricaoPalestra.status, 201);
+    });
   });
 });

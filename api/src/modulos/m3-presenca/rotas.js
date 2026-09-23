@@ -85,6 +85,10 @@ export function rotasDaPresenca({ db, relogio }) {
 
     if (!('lidoEm' in corpo)) {
       const agoraMs = relogio.agora().getTime();
+      // R4: sem lidoEm, a janela é conferida com o relógio; vem antes do código (R28).
+      if (!dentroDaJanela(encontro, agoraMs)) {
+        throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença do encontro');
+      }
       // R10: sem lidoEm, o instante de referência é o relógio.
       if (!codigoAceito(encontro.id, corpo.codigo, agoraMs)) {
         throw new ErroDaApi(422, 'CODIGO_INVALIDO', 'código inválido ou expirado');

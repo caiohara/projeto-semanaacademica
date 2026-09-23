@@ -306,6 +306,27 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 201);
       assert.equal(res.corpo.origem, 'qr');
     });
+
+    it('R4/R2: sem lidoEm, relógio fora da janela de presença (inclusiva) → 422 FORA_DA_JANELA', async () => {
+      const { E } = await montarComInscritos();
+      // O código de 18:44 não pode ser obtido (R3); o de 18:45 é o primeiro. Às 18:44:59 ele
+      // seria de minuto futuro, mas FORA_DA_JANELA vem antes de CODIGO_INVALIDO (R28).
+      const primeiro = await codigoAs(E, '2026-10-19T18:45:00-03:00');
+      await relogio('2026-10-19T18:44:59-03:00');
+      let res = await enviar(E, 'p-carla', { codigo: primeiro });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
+
+      const ultimo = await codigoAs(E, '2026-10-19T22:30:00-03:00');
+      res = await enviar(E, 'p-carla', { codigo: ultimo });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.origem, 'qr');
+
+      await relogio('2026-10-19T22:30:00.001-03:00');
+      res = await enviar(E, 'p-diego', { codigo: ultimo });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

@@ -117,6 +117,19 @@ function situacaoNoInstante(cancelada, encontros, agoraMs) {
   return 'encerrada';
 }
 
+// R8: ocupadas conta confirmada e convocada; emEspera conta só em_espera. R9: atividade
+// cancelada zera as duas, mesmo que as linhas do M2 ainda não reflitam o cancelamento.
+function contarInscricoes(db, id, cancelada) {
+  if (cancelada) return { ocupadas: 0, emEspera: 0 };
+  const { ocupadas } = db.prepare(
+    "SELECT COUNT(*) AS ocupadas FROM inscricoes WHERE atividade_id = ? AND status IN ('confirmada', 'convocada')",
+  ).get(id);
+  const { emEspera } = db.prepare(
+    "SELECT COUNT(*) AS emEspera FROM inscricoes WHERE atividade_id = ? AND status = 'em_espera'",
+  ).get(id);
+  return { ocupadas, emEspera };
+}
+
 function lerAtividade(db, relogio, id) {
   const a = db.prepare('SELECT id, titulo, tipo, sala_id, vagas, cancelada FROM atividades WHERE id = ?').get(id);
   if (!a) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${id} não existe`);
@@ -124,6 +137,7 @@ function lerAtividade(db, relogio, id) {
   const encontros = db.prepare(
     'SELECT id, inicio, fim, inicio_ms, fim_ms FROM encontros WHERE atividade_id = ? ORDER BY inicio_ms, id',
   ).all(id);
+  const { ocupadas, emEspera } = contarInscricoes(db, id, a.cancelada);
   return {
     id: a.id,
     titulo: a.titulo,
@@ -138,9 +152,8 @@ function lerAtividade(db, relogio, id) {
     // R6: soma exata em minutos; pode ter fração quando os instantes têm segundos.
     cargaHorariaMinutos: encontros.reduce((soma, e) => soma + (e.fim_ms - e.inicio_ms), 0) / 60000,
     situacao: situacaoNoInstante(a.cancelada, encontros, relogio.agora().getTime()),
-    // Sem inscrições do M2 (R8), as contagens são zeradas.
-    ocupadas: 0,
-    vagasRestantes: a.vagas,
-    emEspera: 0,
+    ocupadas,
+    vagasRestantes: a.vagas - ocupadas,
+    emEspera,
   };
 }

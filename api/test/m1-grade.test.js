@@ -757,4 +757,54 @@ describe('M1 — grade de atividades', () => {
     const cancelada = await cancelar(daAna.corpo.id, { usuario: 'org-bruno' });
     assert.equal(cancelada.status, 200, JSON.stringify(cancelada.corpo));
   });
+
+  // Fatia 6 — contagens com inscrições reais (depende do M2). O relógio fica no reset
+  // (2026-10-13T09:00:00-03:00), bem antes do encerramento das inscrições do M2 (30 min
+  // antes do 1º encontro, 19/10 18:30).
+  const minicursoComVagas = async (vagas) => {
+    const res = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'Flutter do zero',
+        tipo: 'minicurso',
+        salaId: 'sala-101',
+        vagas,
+        encontros: [encontroEm('19', '19:00', '21:00'), encontroEm('20', '19:00', '21:00')],
+      },
+    });
+    assert.equal(res.status, 201);
+    return res.corpo;
+  };
+  const inscrever = async (atividadeId, usuario) => {
+    const res = await pedir('POST', `/atividades/${atividadeId}/inscricoes`, { usuario });
+    assert.equal(res.status, 201, JSON.stringify(res.corpo));
+    return res.corpo;
+  };
+  const cancelarInscricao = async (id, usuario) => {
+    const res = await pedir('POST', `/inscricoes/${id}/cancelamento`, { usuario });
+    assert.equal(res.status, 200, JSON.stringify(res.corpo));
+    return res.corpo;
+  };
+
+  it('R8: ocupadas conta confirmada e convocada, emEspera conta só em_espera, com inscrições reais', async () => {
+    const atividade = await minicursoComVagas(3);
+    const carla = await inscrever(atividade.id, 'p-carla');
+    await inscrever(atividade.id, 'p-diego');
+    await inscrever(atividade.id, 'p-elisa');
+    await inscrever(atividade.id, 'p-fabio');
+    await inscrever(atividade.id, 'p-gabriela');
+    await inscrever(atividade.id, 'p-heitor');
+    await inscrever(atividade.id, 'p-isadora');
+    assert.equal(carla.status, 'confirmada');
+
+    // Cancelar carla (confirmada) libera 1 vaga e convoca o próximo da fila (M2 R14):
+    // 2 confirmada (diego, elisa) + 1 convocada = 3 ocupadas; sobram 3 em_espera na fila.
+    await cancelarInscricao(carla.id, 'p-carla');
+
+    const lida = await pedir('GET', `/atividades/${atividade.id}`, { usuario: 'p-carla' });
+    assert.equal(lida.status, 200, JSON.stringify(lida.corpo));
+    assert.equal(lida.corpo.vagas, 3);
+    assert.equal(lida.corpo.ocupadas, 3);
+    assert.equal(lida.corpo.emEspera, 3);
+    assert.equal(lida.corpo.vagasRestantes, 0);
+  });
 });

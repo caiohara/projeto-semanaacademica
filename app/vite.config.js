@@ -9,6 +9,7 @@ export default defineConfig({
       '/salas': 'http://localhost:3000',
       '/atividades': 'http://localhost:3000',
       '/encontros': 'http://localhost:3000',
+      '/inscricoes': 'http://localhost:3000',
     },
   },
   test: {

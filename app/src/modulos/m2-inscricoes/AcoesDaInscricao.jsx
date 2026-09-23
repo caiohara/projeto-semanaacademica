@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { chamarApi } from '../../api/cliente.js'
-
-const STATUS_ATIVOS = ['confirmada', 'em_espera', 'convocada']
+import { estaAtiva } from './statusDaInscricao.js'
 
 export function AcoesDaInscricao({ inscricao, usuarioId, aoAtualizar }) {
   const [erro, setErro] = useState(null)
@@ -30,7 +29,7 @@ export function AcoesDaInscricao({ inscricao, usuarioId, aoAtualizar }) {
           Confirmar convocação
         </button>
       )}
-      {STATUS_ATIVOS.includes(inscricao.status) && (
+      {estaAtiva(inscricao) && (
         <button type="button" disabled={enviando} onClick={() => chamar('cancelamento')}>
           Cancelar inscrição
         </button>

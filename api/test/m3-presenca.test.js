@@ -704,6 +704,19 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 403);
       assert.equal(res.corpo.erro, 'NAO_INSCRITO');
     });
+
+    it('R23: LIMITE_DE_MANUAIS = ceil(10% das confirmadas) → 422 ao passar do limite', async () => {
+      const { E } = await montarComInscritos(); // 3 confirmadas: limite = ceil(0.3) = 1
+      await relogio('2026-10-19T19:30:00-03:00');
+      const justificativa = 'Celular sem bateria';
+
+      const primeira = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa });
+      assert.equal(primeira.status, 201);
+
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'p-diego', justificativa });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'LIMITE_DE_MANUAIS');
+    });
   });
 
   describe('listagem (R26)', () => {

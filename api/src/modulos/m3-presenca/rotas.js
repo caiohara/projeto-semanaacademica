@@ -205,6 +205,17 @@ export function rotasDaPresenca({ db, relogio }) {
     if (!dentroDaJanelaManual(encontro, agoraMs)) {
       throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença manual do encontro');
     }
+    // R23: no máximo ceil(10% das confirmadas da atividade) presenças manuais por encontro.
+    const { confirmadas } = db.prepare(
+      "SELECT COUNT(*) AS confirmadas FROM inscricoes WHERE atividade_id = ? AND status = 'confirmada'",
+    ).get(encontro.atividade_id);
+    const { manuais } = db.prepare(
+      "SELECT COUNT(*) AS manuais FROM presencas WHERE encontro_id = ? AND origem = 'manual'",
+    ).get(encontro.id);
+    if (manuais >= Math.ceil(confirmadas * 0.1)) {
+      throw new ErroDaApi(422, 'LIMITE_DE_MANUAIS', 'limite de presenças manuais do encontro atingido');
+    }
+
     // R25: manual grava origem manual, lidoEm = registradaEm = relógio, justificativa como veio.
     const presenca = {
       id: novoId(),

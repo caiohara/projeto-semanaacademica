@@ -87,5 +87,21 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 200);
       assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);
     });
+
+    it('R8: trocaEm = fim do minuto do código e validoAte = fim do minuto seguinte, em -03:00', async () => {
+      const { E } = await montarCenario();
+
+      await relogio('2026-10-19T19:00:30-03:00');
+      let res = await pedir('GET', `/encontros/${E}/codigo`);
+      assert.equal(res.status, 200);
+      assert.equal(res.corpo.trocaEm, '2026-10-19T19:01:00-03:00');
+      assert.equal(res.corpo.validoAte, '2026-10-19T19:02:00-03:00');
+
+      await relogio('2026-10-19T19:01:00-03:00');
+      res = await pedir('GET', `/encontros/${E}/codigo`);
+      assert.equal(res.status, 200);
+      assert.equal(res.corpo.trocaEm, '2026-10-19T19:02:00-03:00');
+      assert.equal(res.corpo.validoAte, '2026-10-19T19:03:00-03:00');
+    });
   });
 });

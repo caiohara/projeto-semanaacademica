@@ -6,6 +6,11 @@ import { derivarCodigo } from './codigo.js';
 
 const MINUTO_MS = 60 * 1000;
 
+// Instantes saem no fuso de Brasília, -03:00 (mesma decisão do M1 P-20). Os limites do
+// código caem em minuto cheio, então não há fração de segundo a preservar.
+const TRES_HORAS_MS = 3 * 60 * 60 * 1000;
+const emBrasilia = (ms) => `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 19)}-03:00`;
+
 // R2: de inicio − 15 min até fim + 30 min, os dois limites inclusivos.
 const dentroDaJanela = (encontro, agoraMs) =>
   agoraMs >= encontro.inicio_ms - 15 * MINUTO_MS && agoraMs <= encontro.fim_ms + 30 * MINUTO_MS;
@@ -15,11 +20,19 @@ export function rotasDaPresenca({ db, relogio }) {
 
   rotas.get('/encontros/:id/codigo', (req, res) => {
     const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
+    const agoraMs = relogio.agora().getTime();
     // R3
-    if (!dentroDaJanela(encontro, relogio.agora().getTime())) {
+    if (!dentroDaJanela(encontro, agoraMs)) {
       throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença do encontro');
     }
-    res.json({ encontroId: encontro.id, codigo: derivarCodigo() });
+    // R8: o código é o do minuto que começa em M; troca em M + 1 min e vale até M + 2 min.
+    const inicioDoMinuto = Math.floor(agoraMs / MINUTO_MS) * MINUTO_MS;
+    res.json({
+      encontroId: encontro.id,
+      codigo: derivarCodigo(),
+      trocaEm: emBrasilia(inicioDoMinuto + MINUTO_MS),
+      validoAte: emBrasilia(inicioDoMinuto + 2 * MINUTO_MS),
+    });
   });
 
   return rotas;

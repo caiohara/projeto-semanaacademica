@@ -512,5 +512,51 @@ describe('M2 — inscrições', () => {
       assert.equal(diegoDepois.corpo.status, 'convocada');
       assert.equal(diegoDepois.corpo.convocadaAte, convocadaAteAntes);
     });
+
+    it('R19: 422 LIMITE_DE_MINICURSOS na confirmação quando ultrapassaria 3 minicursos confirmados/convocados', async () => {
+      const criarMinicurso = async (titulo, encontros) => {
+        const res = await pedir('POST', '/atividades', {
+          usuario: 'org-ana',
+          corpo: { titulo, tipo: 'minicurso', salaId: 'sala-101', vagas: 40, encontros },
+        });
+        assert.equal(res.status, 201);
+        return res.corpo;
+      };
+
+      const m = await criarAtividadeM({ vagas: 1 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.corpo.status, 'em_espera');
+
+      const mc1 = await criarMinicurso('MC1', [
+        { inicio: '2026-10-21T09:00:00-03:00', fim: '2026-10-21T11:00:00-03:00' },
+        { inicio: '2026-10-21T12:00:00-03:00', fim: '2026-10-21T14:00:00-03:00' },
+      ]);
+      const mc2 = await criarMinicurso('MC2', [
+        { inicio: '2026-10-21T15:00:00-03:00', fim: '2026-10-21T17:00:00-03:00' },
+        { inicio: '2026-10-22T09:00:00-03:00', fim: '2026-10-22T11:00:00-03:00' },
+      ]);
+      const mc3 = await criarMinicurso('MC3', [
+        { inicio: '2026-10-22T12:00:00-03:00', fim: '2026-10-22T14:00:00-03:00' },
+        { inicio: '2026-10-22T15:00:00-03:00', fim: '2026-10-22T17:00:00-03:00' },
+      ]);
+      for (const mc of [mc1, mc2, mc3]) {
+        const res = await pedir('POST', `/atividades/${mc.id}/inscricoes`, { usuario: 'p-diego' });
+        assert.equal(res.status, 201);
+        assert.equal(res.corpo.status, 'confirmada');
+      }
+
+      const cancelaCarla = await pedir('POST', `/inscricoes/${carla.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(cancelaCarla.status, 200);
+      const diegoConvocado = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
+      assert.equal(diegoConvocado.corpo.status, 'convocada');
+
+      const res = await pedir('POST', `/inscricoes/${diego.corpo.id}/confirmacao`, { usuario: 'p-diego' });
+      esperarErro(res, 422, 'LIMITE_DE_MINICURSOS');
+
+      const diegoDepois = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
+      assert.equal(diegoDepois.corpo.status, 'convocada');
+    });
   });
 });

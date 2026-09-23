@@ -211,6 +211,21 @@ export function rotasDeInscricoes({ db, relogio }) {
       throw new ErroDaApi(409, 'CONFLITO_DE_HORARIO', 'conflito de horário com outra inscrição ativa');
     }
 
+    // R19: reconfere LIMITE_DE_MINICURSOS (R7); esta convocação já conta como convocada
+    // na contagem, então o total não pode passar de 3.
+    const atividade = db.prepare('SELECT tipo FROM atividades WHERE id = ?').get(inscricao.atividade_id);
+    if (atividade.tipo === 'minicurso') {
+      const { total } = db.prepare(
+        `SELECT COUNT(*) AS total
+         FROM inscricoes i
+         JOIN atividades a ON a.id = i.atividade_id
+         WHERE i.participante_id = ? AND a.tipo = 'minicurso' AND i.status IN ('confirmada', 'convocada')`,
+      ).get(req.usuario.id);
+      if (total > 3) {
+        throw new ErroDaApi(422, 'LIMITE_DE_MINICURSOS', 'limite de 3 minicursos confirmados atingido');
+      }
+    }
+
     res.json(lerInscricao(db, req.params.id));
   });
 

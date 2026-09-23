@@ -492,4 +492,48 @@ describe('M1 — grade de atividades', () => {
     esperarErro(await pedir('GET', '/atividades?dia=19-10-2026', { usuario: 'p-carla' }), 422, 'DADOS_INVALIDOS');
     esperarErro(await pedir('GET', '/atividades?tipo=oficina', { usuario: 'p-carla' }), 422, 'DADOS_INVALIDOS');
   });
+
+  // Fatia 4 — tempo e cancelamento. O tempo só anda por PUT /_teste/relogio.
+  const ajustarRelogio = async (agora) => {
+    const res = await fetch(`${api.url}/_teste/relogio`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agora }),
+    });
+    assert.equal(res.status, 200);
+  };
+  const situacaoEm = async (id, agora) => {
+    await ajustarRelogio(agora);
+    const res = await pedir('GET', `/atividades/${id}`, { usuario: 'p-carla' });
+    assert.equal(res.status, 200);
+    return res.corpo.situacao;
+  };
+
+  it('R7: situacao muda no instante exato do início e do fim, sem nada ser gravado', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+
+    assert.equal(await situacaoEm(palestra.corpo.id, '2026-10-19T18:59:59-03:00'), 'prevista');
+    assert.equal(await situacaoEm(palestra.corpo.id, '2026-10-19T19:00:00-03:00'), 'em_andamento');
+    assert.equal(await situacaoEm(palestra.corpo.id, '2026-10-19T20:59:59-03:00'), 'em_andamento');
+    assert.equal(await situacaoEm(palestra.corpo.id, '2026-10-19T21:00:00-03:00'), 'encerrada');
+    // Calculada na leitura: voltar o relógio volta a situação.
+    assert.equal(await situacaoEm(palestra.corpo.id, '2026-10-19T18:59:59-03:00'), 'prevista');
+  });
+
+  it('R7: minicurso fica em_andamento entre um encontro e outro', async () => {
+    const minicurso = await pedir('POST', '/atividades', {
+      corpo: {
+        titulo: 'Flutter do zero',
+        tipo: 'minicurso',
+        salaId: 'lab-3',
+        vagas: 20,
+        encontros: [encontroEm('19', '19:00', '22:00'), encontroEm('20', '19:00', '22:00')],
+      },
+    });
+    assert.equal(minicurso.status, 201);
+
+    assert.equal(await situacaoEm(minicurso.corpo.id, '2026-10-20T10:00:00-03:00'), 'em_andamento');
+    assert.equal(await situacaoEm(minicurso.corpo.id, '2026-10-20T22:00:00-03:00'), 'encerrada');
+  });
 });

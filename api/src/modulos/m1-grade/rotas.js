@@ -17,7 +17,7 @@ function emBrasilia(ms, original) {
   return `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 19)}${fracao}-03:00`;
 }
 
-export function rotasDaGrade({ db }) {
+export function rotasDaGrade({ db, relogio }) {
   const rotas = Router();
 
   // R1: a ordem é a dos dados iniciais, que é a ordem de inserção.
@@ -51,7 +51,7 @@ export function rotasDaGrade({ db }) {
       db.exec('ROLLBACK');
       throw erro;
     }
-    res.status(201).json(lerAtividade(db, id));
+    res.status(201).json(lerAtividade(db, relogio, id));
   });
 
   // R2: ordem pelo inicio do 1º encontro; empate pelo id.
@@ -62,20 +62,27 @@ export function rotasDaGrade({ db }) {
     // R3: ?dia= (algum encontro nesse dia) e ?tipo=, combinados em E. O dia é o do
     // calendário de Brasília: o inicio já sai em -03:00 (R10), então a data é o prefixo.
     const { dia, tipo } = lerFiltros(req.query);
-    const atividades = ids.map(({ id }) => lerAtividade(db, id))
+    const atividades = ids.map(({ id }) => lerAtividade(db, relogio, id))
       .filter((atv) => tipo === undefined || atv.tipo === tipo)
       .filter((atv) => dia === undefined || atv.encontros.some((e) => e.inicio.slice(0, 10) === dia));
     res.json(atividades);
   });
 
   rotas.get('/atividades/:id', (req, res) => {
-    res.json(lerAtividade(db, req.params.id));
+    res.json(lerAtividade(db, relogio, req.params.id));
   });
 
   return rotas;
 }
 
-function lerAtividade(db, id) {
+// R7: calculada a cada leitura pelo relógio; as transições valem no instante exato.
+function situacaoNoInstante(encontros, agoraMs) {
+  if (agoraMs < encontros[0].inicio_ms) return 'prevista';
+  if (agoraMs < encontros[encontros.length - 1].fim_ms) return 'em_andamento';
+  return 'encerrada';
+}
+
+function lerAtividade(db, relogio, id) {
   const a = db.prepare('SELECT id, titulo, tipo, sala_id, vagas FROM atividades WHERE id = ?').get(id);
   if (!a) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${id} não existe`);
   // R5: encontros sempre em ordem de inicio.
@@ -95,8 +102,8 @@ function lerAtividade(db, id) {
     })),
     // R6: soma exata em minutos; pode ter fração quando os instantes têm segundos.
     cargaHorariaMinutos: encontros.reduce((soma, e) => soma + (e.fim_ms - e.inicio_ms), 0) / 60000,
-    // Fatia 1: sem relógio (R7) nem inscrições do M2 (R8), a atividade nasce prevista e vazia.
-    situacao: 'prevista',
+    situacao: situacaoNoInstante(encontros, relogio.agora().getTime()),
+    // Sem inscrições do M2 (R8), as contagens são zeradas.
     ocupadas: 0,
     vagasRestantes: a.vagas,
     emEspera: 0,

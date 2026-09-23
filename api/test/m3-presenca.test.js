@@ -828,6 +828,48 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 404);
       assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');
     });
+
+    it('R26: lista em ordem crescente de lidoEm; quem não tem presença não aparece', async () => {
+      const { E } = await montarComInscritos();
+
+      const codigoAs1900 = await codigoAs(E, '2026-10-19T19:00:00-03:00');
+      const codigoAs1910 = await codigoAs(E, '2026-10-19T19:10:00-03:00');
+      await relogio('2026-10-19T21:00:00-03:00');
+
+      const carla = await enviar(E, 'p-carla', { codigo: codigoAs1900, lidoEm: '2026-10-19T19:00:45-03:00' });
+      assert.equal(carla.status, 201, JSON.stringify(carla.corpo));
+      const diego = await enviar(E, 'p-diego', { codigo: codigoAs1910, lidoEm: '2026-10-19T19:10:00-03:00' });
+      assert.equal(diego.status, 201, JSON.stringify(diego.corpo));
+
+      await relogio('2026-10-19T19:30:00-03:00');
+      const elisa = await pedir('POST', `/encontros/${E}/presencas/manual`, {
+        usuario: 'org-ana',
+        corpo: { participanteId: 'p-elisa', justificativa: 'Celular sem bateria' },
+      });
+      assert.equal(elisa.status, 201, JSON.stringify(elisa.corpo));
+
+      const lista = await pedir('GET', `/encontros/${E}/presencas`);
+      assert.equal(lista.status, 200);
+      assert.deepEqual(lista.corpo.map((p) => p.participanteId), ['p-carla', 'p-diego', 'p-elisa']);
+    });
+
+    it('R26: duas presenças com o mesmo lidoEm vêm em ordem crescente de id', async () => {
+      const { E } = await montarComInscritos();
+
+      const codigo = await codigoAs(E, '2026-10-19T19:00:00-03:00');
+      await relogio('2026-10-19T19:05:00-03:00');
+      const lidoEm = '2026-10-19T19:00:30-03:00';
+
+      const carla = await enviar(E, 'p-carla', { codigo, lidoEm });
+      assert.equal(carla.status, 201, JSON.stringify(carla.corpo));
+      const diego = await enviar(E, 'p-diego', { codigo, lidoEm });
+      assert.equal(diego.status, 201, JSON.stringify(diego.corpo));
+
+      const lista = await pedir('GET', `/encontros/${E}/presencas`);
+      assert.equal(lista.status, 200);
+      const [primeiro, segundo] = [carla.corpo.id, diego.corpo.id].sort();
+      assert.deepEqual(lista.corpo.map((p) => p.id), [primeiro, segundo]);
+    });
   });
 });
 

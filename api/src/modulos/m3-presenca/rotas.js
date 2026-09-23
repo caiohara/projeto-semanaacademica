@@ -236,12 +236,12 @@ export function rotasDaPresenca({ db, relogio }) {
     res.status(201).json(comoPresenca(presenca));
   });
 
-  // R26: só quem tem presença registrada no encontro.
+  // R26: só quem tem presença registrada no encontro, em ordem crescente de lidoEm, empate pelo id.
   rotas.get('/encontros/:id/presencas', somenteOrganizacao, (req, res) => {
     const encontro = db.prepare('SELECT id FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
     const presencas = db.prepare(
-      'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ?',
+      'SELECT id, encontro_id, participante_id, origem, lido_em, registrada_em, justificativa FROM presencas WHERE encontro_id = ? ORDER BY lido_em_ms, id',
     ).all(req.params.id);
     res.json(presencas.map(comoPresenca));
   });

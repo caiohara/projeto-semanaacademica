@@ -259,6 +259,16 @@ describe('M3 — presença', () => {
       assert.equal(res.corpo.registradaEm, '2026-10-19T21:00:00-03:00');
       assert.equal(res.corpo.justificativa, null);
     });
+
+    it('R16: lidoEm igual ao relógio também grava origem qr_offline', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:30-03:00');
+
+      const res = await enviar(E, 'p-diego', { codigo, lidoEm: '2026-10-19T19:00:30-03:00' });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.origem, 'qr_offline');
+      assert.equal(res.corpo.lidoEm, '2026-10-19T19:00:30-03:00');
+    });
   });
 
   describe('listagem (R26)', () => {

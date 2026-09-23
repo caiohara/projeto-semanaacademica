@@ -560,4 +560,18 @@ describe('M1 — grade de atividades', () => {
     assert.equal(uma.status, 200);
     assert.equal(uma.corpo.situacao, 'cancelada');
   });
+
+  it('R7, R9: cancelada prevalece sobre o relógio e zera as contagens', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+    assert.equal((await cancelar(palestra.corpo.id)).status, 200);
+
+    await ajustarRelogio('2026-10-19T22:00:00-03:00');
+    const res = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
+    assert.equal(res.status, 200);
+    assert.equal(res.corpo.situacao, 'cancelada');
+    assert.equal(res.corpo.ocupadas, 0);
+    assert.equal(res.corpo.emEspera, 0);
+    assert.equal(res.corpo.vagasRestantes, 40);
+  });
 });

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { DetalheAtividade } from './modulos/m1-grade/DetalheAtividade.jsx'
 import { ProgramacaoPorDia } from './modulos/m1-grade/ProgramacaoPorDia.jsx'
 
 const USUARIOS = [
@@ -25,9 +26,16 @@ function App() {
         </label>
       </header>
 
-      <ProgramacaoPorDia usuarioId={usuarioId} onSelecionarAtividade={setAtividadeSelecionadaId} />
-
-      {atividadeSelecionadaId && <p>Atividade selecionada: {atividadeSelecionadaId}</p>}
+      {atividadeSelecionadaId ? (
+        <>
+          <button type="button" onClick={() => setAtividadeSelecionadaId(null)}>
+            Voltar para a programação
+          </button>
+          <DetalheAtividade atividadeId={atividadeSelecionadaId} usuarioId={usuarioId} />
+        </>
+      ) : (
+        <ProgramacaoPorDia usuarioId={usuarioId} onSelecionarAtividade={setAtividadeSelecionadaId} />
+      )}
     </>
   )
 }

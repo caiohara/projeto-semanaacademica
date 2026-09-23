@@ -158,5 +158,14 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'ATIVIDADE_CANCELADA');
     });
+
+    it('R1: qualquer pessoa da organização obtém o código, não só quem criou a atividade', async () => {
+      const { E } = await montarCenario(); // criado por org-ana
+      await relogio('2026-10-19T19:00:30-03:00');
+      const res = await pedir('GET', `/encontros/${E}/codigo`, { usuario: 'org-bruno' });
+      assert.equal(res.status, 200);
+      assert.equal(res.corpo.encontroId, E);
+      assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);
+    });
   });
 });

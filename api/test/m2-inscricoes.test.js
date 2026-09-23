@@ -441,4 +441,15 @@ describe('M2 — inscrições', () => {
       assert.deepEqual(daOrganizacao.corpo, diego.corpo);
     });
   });
+
+  describe('confirmar convocação (fatia 4)', () => {
+    it('R17: 422 SEM_CONVOCACAO ao confirmar uma inscrição confirmada que nunca foi convocada', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+
+      const res = await pedir('POST', `/inscricoes/${carla.corpo.id}/confirmacao`, { usuario: 'p-carla' });
+      esperarErro(res, 422, 'SEM_CONVOCACAO');
+    });
+  });
 });

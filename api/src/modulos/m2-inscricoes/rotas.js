@@ -171,6 +171,21 @@ export function rotasDeInscricoes({ db, relogio }) {
     res.json(lerInscricao(db, req.params.id));
   });
 
+  // R17-R21a: confirmar a convocação.
+  rotas.post('/inscricoes/:id/confirmacao', somenteParticipante, (req, res) => {
+    const inscricao = db.prepare('SELECT id, participante_id, atividade_id, status FROM inscricoes WHERE id = ?').get(req.params.id);
+    if (!inscricao || inscricao.participante_id !== req.usuario.id) {
+      throw new ErroDaApi(404, 'NAO_ENCONTRADO', `inscrição ${req.params.id} não existe`);
+    }
+
+    // R21: SEM_CONVOCACAO (R17) → CONVOCACAO_EXPIRADA (R18) → ...
+    if (inscricao.status !== 'convocada') {
+      throw new ErroDaApi(422, 'SEM_CONVOCACAO', 'esta inscrição não tem convocação ativa');
+    }
+
+    res.json(lerInscricao(db, req.params.id));
+  });
+
   return rotas;
 }
 

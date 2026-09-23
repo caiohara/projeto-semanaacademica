@@ -2,6 +2,8 @@
 import { after, before, beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { subirApi } from './apoio/api.js';
+// Único ponto de teste fora do HTTP (spec, seção 7, critério 7): o segredo não é observável de fora.
+import { derivarCodigo, SEGREDO_PADRAO } from '../src/modulos/m3-presenca/codigo.js';
 
 describe('M3 — presença', () => {
   let api;
@@ -167,5 +169,70 @@ describe('M3 — presença', () => {
       assert.equal(res.corpo.encontroId, E);
       assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);
     });
+  });
+});
+
+describe('M3 — segredo do código (R9)', () => {
+  // Minuto de 19:00 do dia 19, contado a partir do epoch Unix (R7).
+  const MINUTO_DAS_19H = Date.parse('2026-10-19T19:00:00-03:00') / 60000;
+
+  const pedir = async (api, metodo, rota, corpo) => {
+    const res = await fetch(`${api.url}${rota}`, {
+      method: metodo,
+      headers: { 'X-Usuario': 'org-ana', 'Content-Type': 'application/json' },
+      body: corpo === undefined ? undefined : JSON.stringify(corpo),
+    });
+    const texto = await res.text();
+    return { status: res.status, corpo: texto ? JSON.parse(texto) : undefined };
+  };
+
+  // Reset, cria um encontro às 19:00 e devolve { encontroId, codigo } com o relógio às 19:00:30.
+  const codigoDeUmEncontroNovo = async (api) => {
+    assert.equal((await pedir(api, 'POST', '/_teste/reset')).status, 204);
+    const atividade = await pedir(api, 'POST', '/atividades', {
+      titulo: 'Atividade A',
+      tipo: 'palestra',
+      salaId: 'sala-101',
+      vagas: 40,
+      encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T22:00:00-03:00' }],
+    });
+    assert.equal(atividade.status, 201);
+    assert.equal((await pedir(api, 'PUT', '/_teste/relogio', { agora: '2026-10-19T19:00:30-03:00' })).status, 200);
+    const res = await pedir(api, 'GET', `/encontros/${atividade.corpo.encontros[0].id}/codigo`);
+    assert.equal(res.status, 200);
+    return res.corpo;
+  };
+
+  it('R9: mesmo encontroId, índice e segredo dão o mesmo código; segredos diferentes, códigos diferentes', () => {
+    const um = derivarCodigo('enc_1a2b3c4d', MINUTO_DAS_19H, 'segredo-um');
+    assert.match(um, /^[A-HJKMNP-Z2-9]{6}$/);
+    assert.equal(derivarCodigo('enc_1a2b3c4d', MINUTO_DAS_19H, 'segredo-um'), um);
+    assert.notEqual(derivarCodigo('enc_1a2b3c4d', MINUTO_DAS_19H, 'segredo-dois'), um);
+  });
+
+  it('R9: sem SEGREDO_CODIGO a API usa o valor fixo', async () => {
+    const api = await subirApi({ ambiente: { SEGREDO_CODIGO: undefined } });
+    try {
+      const { encontroId, codigo } = await codigoDeUmEncontroNovo(api);
+      assert.equal(codigo, derivarCodigo(encontroId, MINUTO_DAS_19H, SEGREDO_PADRAO));
+    } finally {
+      await api.parar();
+    }
+  });
+
+  it('R9: com SEGREDO_CODIGO a API usa esse segredo, e POST /_teste/reset não o troca', async () => {
+    const segredo = 'segredo-do-teste-m3';
+    assert.notEqual(segredo, SEGREDO_PADRAO);
+    const api = await subirApi({ ambiente: { SEGREDO_CODIGO: segredo } });
+    try {
+      const antes = await codigoDeUmEncontroNovo(api);
+      assert.equal(antes.codigo, derivarCodigo(antes.encontroId, MINUTO_DAS_19H, segredo));
+      assert.notEqual(antes.codigo, derivarCodigo(antes.encontroId, MINUTO_DAS_19H, SEGREDO_PADRAO));
+
+      const depois = await codigoDeUmEncontroNovo(api); // faz outro reset
+      assert.equal(depois.codigo, derivarCodigo(depois.encontroId, MINUTO_DAS_19H, segredo));
+    } finally {
+      await api.parar();
+    }
   });
 });

@@ -23,12 +23,17 @@ function portaLivre() {
 
 const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export async function subirApi({ modoTeste = true } = {}) {
+// ambiente: variáveis a mais para o processo; valor undefined remove a variável herdada.
+export async function subirApi({ modoTeste = true, ambiente = {} } = {}) {
   const porta = await portaLivre();
   const pastaBanco = mkdtempSync(join(tmpdir(), 'semana-api-'));
   const env = { ...process.env, PORT: String(porta), ARQUIVO_BANCO: join(pastaBanco, 'teste.db') };
   delete env.MODO_TESTE;
   if (modoTeste) env.MODO_TESTE = '1';
+  for (const [nome, valor] of Object.entries(ambiente)) {
+    if (valor === undefined) delete env[nome];
+    else env[nome] = valor;
+  }
 
   const processo = spawn(process.execPath, ['src/servidor.js'], {
     cwd: pastaApi,

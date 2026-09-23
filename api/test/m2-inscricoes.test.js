@@ -251,6 +251,15 @@ describe('M2 — inscrições', () => {
       const segundo = await pedir('POST', `/inscricoes/${inscricao.corpo.id}/cancelamento`, { usuario: 'p-carla' });
       esperarErro(segundo, 422, 'ATIVIDADE_JA_INICIADA');
     });
+
+    it('R13: 404 NAO_ENCONTRADO ao tentar cancelar a inscrição de outro participante', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.status, 201);
+
+      const res = await pedir('POST', `/inscricoes/${diego.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      esperarErro(res, 404, 'NAO_ENCONTRADO');
+    });
   });
 
   describe('leitura (fatia 1)', () => {

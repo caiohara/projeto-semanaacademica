@@ -415,6 +415,19 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 200);
       assert.deepEqual(res.corpo, primeira.corpo);
     });
+
+    it('R28: NAO_INSCRITO vem antes de FORA_DA_JANELA, que vem antes de CODIGO_INVALIDO', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T23:00:00-03:00');
+
+      let res = await enviar(E, 'p-gabriela', { codigo: 'ZZZZZZ' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'NAO_INSCRITO');
+
+      res = await enviar(E, 'p-carla', { codigo: 'ZZZZZZ' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

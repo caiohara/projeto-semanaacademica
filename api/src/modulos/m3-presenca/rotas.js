@@ -16,6 +16,8 @@ const emBrasilia = (ms) => `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0
 const dentroDaJanela = (encontro, agoraMs) =>
   agoraMs >= encontro.inicio_ms - 15 * MINUTO_MS && agoraMs <= encontro.fim_ms + 30 * MINUTO_MS;
 
+const CAMPOS_DO_QR = ['codigo', 'lidoEm'];
+
 export function rotasDaPresenca({ db, relogio }) {
   const rotas = Router();
 
@@ -46,6 +48,8 @@ export function rotasDaPresenca({ db, relogio }) {
   rotas.post('/encontros/:id/presencas', (req, res, next) => {
     const corpo = req.body ?? {};
     // R20
+    const desconhecido = Object.keys(corpo).find((campo) => !CAMPOS_DO_QR.includes(campo));
+    if (desconhecido) throw dadosInvalidos(`campo desconhecido: ${desconhecido}`);
     if (typeof corpo.codigo !== 'string') throw dadosInvalidos('codigo é obrigatório e precisa ser texto');
     // R20: lidoEm é opcional, mas null não equivale a ausente.
     if ('lidoEm' in corpo) lerInstante(corpo.lidoEm, 'lidoEm');

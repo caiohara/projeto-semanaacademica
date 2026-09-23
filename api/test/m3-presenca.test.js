@@ -200,6 +200,15 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
     });
+
+    it('R20: campo desconhecido no corpo → 422 DADOS_INVALIDOS', async () => {
+      const { E } = await montarCenario();
+      await relogio('2026-10-19T19:00:30-03:00');
+
+      const res = await enviar(E, { codigo: 'ZZZZZZ', extra: 1 });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'DADOS_INVALIDOS');
+    });
   });
 });
 

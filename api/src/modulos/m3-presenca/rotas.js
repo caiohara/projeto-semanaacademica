@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { ErroDaApi } from '../../erros.js';
-import { derivarCodigo } from './codigo.js';
+import { derivarCodigo, indiceDoMinuto } from './codigo.js';
 
 // M3 — Presença por QR (specs/M3-presenca.md).
 
@@ -26,10 +26,11 @@ export function rotasDaPresenca({ db, relogio }) {
       throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença do encontro');
     }
     // R8: o código é o do minuto que começa em M; troca em M + 1 min e vale até M + 2 min.
-    const inicioDoMinuto = Math.floor(agoraMs / MINUTO_MS) * MINUTO_MS;
+    const indice = indiceDoMinuto(agoraMs);
+    const inicioDoMinuto = indice * MINUTO_MS;
     res.json({
       encontroId: encontro.id,
-      codigo: derivarCodigo(),
+      codigo: derivarCodigo(encontro.id, indice),
       trocaEm: emBrasilia(inicioDoMinuto + MINUTO_MS),
       validoAte: emBrasilia(inicioDoMinuto + 2 * MINUTO_MS),
     });

@@ -103,5 +103,23 @@ describe('M3 — presença', () => {
       assert.equal(res.corpo.trocaEm, '2026-10-19T19:02:00-03:00');
       assert.equal(res.corpo.validoAte, '2026-10-19T19:03:00-03:00');
     });
+
+    it('R7: o código depende do encontro e do minuto do relógio (alinhado ao epoch), não do instante dentro do minuto', async () => {
+      const { E, F } = await montarCenario();
+      const codigo = async (encontro, agora) => {
+        await relogio(agora);
+        const res = await pedir('GET', `/encontros/${encontro}/codigo`);
+        assert.equal(res.status, 200);
+        return res.corpo.codigo;
+      };
+
+      const deE = await codigo(E, '2026-10-19T19:00:30-03:00');
+      const deF = await codigo(F, '2026-10-19T19:00:30-03:00');
+      assert.notEqual(deE, deF);
+
+      assert.equal(await codigo(E, '2026-10-19T19:00:59-03:00'), deE);
+      assert.equal(await codigo(E, '2026-10-19T19:00:00-03:00'), deE);
+      assert.notEqual(await codigo(E, '2026-10-19T19:01:00-03:00'), deE);
+    });
   });
 });

@@ -76,6 +76,10 @@ export function rotasDaGrade({ db, relogio }) {
   // R32: o corpo da requisição é ignorado.
   rotas.post('/atividades/:id/cancelamento', somenteOrganizacao, (req, res) => {
     const atividade = lerAtividade(db, relogio, req.params.id);
+    // R31: vem antes da R30, que também se aplicaria depois do início.
+    if (atividade.situacao === 'cancelada') {
+      throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade já está cancelada');
+    }
     // R30: só antes do início do 1º encontro; no instante exato já é tarde.
     if (relogio.agora().getTime() >= Date.parse(atividade.encontros[0].inicio)) {
       throw new ErroDaApi(422, 'ATIVIDADE_JA_INICIADA', 'a atividade já começou e não pode ser cancelada');

@@ -605,4 +605,15 @@ describe('M1 — grade de atividades', () => {
     const lida = await pedir('GET', `/atividades/${depois.corpo.id}`, { usuario: 'p-carla' });
     assert.equal(lida.corpo.situacao, 'encerrada');
   });
+
+  it('R31: cancelar atividade já cancelada responde 422 ATIVIDADE_CANCELADA, que vence ATIVIDADE_JA_INICIADA', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+    assert.equal((await cancelar(palestra.corpo.id)).status, 200);
+
+    esperarErro(await cancelar(palestra.corpo.id), 422, 'ATIVIDADE_CANCELADA');
+
+    await ajustarRelogio('2026-10-19T20:00:00-03:00');
+    esperarErro(await cancelar(palestra.corpo.id), 422, 'ATIVIDADE_CANCELADA');
+  });
 });

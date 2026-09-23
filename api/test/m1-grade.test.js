@@ -807,4 +807,23 @@ describe('M1 — grade de atividades', () => {
     assert.equal(lida.corpo.emEspera, 3);
     assert.equal(lida.corpo.vagasRestantes, 0);
   });
+
+  it('R26: PATCH com vagas menor que ocupadas responde 409 VAGAS_ABAIXO_DOS_INSCRITOS; igual é aceito', async () => {
+    const atividade = await minicursoComVagas(3);
+    await inscrever(atividade.id, 'p-carla');
+    await inscrever(atividade.id, 'p-diego');
+    await inscrever(atividade.id, 'p-elisa');
+    await inscrever(atividade.id, 'p-fabio');
+    await inscrever(atividade.id, 'p-gabriela');
+
+    const abaixo = await alterar(atividade.id, { vagas: 2 });
+    esperarErro(abaixo, 409, 'VAGAS_ABAIXO_DOS_INSCRITOS');
+    const lida = await pedir('GET', `/atividades/${atividade.id}`, { usuario: 'p-carla' });
+    assert.equal(lida.corpo.vagas, 3);
+
+    const igual = await alterar(atividade.id, { vagas: 3 });
+    assert.equal(igual.status, 200, JSON.stringify(igual.corpo));
+    assert.equal(igual.corpo.vagas, 3);
+    assert.equal(igual.corpo.ocupadas, 3);
+  });
 });

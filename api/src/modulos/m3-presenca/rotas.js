@@ -34,6 +34,11 @@ const comoPresenca = (p) => ({
 export function rotasDaPresenca({ db, relogio }) {
   const rotas = Router();
 
+  const gravar = (presenca, lidoEmMs) => db.prepare(
+    'INSERT INTO presencas (id, encontro_id, participante_id, origem, lido_em, lido_em_ms, registrada_em, justificativa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+  ).run(presenca.id, presenca.encontro_id, presenca.participante_id, presenca.origem, presenca.lido_em,
+    lidoEmMs, presenca.registrada_em, presenca.justificativa);
+
   // R27: 401 (identificar) → 403 (somenteOrganizacao) → 404 → R12 → R3.
   rotas.get('/encontros/:id/codigo', somenteOrganizacao, (req, res) => {
     const encontro = db.prepare(
@@ -58,7 +63,7 @@ export function rotasDaPresenca({ db, relogio }) {
     });
   });
 
-  rotas.post('/encontros/:id/presencas', somenteParticipante, (req, res, next) => {
+  rotas.post('/encontros/:id/presencas', somenteParticipante, (req, res) => {
     const corpo = req.body ?? {};
     // R20
     const desconhecido = Object.keys(corpo).find((campo) => !CAMPOS_DO_QR.includes(campo));
@@ -66,11 +71,25 @@ export function rotasDaPresenca({ db, relogio }) {
     if (typeof corpo.codigo !== 'string') throw dadosInvalidos('codigo é obrigatório e precisa ser texto');
     // R20: lidoEm é opcional, mas null não equivale a ausente.
     if ('lidoEm' in corpo) lerInstante(corpo.lidoEm, 'lidoEm');
-    // Sem lidoEm é a presença online (fatia 2).
-    if (!('lidoEm' in corpo)) return next();
 
     const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
+
+    if (!('lidoEm' in corpo)) {
+      // R25: QR online grava origem qr, lidoEm = registradaEm = relógio.
+      const agoraMs = relogio.agora().getTime();
+      const presenca = {
+        id: novoId(),
+        encontro_id: encontro.id,
+        participante_id: req.usuario.id,
+        origem: 'qr',
+        lido_em: emBrasilia(agoraMs),
+        registrada_em: emBrasilia(agoraMs),
+        justificativa: null,
+      };
+      gravar(presenca, agoraMs);
+      return res.status(201).json(comoPresenca(presenca));
+    }
 
     // R18: lidoEm no futuro é dado inválido; vem logo depois do 404 (R28), antes da repetição.
     const agoraMs = relogio.agora().getTime();
@@ -103,10 +122,7 @@ export function rotasDaPresenca({ db, relogio }) {
       registrada_em: emBrasilia(agoraMs),
       justificativa: null,
     };
-    db.prepare(
-      'INSERT INTO presencas (id, encontro_id, participante_id, origem, lido_em, lido_em_ms, registrada_em, justificativa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    ).run(presenca.id, presenca.encontro_id, presenca.participante_id, presenca.origem, presenca.lido_em,
-      lidoEmMs, presenca.registrada_em, presenca.justificativa);
+    gravar(presenca, lidoEmMs);
     res.status(201).json(comoPresenca(presenca));
   });
 

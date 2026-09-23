@@ -260,6 +260,25 @@ describe('M2 — inscrições', () => {
       const res = await pedir('POST', `/inscricoes/${diego.corpo.id}/cancelamento`, { usuario: 'p-carla' });
       esperarErro(res, 404, 'NAO_ENCONTRADO');
     });
+
+    it('R12: cancelar inscrição em_espera (única na fila) só muda o status para cancelada, sem convocar', async () => {
+      const m = await criarAtividadeM({ vagas: 1 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.status, 201);
+      assert.equal(carla.corpo.status, 'confirmada');
+
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.status, 201);
+      assert.equal(diego.corpo.status, 'em_espera');
+
+      const cancelamento = await pedir('POST', `/inscricoes/${diego.corpo.id}/cancelamento`, { usuario: 'p-diego' });
+      assert.equal(cancelamento.status, 200);
+      assert.equal(cancelamento.corpo.status, 'cancelada');
+
+      const carlaDepois = await pedir('GET', `/inscricoes/${carla.corpo.id}`, { usuario: 'p-carla' });
+      assert.equal(carlaDepois.status, 200);
+      assert.equal(carlaDepois.corpo.status, 'confirmada');
+    });
   });
 
   describe('leitura (fatia 1)', () => {

@@ -16,7 +16,7 @@ export function rotasDeInscricoes({ db, relogio }) {
 
   // R1: o corpo é ignorado — não há campos de entrada definidos para esta rota.
   rotas.post('/atividades/:id/inscricoes', somenteParticipante, (req, res) => {
-    const atividade = db.prepare('SELECT id, cancelada, tipo FROM atividades WHERE id = ?').get(req.params.id);
+    const atividade = db.prepare('SELECT id, cancelada, tipo, vagas FROM atividades WHERE id = ?').get(req.params.id);
     if (!atividade) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `atividade ${req.params.id} não existe`);
 
     // R8: ATIVIDADE_CANCELADA (R4) vem antes de JA_INSCRITO (R3).
@@ -65,12 +65,17 @@ export function rotasDeInscricoes({ db, relogio }) {
       }
     }
 
+    // R2: sem vaga, a inscrição nasce em_espera (posicaoNaEspera fica para a fatia da fila).
+    const { ocupadas } = db.prepare(
+      "SELECT COUNT(*) AS ocupadas FROM inscricoes WHERE atividade_id = ? AND status IN ('confirmada', 'convocada')",
+    ).get(req.params.id);
+    const status = ocupadas < atividade.vagas ? 'confirmada' : 'em_espera';
+
     const agora = relogio.agora();
     const id = novoId();
-    // R2: só o caso "há vaga" nesta fatia — a inscrição nasce sempre confirmada.
     db.prepare(
       'INSERT INTO inscricoes (id, atividade_id, participante_id, status, criada_em, criada_em_ms) VALUES (?, ?, ?, ?, ?, ?)',
-    ).run(id, req.params.id, req.usuario.id, 'confirmada', agora.toISOString(), agora.getTime());
+    ).run(id, req.params.id, req.usuario.id, status, agora.toISOString(), agora.getTime());
 
     res.status(201).json(lerInscricao(db, id));
   });

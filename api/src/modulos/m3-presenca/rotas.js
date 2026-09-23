@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { ErroDaApi } from '../../erros.js';
+import { derivarCodigo } from './codigo.js';
 
 // M3 — Presença por QR (specs/M3-presenca.md).
 
@@ -18,7 +19,7 @@ export function rotasDaPresenca({ db, relogio }) {
     if (!dentroDaJanela(encontro, relogio.agora().getTime())) {
       throw new ErroDaApi(422, 'FORA_DA_JANELA', 'fora da janela de presença do encontro');
     }
-    res.json({ encontroId: encontro.id });
+    res.json({ encontroId: encontro.id, codigo: derivarCodigo() });
   });
 
   return rotas;

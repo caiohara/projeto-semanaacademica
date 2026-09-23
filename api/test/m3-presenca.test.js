@@ -79,5 +79,13 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
     });
+
+    it('R6: o código tem 6 caracteres, só maiúsculas e dígitos, sem 0 O 1 I L', async () => {
+      const { E } = await montarCenario();
+      await relogio('2026-10-19T19:00:30-03:00');
+      const res = await pedir('GET', `/encontros/${E}/codigo`);
+      assert.equal(res.status, 200);
+      assert.match(res.corpo.codigo, /^[A-HJKMNP-Z2-9]{6}$/);
+    });
   });
 });

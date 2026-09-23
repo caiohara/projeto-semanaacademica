@@ -754,6 +754,47 @@ describe('M3 — presença', () => {
       assert.deepEqual(res.corpo, viaManual.corpo);
       assert.equal(res.corpo.origem, 'manual');
     });
+
+    it('R29: JUSTIFICATIVA_OBRIGATORIA vem antes da presença existente (R24) → 422, não 200', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T19:30:00-03:00');
+      const primeira = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(primeira.status, 201);
+
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla' });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'JUSTIFICATIVA_OBRIGATORIA');
+    });
+
+    it('R29: presença existente (R24) vem antes de FORA_DA_JANELA (R5) → 200 mesmo fora da janela', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T19:30:00-03:00');
+      const primeira = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(primeira.status, 201);
+
+      await relogio('2026-10-20T01:00:00-03:00'); // fora da janela manual
+      const res = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 200);
+      assert.deepEqual(res.corpo, primeira.corpo);
+    });
+
+    it('R29: NAO_INSCRITO vem antes de FORA_DA_JANELA, que vem antes de LIMITE_DE_MANUAIS', async () => {
+      const { E } = await montarComInscritos(); // limite = 1
+      const justificativa = 'Celular sem bateria';
+      await relogio('2026-10-19T19:30:00-03:00');
+      const primeira = await enviarManual(E, 'org-ana', { participanteId: 'p-carla', justificativa });
+      assert.equal(primeira.status, 201); // esgota o limite de 1
+
+      await relogio('2026-10-20T01:00:00-03:00'); // fora da janela manual
+
+      let res = await enviarManual(E, 'org-ana', { participanteId: 'p-fabio', justificativa });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'NAO_INSCRITO');
+
+      res = await enviarManual(E, 'org-ana', { participanteId: 'p-elisa', justificativa });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
+    });
   });
 
   describe('listagem (R26)', () => {

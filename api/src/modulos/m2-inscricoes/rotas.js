@@ -133,6 +133,16 @@ export function rotasDeInscricoes({ db, relogio }) {
   return rotas;
 }
 
+// R24: posicaoNaEspera é recalculada a cada leitura, 1-indexada, só entre em_espera
+// da mesma atividade, ordenadas por criadaEm (empate por id).
+function posicaoNaEspera(db, i) {
+  if (i.status !== 'em_espera') return null;
+  const fila = db.prepare(
+    "SELECT id FROM inscricoes WHERE atividade_id = ? AND status = 'em_espera' ORDER BY criada_em_ms, id",
+  ).all(i.atividade_id);
+  return fila.findIndex((linha) => linha.id === i.id) + 1;
+}
+
 function lerInscricao(db, id) {
   const i = db.prepare(
     'SELECT id, atividade_id, participante_id, status, convocada_ate, criada_em_ms FROM inscricoes WHERE id = ?',
@@ -142,8 +152,7 @@ function lerInscricao(db, id) {
     atividadeId: i.atividade_id,
     participanteId: i.participante_id,
     status: i.status,
-    // R24 (posicaoNaEspera) fica para a fatia da fila.
-    posicaoNaEspera: null,
+    posicaoNaEspera: posicaoNaEspera(db, i),
     convocadaAte: i.convocada_ate,
     criadaEm: emBrasilia(i.criada_em_ms),
   };

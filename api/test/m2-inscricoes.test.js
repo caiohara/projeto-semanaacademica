@@ -281,6 +281,21 @@ describe('M2 — inscrições', () => {
     });
   });
 
+  describe('fila e convocação (fatia 3)', () => {
+    it('R2: sem vaga, a inscrição nasce em_espera com posicaoNaEspera 1', async () => {
+      const m = await criarAtividadeM({ vagas: 1 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.status, 201);
+      assert.equal(carla.corpo.status, 'confirmada');
+
+      const res = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.status, 'em_espera');
+      assert.equal(res.corpo.posicaoNaEspera, 1);
+      assert.equal(res.corpo.convocadaAte, null);
+    });
+  });
+
   describe('leitura (fatia 1)', () => {
     it('R22: organização vê as inscrições de todos; participante só as próprias; empate por id; filtro sem match é []', async () => {
       const m = await criarAtividadeM({ vagas: 2 });

@@ -21,8 +21,12 @@ export function rotasDaPresenca({ db, relogio }) {
 
   // R27: 401 (identificar) → 403 (somenteOrganizacao) → 404 → R12 → R3.
   rotas.get('/encontros/:id/codigo', somenteOrganizacao, (req, res) => {
-    const encontro = db.prepare('SELECT id, inicio_ms, fim_ms FROM encontros WHERE id = ?').get(req.params.id);
+    const encontro = db.prepare(
+      'SELECT e.id, e.inicio_ms, e.fim_ms, a.cancelada FROM encontros e JOIN atividades a ON a.id = e.atividade_id WHERE e.id = ?',
+    ).get(req.params.id);
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
+    // R12
+    if (encontro.cancelada) throw new ErroDaApi(422, 'ATIVIDADE_CANCELADA', 'a atividade do encontro foi cancelada');
     const agoraMs = relogio.agora().getTime();
     // R3
     if (!dentroDaJanela(encontro, agoraMs)) {

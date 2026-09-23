@@ -142,5 +142,21 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 404);
       assert.equal(res.corpo.erro, 'NAO_ENCONTRADO');
     });
+
+    it('R12/R27: atividade cancelada → 422 ATIVIDADE_CANCELADA, antes de FORA_DA_JANELA', async () => {
+      const { A, E } = await montarCenario();
+      const cancelada = await pedir('POST', `/atividades/${A.id}/cancelamento`);
+      assert.equal(cancelada.status, 200);
+
+      await relogio('2026-10-19T19:00:30-03:00');
+      let res = await pedir('GET', `/encontros/${E}/codigo`);
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'ATIVIDADE_CANCELADA');
+
+      await relogio('2026-10-19T23:00:00-03:00');
+      res = await pedir('GET', `/encontros/${E}/codigo`);
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'ATIVIDADE_CANCELADA');
+    });
   });
 });

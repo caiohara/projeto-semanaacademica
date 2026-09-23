@@ -36,6 +36,22 @@ export function rotasDeInscricoes({ db, relogio }) {
     ).get(req.params.id, req.usuario.id);
     if (jaInscrito) throw new ErroDaApi(409, 'JA_INSCRITO', 'já existe uma inscrição ativa nesta atividade');
 
+    // R6: sobreposição de horário com um encontro de outra atividade em que o participante
+    // tem inscrição confirmada ou convocada (em_espera não conta).
+    const encontrosDaAtividade = db.prepare(
+      'SELECT inicio_ms, fim_ms FROM encontros WHERE atividade_id = ?',
+    ).all(req.params.id);
+    const encontrosConflitantes = db.prepare(
+      `SELECT e.inicio_ms AS inicioMs, e.fim_ms AS fimMs
+       FROM inscricoes i
+       JOIN encontros e ON e.atividade_id = i.atividade_id
+       WHERE i.participante_id = ? AND i.atividade_id != ? AND i.status IN ('confirmada', 'convocada')`,
+    ).all(req.usuario.id, req.params.id);
+    const sobrepoe = (a, b) => a.inicio_ms < b.fimMs && b.inicioMs < a.fim_ms;
+    if (encontrosDaAtividade.some((novo) => encontrosConflitantes.some((outro) => sobrepoe(novo, outro)))) {
+      throw new ErroDaApi(409, 'CONFLITO_DE_HORARIO', 'conflito de horário com outra inscrição ativa');
+    }
+
     const agora = relogio.agora();
     const id = novoId();
     // R2: só o caso "há vaga" nesta fatia — a inscrição nasce sempre confirmada.

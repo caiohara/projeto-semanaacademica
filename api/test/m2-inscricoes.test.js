@@ -124,5 +124,25 @@ describe('M2 — inscrições', () => {
       const depois = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
       esperarErro(depois, 422, 'INSCRICOES_ENCERRADAS');
     });
+
+    it('R6: 409 CONFLITO_DE_HORARIO com um encontro confirmado em outra atividade no mesmo horário', async () => {
+      const outra = await pedir('POST', '/atividades', {
+        usuario: 'org-ana',
+        corpo: {
+          titulo: 'Outra atividade',
+          tipo: 'palestra',
+          salaId: 'sala-101',
+          vagas: 40,
+          encontros: [{ inicio: '2026-10-19T19:00:00-03:00', fim: '2026-10-19T21:00:00-03:00' }],
+        },
+      });
+      assert.equal(outra.status, 201);
+      const confirmada = await pedir('POST', `/atividades/${outra.corpo.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(confirmada.status, 201);
+
+      const m = await criarAtividadeM({ vagas: 2 });
+      const res = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      esperarErro(res, 409, 'CONFLITO_DE_HORARIO');
+    });
   });
 });

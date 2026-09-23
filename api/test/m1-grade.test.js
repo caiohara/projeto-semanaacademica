@@ -665,4 +665,31 @@ describe('M1 — grade de atividades', () => {
     const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
     assert.deepEqual(lida.corpo, palestra.corpo);
   });
+
+  it('R25: PATCH {} responde 200 sem mudança; campo desconhecido ou titulo/vagas inválidos respondem 422 DADOS_INVALIDOS', async () => {
+    const palestra = await pedir('POST', '/atividades', { corpo: palestraValida() });
+    assert.equal(palestra.status, 201);
+
+    const vazio = await alterar(palestra.corpo.id, {});
+    assert.equal(vazio.status, 200, JSON.stringify(vazio.corpo));
+    assert.deepEqual(vazio.corpo, palestra.corpo);
+
+    const corpos = [
+      { descricao: 'x' },
+      { vagas: 0 },
+      { vagas: -1 },
+      { vagas: 2.5 },
+      { vagas: '20' },
+      { vagas: null },
+      { titulo: '' },
+      { titulo: '   ' },
+      { titulo: null },
+      { titulo: 7 },
+    ];
+    for (const corpo of corpos) {
+      esperarErro(await alterar(palestra.corpo.id, corpo), 422, 'DADOS_INVALIDOS');
+    }
+    const lida = await pedir('GET', `/atividades/${palestra.corpo.id}`, { usuario: 'p-carla' });
+    assert.deepEqual(lida.corpo, palestra.corpo);
+  });
 });

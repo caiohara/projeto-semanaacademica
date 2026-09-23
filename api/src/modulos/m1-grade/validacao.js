@@ -18,6 +18,16 @@ export function lerFiltros({ dia, tipo }) {
   return { dia, tipo };
 }
 
+function validarTitulo(titulo) {
+  if (typeof titulo !== 'string' || titulo.trim() === '') {
+    throw dadosInvalidos('titulo precisa ser um texto não vazio');
+  }
+}
+
+function validarVagas(vagas) {
+  if (!Number.isInteger(vagas) || vagas < 1) throw dadosInvalidos('vagas precisa ser um inteiro maior ou igual a 1');
+}
+
 // R12: forma do corpo do POST /atividades. Qualquer falha aqui é DADOS_INVALIDOS
 // e vem antes das regras do recurso (contrato §1).
 export function lerNovaAtividade(corpo) {
@@ -28,12 +38,10 @@ export function lerNovaAtividade(corpo) {
   if (extra) throw dadosInvalidos(`${extra} não é aceito`);
   const { titulo, tipo, salaId, vagas, encontros } = corpo;
 
-  if (typeof titulo !== 'string' || titulo.trim() === '') {
-    throw dadosInvalidos('titulo precisa ser um texto não vazio');
-  }
+  validarTitulo(titulo);
   if (!TIPOS.includes(tipo)) throw dadosInvalidos('tipo precisa ser palestra ou minicurso');
   if (typeof salaId !== 'string') throw dadosInvalidos('salaId precisa ser um texto');
-  if (!Number.isInteger(vagas) || vagas < 1) throw dadosInvalidos('vagas precisa ser um inteiro maior ou igual a 1');
+  validarVagas(vagas);
   if (!Array.isArray(encontros)) throw dadosInvalidos('encontros precisa ser uma lista');
 
   return {
@@ -57,12 +65,21 @@ export function lerNovaAtividade(corpo) {
 }
 
 // R24: fora de titulo e vagas, nada da Atividade é editável, nem com o valor atual.
+const CAMPOS_EDITAVEIS = ['titulo', 'vagas'];
 const CAMPOS_NAO_EDITAVEIS = [
   'id', 'tipo', 'salaId', 'encontros',
   'cargaHorariaMinutos', 'situacao', 'ocupadas', 'vagasRestantes', 'emEspera',
 ];
 
+// R25: forma do corpo do PATCH. Campo desconhecido é DADOS_INVALIDOS; titulo e vagas,
+// quando vêm, seguem a R12. Como no POST, a forma vem antes das regras do recurso.
 export function lerAlteracao(corpo) {
+  if (!ehObjeto(corpo)) throw dadosInvalidos('o corpo precisa ser um objeto');
+  const desconhecido = Object.keys(corpo)
+    .find((campo) => !CAMPOS_EDITAVEIS.includes(campo) && !CAMPOS_NAO_EDITAVEIS.includes(campo));
+  if (desconhecido) throw dadosInvalidos(`${desconhecido} não é aceito`);
+  if ('titulo' in corpo) validarTitulo(corpo.titulo);
+  if ('vagas' in corpo) validarVagas(corpo.vagas);
   const naoEditavel = Object.keys(corpo).find((campo) => CAMPOS_NAO_EDITAVEIS.includes(campo));
   if (naoEditavel) throw new ErroDaApi(422, 'CAMPO_NAO_EDITAVEL', `${naoEditavel} não pode ser alterado`);
   const { titulo, vagas } = corpo;

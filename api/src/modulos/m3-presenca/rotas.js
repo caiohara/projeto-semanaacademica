@@ -19,6 +19,12 @@ const dentroDaJanela = (encontro, agoraMs) =>
 
 const CAMPOS_DO_QR = ['codigo', 'lidoEm'];
 
+// R10: vale o código do minuto do instante de referência ou o do minuto anterior.
+const codigoAceito = (encontroId, codigo, referenciaMs) => {
+  const indice = indiceDoMinuto(referenciaMs);
+  return codigo === derivarCodigo(encontroId, indice) || codigo === derivarCodigo(encontroId, indice - 1);
+};
+
 const novoId = () => `pre_${randomBytes(4).toString('hex')}`;
 
 const comoPresenca = (p) => ({
@@ -76,8 +82,12 @@ export function rotasDaPresenca({ db, relogio }) {
     if (!encontro) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `encontro ${req.params.id} não existe`);
 
     if (!('lidoEm' in corpo)) {
-      // R25: QR online grava origem qr, lidoEm = registradaEm = relógio.
       const agoraMs = relogio.agora().getTime();
+      // R10: sem lidoEm, o instante de referência é o relógio.
+      if (!codigoAceito(encontro.id, corpo.codigo, agoraMs)) {
+        throw new ErroDaApi(422, 'CODIGO_INVALIDO', 'código inválido ou expirado');
+      }
+      // R25: QR online grava origem qr, lidoEm = registradaEm = relógio.
       const presenca = {
         id: novoId(),
         encontro_id: encontro.id,
@@ -106,9 +116,8 @@ export function rotasDaPresenca({ db, relogio }) {
       throw new ErroDaApi(422, 'FORA_DA_JANELA', 'lidoEm fora da janela de presença do encontro');
     }
 
-    // R16/R10: o código vale no minuto de lidoEm ou no minuto anterior.
-    const indice = indiceDoMinuto(lidoEmMs);
-    if (corpo.codigo !== derivarCodigo(encontro.id, indice) && corpo.codigo !== derivarCodigo(encontro.id, indice - 1)) {
+    // R16/R10: o código é conferido com lidoEm.
+    if (!codigoAceito(encontro.id, corpo.codigo, lidoEmMs)) {
       throw new ErroDaApi(422, 'CODIGO_INVALIDO', 'código inválido ou expirado');
     }
 

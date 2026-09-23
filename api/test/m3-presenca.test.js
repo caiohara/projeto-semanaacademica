@@ -258,6 +258,21 @@ describe('M3 — presença', () => {
       assert.equal(res.corpo.registradaEm, '2026-10-19T19:00:30-03:00');
       assert.equal(res.corpo.justificativa, null);
     });
+
+    it('R10/R8: código do minuto anterior ainda vale; em validoAte deixa de valer → 422 CODIGO_INVALIDO', async () => {
+      const { E } = await montarComInscritos();
+      const codigo = await codigoAs(E, '2026-10-19T19:00:00-03:00');
+
+      await relogio('2026-10-19T19:01:59.999-03:00');
+      let res = await enviar(E, 'p-diego', { codigo });
+      assert.equal(res.status, 201);
+      assert.equal(res.corpo.origem, 'qr');
+
+      await relogio('2026-10-19T19:02:00-03:00');
+      res = await enviar(E, 'p-elisa', { codigo });
+      assert.equal(res.status, 422);
+      assert.equal(res.corpo.erro, 'CODIGO_INVALIDO');
+    });
   });
 
   describe('presença por QR offline (R16–R19, R28)', () => {

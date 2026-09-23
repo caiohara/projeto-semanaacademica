@@ -353,6 +353,17 @@ describe('M1 — grade de atividades', () => {
     }), 422, 'ENCONTRO_INVALIDO');
   });
 
+  it('R18: encontro que atravessa a meia-noite UTC mas fica no mesmo dia de Brasília é aceito', async () => {
+    // 19/10 20:00–22:00 em Brasília; em UTC vai de 19/10 23:00 a 20/10 01:00.
+    const res = await pedir('POST', '/atividades', {
+      corpo: { ...palestraValida(), encontros: [{ inicio: '2026-10-19T23:00:00Z', fim: '2026-10-20T01:00:00Z' }] },
+    });
+    assert.equal(res.status, 201);
+    assert.equal(res.corpo.encontros[0].inicio, '2026-10-19T20:00:00-03:00');
+    assert.equal(res.corpo.encontros[0].fim, '2026-10-19T22:00:00-03:00');
+    assert.equal(res.corpo.cargaHorariaMinutos, 120);
+  });
+
   it('R19: encontro fora de 19/10/2026 a 23/10/2026 responde 422 ENCONTRO_INVALIDO', async () => {
     const palestraCom = (encontro) => ({ ...palestraValida(), encontros: [encontro] });
 

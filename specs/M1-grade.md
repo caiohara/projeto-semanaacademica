@@ -169,7 +169,7 @@ Todos partem de `POST /_teste/reset` (relógio em `2026-10-13T09:00:00-03:00`) e
 41. (R33) Atividade criada por `org-ana`; `org-bruno` faz PATCH `{"titulo":"x"}` → 200 e cancela → 200.
 42. (R34) Palestra válida com `"descricao":"x"` → 422 `DADOS_INVALIDOS`; com `"situacao":"prevista"`, `"ocupadas":0`, `"emEspera":0`, `"vagasRestantes":40` ou `"cargaHorariaMinutos":120` → cada um 422 `DADOS_INVALIDOS`; palestra válida com `"id":"atv_00000000"` → 201, `id` diferente de `atv_00000000` e no formato `atv_` + 8 hex.
 43. (R20) Minicurso na `lab-3` com encontros 19/10 19:00–21:00 e 19/10 21:00–23:00 → 201 (encostar não é sobreposição nem conflito de sala consigo mesma).
-44. (R18) Encontro de `2026-10-19T20:00:00Z` a `2026-10-20T00:30:00Z` (19/10 17:00–21:30 em Brasília) → 201; encontro de `2026-10-20T02:00:00Z` a `2026-10-20T04:00:00Z` (19/10 23:00 a 20/10 01:00 em Brasília) → 422 `ENCONTRO_INVALIDO`.
+44. (R18) Encontro de `2026-10-19T23:00:00Z` a `2026-10-20T01:00:00Z` (19/10 20:00–22:00 em Brasília, 120 min) → 201; encontro de `2026-10-20T02:00:00Z` a `2026-10-20T04:00:00Z` (19/10 23:00 a 20/10 01:00 em Brasília) → 422 `ENCONTRO_INVALIDO`.
 
 ## 7. Como isto será verificado
 

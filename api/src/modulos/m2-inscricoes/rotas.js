@@ -9,7 +9,41 @@ const novoId = () => `ins_${randomBytes(4).toString('hex')}`;
 
 // Instantes saem no fuso de Brasília, -03:00 (mesmo critério do M1 P-20 e M3).
 const TRES_HORAS_MS = 3 * 60 * 60 * 1000;
+const DUAS_HORAS_MS = 2 * 60 * 60 * 1000;
 const emBrasilia = (ms) => `${new Date(ms - TRES_HORAS_MS).toISOString().slice(0, 23)}-03:00`;
+
+// R14, R15, R16: toda vaga liberada (cancelamento de confirmada/convocada, aumento de
+// vagas ou convocação vencida) convoca o próximo da fila FIFO, até esgotar fila ou vagas;
+// a expiração de convocadaAte é lazy, detectada e resolvida na mesma passada.
+export function processarConvocacoes(db, relogio, atividadeId) {
+  const agoraMs = relogio.agora().getTime();
+  for (;;) {
+    const vencida = db.prepare(
+      "SELECT id FROM inscricoes WHERE atividade_id = ? AND status = 'convocada' AND convocada_ate_ms <= ? "
+      + 'ORDER BY criada_em_ms, id LIMIT 1',
+    ).get(atividadeId, agoraMs);
+    if (vencida) {
+      db.prepare("UPDATE inscricoes SET status = 'expirada', convocada_ate = NULL, convocada_ate_ms = NULL WHERE id = ?")
+        .run(vencida.id);
+      continue;
+    }
+
+    const atividade = db.prepare('SELECT vagas FROM atividades WHERE id = ?').get(atividadeId);
+    const { ocupadas } = db.prepare(
+      "SELECT COUNT(*) AS ocupadas FROM inscricoes WHERE atividade_id = ? AND status IN ('confirmada', 'convocada')",
+    ).get(atividadeId);
+    if (ocupadas >= atividade.vagas) return;
+
+    const proximo = db.prepare(
+      "SELECT id FROM inscricoes WHERE atividade_id = ? AND status = 'em_espera' ORDER BY criada_em_ms, id LIMIT 1",
+    ).get(atividadeId);
+    if (!proximo) return;
+
+    const convocadaAteMs = agoraMs + DUAS_HORAS_MS;
+    db.prepare("UPDATE inscricoes SET status = 'convocada', convocada_ate = ?, convocada_ate_ms = ? WHERE id = ?")
+      .run(emBrasilia(convocadaAteMs), convocadaAteMs, proximo.id);
+  }
+}
 
 export function rotasDeInscricoes({ db, relogio }) {
   const rotas = Router();
@@ -97,10 +131,12 @@ export function rotasDeInscricoes({ db, relogio }) {
 
   // R23: organização vê qualquer inscrição; participante só a própria.
   rotas.get('/inscricoes/:id', (req, res) => {
-    const inscricao = db.prepare('SELECT id, participante_id FROM inscricoes WHERE id = ?').get(req.params.id);
+    const inscricao = db.prepare('SELECT id, participante_id, atividade_id FROM inscricoes WHERE id = ?').get(req.params.id);
     const visivel = inscricao
       && (req.usuario.papel === 'organizacao' || inscricao.participante_id === req.usuario.id);
     if (!visivel) throw new ErroDaApi(404, 'NAO_ENCONTRADO', `inscrição ${req.params.id} não existe`);
+    // R16: a expiração de convocadaAte é lazy — resolvida ao tocar a inscrição.
+    processarConvocacoes(db, relogio, inscricao.atividade_id);
     res.json(lerInscricao(db, req.params.id));
   });
 
@@ -126,7 +162,12 @@ export function rotasDeInscricoes({ db, relogio }) {
       throw new ErroDaApi(422, 'INSCRICAO_INATIVA', 'a inscrição já não está ativa');
     }
 
+    // R12: cancelar confirmada/convocada libera a vaga e convoca o próximo da fila;
+    // cancelar em_espera só sai da fila, sem convocar ninguém.
     db.prepare("UPDATE inscricoes SET status = 'cancelada' WHERE id = ?").run(req.params.id);
+    if (inscricao.status === 'confirmada' || inscricao.status === 'convocada') {
+      processarConvocacoes(db, relogio, inscricao.atividade_id);
+    }
     res.json(lerInscricao(db, req.params.id));
   });
 

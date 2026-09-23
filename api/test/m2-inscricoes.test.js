@@ -294,6 +294,27 @@ describe('M2 — inscrições', () => {
       assert.equal(res.corpo.posicaoNaEspera, 1);
       assert.equal(res.corpo.convocadaAte, null);
     });
+
+    it('R12/R14: cancelar inscrição confirmada libera vaga e convoca o próximo da fila', async () => {
+      const m = await criarAtividadeM({ vagas: 1 });
+      const carla = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-carla' });
+      assert.equal(carla.corpo.status, 'confirmada');
+      const diego = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(diego.corpo.status, 'em_espera');
+
+      const cancelamento = await pedir('POST', `/inscricoes/${carla.corpo.id}/cancelamento`, { usuario: 'p-carla' });
+      assert.equal(cancelamento.status, 200);
+      assert.equal(cancelamento.corpo.status, 'cancelada');
+
+      const diegoDepois = await pedir('GET', `/inscricoes/${diego.corpo.id}`, { usuario: 'p-diego' });
+      assert.equal(diegoDepois.status, 200);
+      assert.equal(diegoDepois.corpo.status, 'convocada');
+      assert.equal(diegoDepois.corpo.posicaoNaEspera, null);
+      assert.equal(
+        Date.parse(diegoDepois.corpo.convocadaAte),
+        Date.parse('2026-10-13T09:00:00-03:00') + 2 * 60 * 60 * 1000,
+      );
+    });
   });
 
   describe('leitura (fatia 1)', () => {

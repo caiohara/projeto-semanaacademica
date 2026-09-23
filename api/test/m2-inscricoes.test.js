@@ -74,5 +74,19 @@ describe('M2 — inscrições', () => {
       const res = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego', corpo: {} });
       assert.equal(res.status, 201);
     });
+
+    it('R2: com vaga disponível, a inscrição nasce confirmada', async () => {
+      const m = await criarAtividadeM({ vagas: 2 });
+      const res = await pedir('POST', `/atividades/${m.id}/inscricoes`, { usuario: 'p-diego' });
+      assert.equal(res.status, 201);
+      assert.match(res.corpo.id, /^ins_[0-9a-f]{8}$/);
+      assert.equal(res.corpo.atividadeId, m.id);
+      assert.equal(res.corpo.participanteId, 'p-diego');
+      assert.equal(res.corpo.status, 'confirmada');
+      assert.equal(res.corpo.posicaoNaEspera, null);
+      assert.equal(res.corpo.convocadaAte, null);
+      assert.equal(typeof res.corpo.criadaEm, 'string');
+      assert.equal(Date.parse(res.corpo.criadaEm), Date.parse('2026-10-13T09:00:00-03:00'));
+    });
   });
 });

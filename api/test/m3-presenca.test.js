@@ -795,6 +795,14 @@ describe('M3 — presença', () => {
       assert.equal(res.status, 422);
       assert.equal(res.corpo.erro, 'FORA_DA_JANELA');
     });
+
+    it('contrato §1: participante chamando a rota manual → 403 SOMENTE_ORGANIZACAO', async () => {
+      const { E } = await montarComInscritos();
+      await relogio('2026-10-19T19:30:00-03:00');
+      const res = await enviarManual(E, 'p-carla', { participanteId: 'p-carla', justificativa: 'Celular sem bateria' });
+      assert.equal(res.status, 403);
+      assert.equal(res.corpo.erro, 'SOMENTE_ORGANIZACAO');
+    });
   });
 
   describe('listagem (R26)', () => {
